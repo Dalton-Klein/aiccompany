@@ -3,7 +3,6 @@ const { sequelize } = require("../models/index");
 const format = require("pg-format");
 const { getUserInfo, updateUserGenInfoField, searchForUserByUsername } = require("../services/user-common");
 const moment = require("moment");
-const { getEndorsementsForUser } = require("../services/endorsement-queries");
 
 const getUserDetails = async (req, res) => {
   try {
@@ -160,15 +159,6 @@ const getSocialDetails = async (req, res) => {
       connections: connectionCount ? connectionCount[0].count : 0,
       mutual: intersection ? intersection.length : 0,
     };
-    query = getEndorsementsForUser();
-    //Get Endorsements
-    const endorsementResult = await sequelize.query(query, {
-      type: Sequelize.QueryTypes.SELECT,
-      replacements: {
-        receiverId: forUserId,
-      },
-    });
-    result.endorsements = endorsementResult;
     res.status(200).send(result);
   } catch (err) {
     console.log(err);

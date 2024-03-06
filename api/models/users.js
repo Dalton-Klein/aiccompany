@@ -54,6 +54,10 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: true,
         allowNull: false,
       },
+      last_seen: {
+        type: DataTypes.DATEONLY,
+        allowNull: false
+      }
     },
     { schema: "public", freezeTableName: true }
   );

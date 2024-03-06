@@ -27,10 +27,10 @@ const searchForUserByUsername = async (inputString) => {
 const updateUserGenInfoField = async (userId, field, value) => {
   const query = format(
     `
-    update public.user_general_infos
+    update public.users
       set %I = :value,
           updated_at = current_timestamp
-    where user_id = :userId
+    where id = :userId
   `,
     field
   );

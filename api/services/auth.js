@@ -1,6 +1,6 @@
 require("dotenv").config();
 const db = require("../models/index");
-const appName = "gangs.gg";
+const appName = "aiccompany";
 const supportEmail = process.env.EMAIL;
 const nodemailer = require("nodemailer");
 const express = require("express");

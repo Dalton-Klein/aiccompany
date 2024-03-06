@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
       },
       deadline: {
-        type: DataTypes.DATETIME,
+        type: DataTypes.DATEONLY,
         allowNull: true,
       },
       notes: {

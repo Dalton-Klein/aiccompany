@@ -5,9 +5,6 @@ const services = require("../services/auth");
 const {
   getUserDataByEmailQuery,
   createUserQuery,
-  createGeneralInfoQuery,
-  createRustInfoQuery,
-  createRocketLeagueInfoQuery,
 } = require("../services/user-queries");
 const { users, user_tokens, v_keys, sequelize } = require("../models/index");
 const Sequelize = require("sequelize");

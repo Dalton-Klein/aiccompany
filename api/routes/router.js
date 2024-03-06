@@ -4,6 +4,7 @@ const authController = require("../controllers/auth-controller");
 const friendsController = require("../controllers/friends-controller");
 const notificationsController = require("../controllers/notifications-controller");
 const userController = require("../controllers/user-controller");
+const eventsController = require("../controllers/events-controller");
 // testing
 const testController = require("../controllers/test-controller");
 // start router
@@ -28,10 +29,11 @@ router.post("/search-user-by-username", userController.searchForUser);
 // NOTIFICATIONS RELATED ROUTES
 router.post("/get-notifications", notificationsController.getNotificationsForUser);
 
+//EVENTS ROUTES
+router.post("/get-my-events", eventsController.getAllEventsForUser);
+
 // SOCIAL ROUTES
 router.post("/social", userController.getSocialDetails);
-
-// CONNECTIONS RELATED ROUTES
 router.post("/friend-request", friendsController.sendFriendRequest);
 router.post("/accept-friend", friendsController.acceptFriendRequest);
 router.post("/friends", friendsController.getFriendsForUser);

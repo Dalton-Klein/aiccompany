@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { View, ScrollView, SafeAreaView, Text } from "react-native";
-import { Dashboard } from "../../pages/dashboard";
-import { Settings } from "../../pages/settings";
-import { Calendar } from "../../pages/calendar";
-import { Assistant } from "../../pages/assistant";
+import { Dashboard } from "../../../app/(tabs)/dashboard";
+import { Settings } from "../../../app/(tabs)/settings";
+import { Calendar } from "../../../app/(tabs)/calendar";
+import { Assistant } from "../../../app/(tabs)/assistant";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 const Tab = createBottomTabNavigator();
 
