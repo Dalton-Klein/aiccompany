@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { View, StyleSheet, Text } from "react-native";
 import { useRouter } from "expo-router";
-import EventTile from "../../tiles/calendar/event-tile";
+import EventTile from "./event-tile";
 import * as THEME from "../../../constants/theme";
-
 
 const DayTile = (props) => {
   const router = useRouter();
@@ -15,22 +14,22 @@ const DayTile = (props) => {
   }, []);
 
   const generateEventSchedule = () => {
-    seteventFeed(props.events.map((event) => (
-      turnEventIntoTile(event)
-    )))
-  }
+    seteventFeed(props.events.map((event: any) => turnEventIntoTile(event)));
+  };
 
   const turnEventIntoTile = (event) => {
-    return (<View key={event.id}>
-          <EventTile {...event}></EventTile>
-        </View>);
-  }
+    return (
+      <View key={event.id}>
+        <EventTile {...event}></EventTile>
+      </View>
+    );
+  };
 
   return (
-      <View style={styles.dayTile}>
-        <Text style={styles.dayTitle}>{props.title}</Text>
-        {eventFeed}
-      </View>
+    <View style={styles.dayTile}>
+      <Text style={styles.dayTitle}>{props.title}</Text>
+      {eventFeed}
+    </View>
   );
 };
 

@@ -26,15 +26,16 @@ export const verifyUser = async (email, vKey, name, password, steam_id) => {
 };
 
 export const createUser = async (user) => {
-  const { name, email } = user;
+  const { username, email, appleId } = user;
   let result = await fetch(`${endpointURL}/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      username: name,
+      username,
       email,
+      appleId,
     }),
   })
     .then((res) => res.json())
@@ -43,23 +44,39 @@ export const createUser = async (user) => {
   return result;
 };
 
-export const signInUser = async (user, isGoogleSignIn) => {
-  const { email, password } = user;
-  let result = await fetch(`${endpointURL}/signin`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      email: email,
-      password: password,
-      isGoogleSignIn,
-    }),
-  })
-    .then((res) => res.json())
-    .then((data) => data)
-    .catch((err) => console.log("SIGN IN USER ERROR", err));
-  return result;
+export const signInUser = async (user, isAppleSignIn) => {
+  const { email, password, appleUserId } = user;
+  if (isAppleSignIn) {
+    console.log("&*%^&*%&^*%  ", `${endpointURL}/try-apple-signin`);
+    let result = await fetch(`${endpointURL}/try-apple-signin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        appleUserId,
+      }),
+    })
+      .then((res) => res.json())
+      .catch((err) => console.log("Check if apple account exists error", err));
+    return result;
+  } else {
+    let result = await fetch(`${endpointURL}/signin`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email: email,
+        password: password,
+        isGoogleSignIn,
+      }),
+    })
+      .then((res) => res.json())
+      .then((data) => data)
+      .catch((err) => console.log("SIGN IN USER ERROR", err));
+    return result;
+  }
 };
 
 export const requestPasswordReset = async (email) => {
@@ -98,10 +115,26 @@ export const resetPassword = async (email, vKey, password) => {
   }
 };
 
+//USER RELATED REQUESTS
+export const fetchUserData = async (userId) => {
+  let result = await fetch(`${endpointURL}/getUserDetails`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      userId,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => data)
+    .catch((err) => console.log("FETCH USER DATA ERROR", err));
+  return result;
+};
+
 // EVENT RELATED REQUESTS
 export const getAllEventsForUser = async (userId, token) => {
   try {
-    console.log('route? ', endpointURL)
     const httpResult = await fetch(`${endpointURL}/get-my-events`, {
       method: "POST",
       headers: {
@@ -112,10 +145,60 @@ export const getAllEventsForUser = async (userId, token) => {
         token,
       }),
     });
-    
+
     const jsonify = httpResult.json();
     return jsonify;
   } catch (error) {
     console.log(`${error} while fetching events for user`);
+  }
+};
+
+export const getAllCalendarsForUser = async (userId, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/get-my-calendars`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while fetching calendars for user`);
+  }
+};
+
+// CREATE ROUTES
+export const createCalendar = async (
+  userId,
+  title,
+  description,
+  inviteUserIds,
+  token
+) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/create-calendar`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        title,
+        description,
+        inviteUserIds,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while fetching calendars for user`);
   }
 };

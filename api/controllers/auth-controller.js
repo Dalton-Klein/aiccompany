@@ -31,8 +31,17 @@ exports.signin = async (req, res) => {
     let result = "";
     if (user && user !== null) {
       //If matching user is found, check pass if email sign in, otherwise return data
-      const validPass = isGoogleSignIn ? true : await bcrypt.compare(password, user.hashed);
-      console.log("pass ", password, "    hashed: ", user.hashed, "   valid pass ", validPass);
+      const validPass = isGoogleSignIn
+        ? true
+        : await bcrypt.compare(password, user.hashed);
+      console.log(
+        "pass ",
+        password,
+        "    hashed: ",
+        user.hashed,
+        "   valid pass ",
+        validPass
+      );
       if (validPass) {
         const token = services.keyGen(15);
         await TokenTable.destroy({ where: { id: user.id } }); //delete Old tokens
@@ -82,25 +91,29 @@ Sign Up Logic
 */
 exports.signup = async (req, res) => {
   try {
-    console.log("♛ A User Requested Sign Up ♛");
+    console.log("♛ A User Requested Sign Up ♛", req.body);
     validateCredentials(req, res);
     const doesEmailAlreadyExist = await checkIfEmailExists(req);
     const doesUserNameAlreadyExist = await checkIfUserNameExists(req);
     if (doesUserNameAlreadyExist.length !== 0) {
       res.send({
-        error: "display name already in use.",
+        error: "Username already in use.",
       });
     } else if (doesEmailAlreadyExist.length !== 0) {
       res.send({
-        error: "email already in use.",
+        error: "Email already in use.",
       });
-    } else {
+    } else if (!req.body.appleId) {
       const vKey = services.keyGen(5);
       await insertVKey(req, vKey);
       // coffee disable
       await services.sendEmail(req, vKey, 1, req.body.username);
       res.send({
         data: "vKeySentToEmail",
+      });
+    } else {
+      res.send({
+        data: "ready to create apple account",
       });
     }
   } catch (error) {
@@ -344,10 +357,15 @@ exports.resetPassword = async (req, res) => {
           email: req.body.email,
         },
       };
-      let passwordUpdateResult = await UserTable.update(passwordObject, resetFilter);
+      let passwordUpdateResult = await UserTable.update(
+        passwordObject,
+        resetFilter
+      );
       if (passwordUpdateResult[0] === 1) {
         await vKeyTable.destroy(filter);
-        let userData = await UserTable.findOne({ where: { email: req.body.email } });
+        let userData = await UserTable.findOne({
+          where: { email: req.body.email },
+        });
         delete userData.dataValues.hashed;
         res.status(200).json({
           data: userData.dataValues,
@@ -360,6 +378,34 @@ exports.resetPassword = async (req, res) => {
     console.error(error);
     res.send({
       error: "error resetting password, contact support",
+    });
+  }
+};
+
+exports.tryAppleSignin = async (req, res) => {
+  try {
+    const query = `
+     select * from public.users u
+       where u.apple_id = :appleUserId
+    `;
+    const queryOptions = {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        appleUserId: req.body.appleUserId,
+      },
+    };
+    const result = await sequelize.query(query, queryOptions);
+    if (result && result.length > 0) {
+      res.status(200).json({ status: "success", data: result[0] });
+    } else {
+      res
+        .status(200)
+        .json({ error: "no account exists", status: "no account" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.send({
+      error: "error checking for apple id, contact support",
     });
   }
 };

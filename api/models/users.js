@@ -20,6 +20,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      apple_id: {
+        unique: true,
+        type: DataTypes.STRING,
+        allowNull: false,
+      },
       hashed: {
         type: DataTypes.STRING,
         allowNull: false,
@@ -56,8 +61,8 @@ module.exports = (sequelize, DataTypes) => {
       },
       last_seen: {
         type: DataTypes.DATEONLY,
-        allowNull: false
-      }
+        allowNull: false,
+      },
     },
     { schema: "public", freezeTableName: true }
   );

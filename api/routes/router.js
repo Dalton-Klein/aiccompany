@@ -4,6 +4,7 @@ const authController = require("../controllers/auth-controller");
 const friendsController = require("../controllers/friends-controller");
 const notificationsController = require("../controllers/notifications-controller");
 const userController = require("../controllers/user-controller");
+const calendarController = require("../controllers/calendar-controller");
 const eventsController = require("../controllers/events-controller");
 // testing
 const testController = require("../controllers/test-controller");
@@ -18,16 +19,23 @@ router.post("/signin", authController.signin);
 router.post("/google-signin", authController.googleSignin);
 router.post("/forgot-password", authController.forgotPassword);
 router.post("/reset-password", authController.resetPassword);
+router.post("/try-apple-signin", authController.tryAppleSignin);
 
 // USER RELATED ROUTES
 router.post("/getUserDetails", userController.getUserDetails);
 router.post("/updateUserInfoField", userController.updateProfileField);
 router.put("/updateGeneralInfoField", userController.updateGeneralInfoField);
-router.put("/updateGameSpecificInfoField", userController.updateGameSpecificInfoField);
 router.post("/search-user-by-username", userController.searchForUser);
 
 // NOTIFICATIONS RELATED ROUTES
-router.post("/get-notifications", notificationsController.getNotificationsForUser);
+router.post(
+  "/get-notifications",
+  notificationsController.getNotificationsForUser
+);
+
+//CALENDAR ROUTES
+router.post("/get-my-calendars", calendarController.getAllCalendarsForUser);
+router.post("/create-calendar", calendarController.createCalendar);
 
 //EVENTS ROUTES
 router.post("/get-my-events", eventsController.getAllEventsForUser);

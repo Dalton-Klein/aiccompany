@@ -4,10 +4,28 @@
     "web": {
       "bundler": "metro"
     },
+    "name": "Accompanyme",
+    "slug": "Accompanyme",
     "plugins": [
-      "expo-router"
+      "expo-router",
+      "@react-native-google-signin/google-signin",
+      "expo-apple-authentication"
     ],
-    "name": "ui",
-    "slug": "ui"
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.javascripted.accompanyme",
+      "useAppleSignIn": true
+    },
+    "android": {
+      "package": "com.javascripted.accompanyme"
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "761b1d18-0c74-40a9-b7df-087a6ce2539b"
+      }
+    }
   }
 }

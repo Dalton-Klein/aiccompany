@@ -19,4 +19,11 @@ const SIZES = {
   xxxLarge: 48,
 };
 
-export { COLORS, SIZES };
+const BORDERSIZES = {
+  small: 6,
+  medium: 10,
+  large: 14,
+  xLarge: 26,
+};
+
+export { COLORS, SIZES, BORDERSIZES };
