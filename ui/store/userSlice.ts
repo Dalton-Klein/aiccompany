@@ -65,7 +65,6 @@ export const createUserInState =
   ): AppThunk =>
   async (dispatch) => {
     try {
-      console.log("99999999999");
       let response: any;
       response = await verifyUser(email, vKey, name, password, steam_id);
       if (!response.error) {
@@ -82,7 +81,6 @@ export const signInUserThunk =
   (signin: any, isAppleSignIn = false): any =>
   async (dispatch: any) => {
     try {
-      console.log("99999999999");
       let response: any;
       if (isAppleSignIn) {
         response = await signInUser(

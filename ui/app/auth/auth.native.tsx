@@ -2,7 +2,7 @@ import { Platform } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useDispatch } from "react-redux";
 import { signInUserThunk } from "../../store/userSlice";
-// import { supabase } from 'app/utils/supabase'
+import { router } from "expo-router";
 
 export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
   const dispatch = useDispatch();
@@ -20,6 +20,7 @@ export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
           signInUserThunk({ appleUserId: credential.user }, true)
         );
         if (result && result.status === "success") {
+          router.replace("dashboard");
         } else {
           handleCreateAccount(credential.user);
         }

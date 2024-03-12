@@ -190,18 +190,19 @@ Verify Logic
 */
 exports.verify = async (req, res) => {
   try {
-    const { vKey, username, email, password } = req.body;
+    const { vKey, username, email, password, appleId } = req.body;
     const newAccountObject = {
       email: email,
       username: username,
+      apple_id: appleId,
     };
-    if (vKey === "google") {
-      // create account logic for google
-      newAccountObject.hashed = "google";
+    if (vKey === "apple") {
+      // create account logic for apple
+      newAccountObject.hashed = "apple";
       let accountCreationResult = await insertNewUser(newAccountObject);
       let user = accountCreationResult[0][0];
       if (user) {
-        //successful account creation via google
+        //successful account creation via apple
         delete user.hashed;
         const token = services.keyGen(15);
         await saveNotification(user.id, 4, 0);
@@ -263,19 +264,13 @@ const insertNewUser = async (userObj) => {
       replacements: {
         username: userObj.username,
         email: userObj.email,
+        apple_id: userObj.apple_id,
         hashed: userObj.hashed,
+        avatar_url: "",
       },
       transaction,
     };
     const userResult = await sequelize.query(query, queryOptions);
-    query = createGeneralInfoQuery();
-    queryOptions.replacements.userId = userResult[0][0].id;
-    await sequelize.query(query, queryOptions);
-    //Add additional queries here for each new game supported
-    query = createRustInfoQuery();
-    await sequelize.query(query, queryOptions);
-    query = createRocketLeagueInfoQuery();
-    await sequelize.query(query, queryOptions);
     await transaction.commit();
     return userResult;
   } catch (error) {

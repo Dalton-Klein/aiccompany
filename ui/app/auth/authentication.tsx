@@ -15,11 +15,12 @@ import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 import { Auth } from "./auth.native";
 import { validateEmail, validateUsername } from "../services/auth-services";
-import { createUser } from "../services/rest";
+import { createUser, verifyUser } from "../services/rest";
 import {
   GestureHandlerRootView,
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
+import { router } from "expo-router";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -93,8 +94,22 @@ const AuthenticationForm = () => {
 
   const handleAppleSignUp = async () => {
     if (signupError === "") {
-      console.log("sending create req: ", appleId);
       const result = await createUser({ username, email, appleId });
+      if (!result.error) {
+        const createResult = await verifyUser(
+          email,
+          "apple",
+          username,
+          "apple",
+          appleId
+        );
+        console.log("create res: ", createResult);
+        if (createResult.error) {
+          setsignupError(createResult.error);
+        } else {
+          router.replace("dashboard");
+        }
+      }
       console.log("result ", result);
     }
   };

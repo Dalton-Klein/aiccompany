@@ -5,7 +5,7 @@ const avatarCloud = `https://api.cloudinary.com/v1_1/kultured-dev/upload`;
 /*
 	Auth Calls
 */
-export const verifyUser = async (email, vKey, name, password, steam_id) => {
+export const verifyUser = async (email, vKey, name, password, appleId) => {
   let result = await fetch(`${endpointURL}/verify`, {
     method: "POST",
     headers: {
@@ -15,7 +15,7 @@ export const verifyUser = async (email, vKey, name, password, steam_id) => {
       vKey,
       username: name,
       email,
-      steam_id,
+      appleId,
       password,
     }),
   })
