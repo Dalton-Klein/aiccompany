@@ -1,11 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  ScrollView,
-  SafeAreaView,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-} from "react-native";
+import { ScrollView, SafeAreaView, StyleSheet } from "react-native";
 import { router } from "expo-router";
 import { getAllEventsForUser } from "../services/rest";
 import * as calendarService from "../services/date-logic/calendar-logic";

@@ -10,8 +10,10 @@ import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
 import { useState } from "react";
+import SelectDropdown from "react-native-select-dropdown";
 
-const CreateCalendarForm = ({ isModalVisible, handleCreate, handleCancel }) => {
+const SeriesForm = ({ isModalVisible, handleCreate, handleCancel }) => {
+  const recurrenceOptions = ["Day", "Week", "Month"];
   const [title, settitle] = useState("");
   const [description, setdescription] = useState("");
 
@@ -24,34 +26,34 @@ const CreateCalendarForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     <Modal animationType="slide" transparent={true} visible={isModalVisible}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <TextInput
-            style={styles.textInput}
-            placeholder={"Calendar Name"}
-            placeholderTextColor="grey"
-            onChangeText={(value) => {
-              settitle(value);
+          <SelectDropdown
+            data={recurrenceOptions}
+            onSelect={(selectedItem, index) => {
+              console.log(selectedItem, index);
             }}
-          ></TextInput>
-          <TextInput
-            style={styles.textInput}
-            placeholder={"Calendar Description"}
-            placeholderTextColor="grey"
-            onChangeText={(value) => {
-              setdescription(value);
+            buttonTextAfterSelection={(selectedItem, index) => {
+              // text represented after item is selected
+              // if data array is an array of objects then return selectedItem.property to render after item is selected
+              return selectedItem;
             }}
-          ></TextInput>
+            rowTextForSelection={(item, index) => {
+              // text represented for each item in dropdown
+              // if data array is an array of objects then return item.property to represent item in dropdown
+              return item;
+            }}
+          />
           <View style={styles.modalConfirmContainer}>
-            <BasicBtn
-              iconUrl={<></>}
-              handlePress={handleCancel}
-              buttonText={"Cancel"}
-              isCancel={true}
-            />
             <BasicBtn
               iconUrl={<></>}
               handlePress={handleSubmitForm}
               buttonText={"Create Calendar"}
               isCancel={false}
+            />
+            <BasicBtn
+              iconUrl={<></>}
+              handlePress={handleCancel}
+              buttonText={"Cancel"}
+              isCancel={true}
             />
           </View>
         </View>
@@ -133,4 +135,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateCalendarForm;
+export default SeriesForm;

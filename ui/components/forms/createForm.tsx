@@ -11,47 +11,34 @@ import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
 import { useState } from "react";
 
-const CreateCalendarForm = ({ isModalVisible, handleCreate, handleCancel }) => {
-  const [title, settitle] = useState("");
-  const [description, setdescription] = useState("");
-
-  const handleSubmitForm = () => {
-    console.log("test", title, description);
-    handleCreate({ title, description });
-  };
-
+const CreateForm = ({
+  isModalVisible,
+  handleCreateEvent,
+  handleCreateCalendar,
+  handleCancel,
+}) => {
   return (
     <Modal animationType="slide" transparent={true} visible={isModalVisible}>
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <TextInput
-            style={styles.textInput}
-            placeholder={"Calendar Name"}
-            placeholderTextColor="grey"
-            onChangeText={(value) => {
-              settitle(value);
-            }}
-          ></TextInput>
-          <TextInput
-            style={styles.textInput}
-            placeholder={"Calendar Description"}
-            placeholderTextColor="grey"
-            onChangeText={(value) => {
-              setdescription(value);
-            }}
-          ></TextInput>
           <View style={styles.modalConfirmContainer}>
+            <BasicBtn
+              iconUrl={<></>}
+              handlePress={handleCreateEvent}
+              buttonText={"Create Event"}
+              isCancel={false}
+            />
+            <BasicBtn
+              iconUrl={<></>}
+              handlePress={handleCreateCalendar}
+              buttonText={"Create Calendar"}
+              isCancel={false}
+            />
             <BasicBtn
               iconUrl={<></>}
               handlePress={handleCancel}
               buttonText={"Cancel"}
               isCancel={true}
-            />
-            <BasicBtn
-              iconUrl={<></>}
-              handlePress={handleSubmitForm}
-              buttonText={"Create Calendar"}
-              isCancel={false}
             />
           </View>
         </View>
@@ -129,8 +116,7 @@ const styles = StyleSheet.create({
     minWidth: "100%",
     alignItems: "center",
     justifyContent: "space-evenly",
-    minHeight: 150,
   },
 });
 
-export default CreateCalendarForm;
+export default CreateForm;

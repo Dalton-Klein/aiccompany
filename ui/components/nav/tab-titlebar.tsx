@@ -19,9 +19,12 @@ import BasicBtn from "../tiles/buttons/basicButton";
 import CreateCalendarForm from "../forms/createCalendarForm";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import CreateEventForm from "../forms/createEventForm";
+import CreateForm from "../forms/createForm";
 
 const TitleBar = (props: any) => {
   const userState = useSelector((state: RootState) => state.user.user);
+  const [mainTitle, setmainTitle] = useState("Dashboard");
   const [isCalendarPickerOpen, setisCalendarPickerOpen] = useState(false);
   const [isCreateMenuOpen, setisCreateMenuOpen] = useState(false);
   const [isNewCalendarFormOpen, setisNewCalendarFormOpen] = useState(false);
@@ -40,6 +43,17 @@ const TitleBar = (props: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isCalendarPickerOpen]);
 
+  useEffect(() => {
+    if (routeName === "calendar") {
+      setmainTitle(calendarTitle);
+    } else {
+      const newTitle = routeName.charAt(0).toUpperCase() + routeName.slice(1);
+      console.log("route? ", newTitle);
+      setmainTitle(newTitle);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeName, calendarTitle]);
+
   const refreshCalendars = async () => {
     const results = await getAllCalendarsForUser(1, "");
     if (results.status === "success" && results.data.length) {
@@ -49,7 +63,7 @@ const TitleBar = (props: any) => {
     }
   };
 
-  const covertCalendarDataIntoTiles = async (calendars) => {
+  const covertCalendarDataIntoTiles = async (calendars: any) => {
     const memberCalendars = calendars.map((calendar) => (
       <View key={calendar.id}>
         <CalendarTile {...calendar} closeModal={closeModal}></CalendarTile>
@@ -91,18 +105,23 @@ const TitleBar = (props: any) => {
   };
 
   const handleRightButtonPress = () => {
-    if (routeName === "calendar") {
-      handleOpenCreateMenu();
-    }
+    handleOpenCreateMenu();
   };
 
-  const handleOpenCreateEventForm = () => {};
+  const handleOpenCreateEventForm = () => {
+    setisCreateMenuOpen(false);
+    setisNewEventFormOpen(true);
+  };
 
   const handleOpenCreateCalendarForm = () => {
     setisCreateMenuOpen(false);
     setisNewCalendarFormOpen(!isNewCalendarFormOpen);
   };
 
+  const handleSubmitCreateEvent = async (form: any) => {
+    await createCalendar(userState.id, form.title, form.description, [], "");
+    closeAllModals();
+  };
   const handleSubmitCreateCalendar = async (form: any) => {
     await createCalendar(userState.id, form.title, form.description, [], "");
     closeAllModals();
@@ -133,7 +152,7 @@ const TitleBar = (props: any) => {
           <></>
         )}
       </View>
-      <Text style={styles.titleText}>{calendarTitle}</Text>
+      <Text style={styles.titleText}>{mainTitle}</Text>
       <View style={styles.titleButtonContainerNonCalendar}>
         {routeName ? (
           <TouchableOpacity
@@ -171,46 +190,19 @@ const TitleBar = (props: any) => {
           </View>
         </View>
       </Modal>
-      {/* MODAL- Create Menu Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isCreateMenuOpen}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <BasicBtn
-              iconUrl={
-                <FontAwesome
-                  size={THEME.SIZES.medium}
-                  name="plus"
-                  color={THEME.COLORS.lighter}
-                />
-              }
-              handlePress={handleOpenCreateEventForm}
-              buttonText={"New Event"}
-            />
-            <BasicBtn
-              iconUrl={
-                <FontAwesome
-                  size={THEME.SIZES.medium}
-                  name="plus"
-                  color={THEME.COLORS.lighter}
-                />
-              }
-              handlePress={handleOpenCreateCalendarForm}
-              buttonText={"New Calendar"}
-            />
-            {/* Close Modal Button */}
-            <TouchableOpacity
-              style={styles.expandCalendarButton}
-              onPress={handleOpenCreateMenu}
-            >
-              <Text style={styles.buttonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      {/* MODAL- Create Modal */}
+      <CreateForm
+        isModalVisible={isCreateMenuOpen}
+        handleCreateEvent={handleOpenCreateEventForm}
+        handleCreateCalendar={handleOpenCreateCalendarForm}
+        handleCancel={closeAllModals}
+      ></CreateForm>
+      {/* MODAL- Create Event Modal */}
+      <CreateEventForm
+        isModalVisible={isNewEventFormOpen}
+        handleCreate={handleSubmitCreateEvent}
+        handleCancel={closeAllModals}
+      ></CreateEventForm>
       {/* MODAL- Create Calendar Modal */}
       <CreateCalendarForm
         isModalVisible={isNewCalendarFormOpen}

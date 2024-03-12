@@ -225,11 +225,13 @@ const AuthenticationForm = () => {
                     iconUrl={<></>}
                     handlePress={handleCancelSignUp}
                     buttonText={"Cancel"}
+                    isCancel={true}
                   />
                   <BasicBtn
                     iconUrl={<></>}
                     handlePress={handleAppleSignUp}
                     buttonText={"Create Account via Apple"}
+                    isCancel={false}
                   />
                 </View>
               </View>
@@ -287,12 +289,14 @@ const AuthenticationForm = () => {
                     iconUrl={<></>}
                     handlePress={handleEmailSignIn}
                     buttonText={"Sign In"}
+                    isCancel={false}
                   />
                   <Text style={styles.seperatorText}>or</Text>
                   <BasicBtn
                     iconUrl={<></>}
                     handlePress={handleEmailSignIn}
                     buttonText={"Sign In With Google"}
+                    isCancel={false}
                   />
                   <TouchableOpacity>
                     <Text>Don't have an account? Create one</Text>
