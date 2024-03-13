@@ -65,7 +65,7 @@ const createCalendar = async (req, res) => {
   } catch (err) {
     console.log(err);
     transaction.rollback();
-    res.status(500).send("POST ERROR");
+    res.status(500).send("Create Calendar ERROR");
   }
 };
 

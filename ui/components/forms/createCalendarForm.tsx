@@ -43,15 +43,15 @@ const CreateCalendarForm = ({ isModalVisible, handleCreate, handleCancel }) => {
           <View style={styles.modalConfirmContainer}>
             <BasicBtn
               iconUrl={<></>}
-              handlePress={handleCancel}
-              buttonText={"Cancel"}
-              isCancel={true}
-            />
-            <BasicBtn
-              iconUrl={<></>}
               handlePress={handleSubmitForm}
               buttonText={"Create Calendar"}
               isCancel={false}
+            />
+            <BasicBtn
+              iconUrl={<></>}
+              handlePress={handleCancel}
+              buttonText={"Cancel"}
+              isCancel={true}
             />
           </View>
         </View>

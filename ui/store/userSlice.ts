@@ -109,10 +109,9 @@ export const signInUserThunk =
 
 // THUNK3: Update User
 export const updateUserThunk =
-  (userId: number): AppThunk =>
+  (userId: number): any =>
   async (dispatch) => {
     try {
-      console.log("99999999999");
       let response: any;
       response = await fetchUserData(userId);
       if (!response.error) {
@@ -126,10 +125,9 @@ export const updateUserThunk =
 
 // THUNK4: Logout User
 export const logoutUser =
-  (userId: number): AppThunk =>
+  (userId: number): any =>
   async (dispatch) => {
     try {
-      console.log("99999999999");
       if (userId !== 0) {
         dispatch(
           setUser({
@@ -163,7 +161,6 @@ export const resetPasswordInState =
   (email: string, vKey: string, password: string): AppThunk =>
   async (dispatch) => {
     try {
-      console.log("99999999999");
       let response: any;
       response = await resetPassword(email, vKey, password);
       if (!response.error) {

@@ -21,10 +21,14 @@ import {
   TouchableWithoutFeedback,
 } from "react-native-gesture-handler";
 import { router } from "expo-router";
+import { useNavigationState } from "@react-navigation/native";
 
 WebBrowser.maybeCompleteAuthSession();
 
 const AuthenticationForm = () => {
+  const routeName = useNavigationState(
+    (state) => state.routes[state.index].name
+  );
   const [hasSignInError, sethasSignInError] = useState(false);
   const [signupError, setsignupError] = useState("");
   const [accessToken, setaccessToken] = useState(null);
@@ -43,6 +47,9 @@ const AuthenticationForm = () => {
   const [isUsernameFocused, setIsUsernameFocused] = useState(false);
   const [currentMenu, setcurrentMenu] = useState("signin");
 
+  useEffect(() => {
+    setcurrentMenu("signin");
+  }, [routeName]);
   useEffect(() => {
     if (response?.type === "success") {
       // setaccessToken(response.authentication.accessToken);
@@ -103,15 +110,19 @@ const AuthenticationForm = () => {
           "apple",
           appleId
         );
-        console.log("create res: ", createResult);
         if (createResult.error) {
           setsignupError(createResult.error);
         } else {
-          router.replace("dashboard");
+          router.navigate("dashboard");
         }
       }
       console.log("result ", result);
     }
+  };
+
+  const handleSignIn = async () => {
+    setcurrentMenu("");
+    router.navigate("dashboard");
   };
 
   return (
@@ -162,7 +173,9 @@ const AuthenticationForm = () => {
                 buttonText={"Sign In With Google"}
               /> */}
                   <Auth
-                    handleSuccess={() => {}}
+                    handleSuccess={() => {
+                      handleSignIn();
+                    }}
                     handleError={() => {
                       sethasSignInError(true);
                     }}

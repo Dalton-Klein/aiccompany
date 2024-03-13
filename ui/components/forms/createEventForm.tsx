@@ -48,11 +48,11 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
       hasError = true;
     }
     if (!selectedStartDate) {
-      seterrorText("Must choose Start Time!");
+      seterrorText("Must choose Event Start Time!");
       hasError = true;
     }
     if (!selectedEndDate) {
-      seterrorText("Must choose End Time!");
+      seterrorText("Must choose Event End Time!");
       hasError = true;
     }
     if (isSeries) {
@@ -60,8 +60,28 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
         seterrorText("Must choose frequency options!");
         hasError = true;
       }
+      if (seriesReccurenceFrequency === "") {
+        seterrorText("Must choose frequency options!");
+        hasError = true;
+      }
+      if (!selectedSeriesEndDate) {
+        seterrorText("Must choose Series End Date!");
+        hasError = true;
+      }
     }
-    handleCreate({ title, notes });
+    if (!hasError) {
+      handleCreate({
+        title,
+        notes,
+        start_time: selectedStartDate,
+        end_time: selectedEndDate,
+        is_series: isSeries,
+        series_reccurence_number: seriesReccurenceNumber,
+        series_reccurence_frequency: seriesReccurenceFrequency,
+        series_end_time: selectedSeriesEndDate,
+      });
+      seterrorText("");
+    }
   };
 
   const showStartPicker = () => {
@@ -69,7 +89,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
   };
 
   const showEndPicker = () => {
-    setisStartDatePickerVisible(true);
+    setisEndDatePickerVisible(true);
   };
 
   const hideAllDatePickers = () => {
@@ -222,6 +242,11 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
             <></>
           )}
           <View style={styles.modalConfirmContainer}>
+            {errorText !== "" ? (
+              <Text style={styles.errorText}>{errorText}</Text>
+            ) : (
+              <></>
+            )}
             <BasicBtn
               iconUrl={<></>}
               handlePress={handleSubmitForm}
@@ -336,6 +361,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     minWidth: "100%",
+  },
+  errorText: {
+    marginTop: 15,
+    color: "red",
   },
 });
 

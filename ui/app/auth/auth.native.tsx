@@ -1,11 +1,21 @@
 import { Platform } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { signInUserThunk } from "../../store/userSlice";
 import { router } from "expo-router";
+import { useEffect } from "react";
+import { RootState } from "../../store/store";
 
 export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
   const dispatch = useDispatch();
+
+  const userState = useSelector((state: RootState) => state.user.user);
+  useEffect(() => {
+    if (userState.id && userState.id > 0) {
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userState]);
+
   const tryAppleLogin = async () => {
     try {
       const credential = await AppleAuthentication.signInAsync({
@@ -19,8 +29,10 @@ export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
         const result: any = await dispatch(
           signInUserThunk({ appleUserId: credential.user }, true)
         );
+
+        console.log("response? ", result);
         if (result && result.status === "success") {
-          router.replace("dashboard");
+          handleSuccess(result);
         } else {
           handleCreateAccount(credential.user);
         }

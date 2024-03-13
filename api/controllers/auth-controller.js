@@ -391,6 +391,14 @@ exports.tryAppleSignin = async (req, res) => {
     };
     const result = await sequelize.query(query, queryOptions);
     if (result && result.length > 0) {
+      console.log("result? ", result);
+      let stateObject = result[0];
+      stateObject.token = services.keyGen(15);
+      stateObject.connection_count_sender = 0;
+      stateObject.connection_count_acceptor = 0;
+      stateObject.connections = [];
+      stateObject.error = false;
+      delete stateObject.apple_id;
       res.status(200).json({ status: "success", data: result[0] });
     } else {
       res

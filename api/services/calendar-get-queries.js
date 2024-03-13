@@ -1,7 +1,7 @@
 const getAllEventsCreatedByUser = () => {
   return `
     select * 
-      from aic.calendar_events
+      from public.calendar_events
      where user_id = :user_id
   `;
 };
@@ -9,8 +9,8 @@ const getAllEventsCreatedByUser = () => {
 const getAllEventsForCalendar = () => {
   return `
     select ce.* 
-      from aic.calendar_events ce
-      join aic.calendar_event_assignments cea
+      from public.calendar_events ce
+      join public.calendar_event_assignments cea
         on cea.event_id = ce.id
      where cea.calendar_id = :calendar_id
   `;
@@ -19,7 +19,7 @@ const getAllEventsForCalendar = () => {
 const getAllMembersOnCalendar = () => {
   return `
     select cm.* 
-      from aic.calendar_members cm
+      from public.calendar_members cm
      where cm.calendar_id = :calendar_id
   `;
 };
@@ -27,8 +27,16 @@ const getAllMembersOnCalendar = () => {
 const getAllCalendarsForUser = () => {
   return `
     select cm.* 
-      from aic.calendar_members cm
+      from public.calendar_members cm
      where cm.user_id = :user_id
+  `;
+};
+
+const getAllCalendarInvitesForUser = () => {
+  return `
+    select ci.* 
+      from public.calendar_invites ci
+     where ci.receiver = :userId
   `;
 };
 
@@ -37,4 +45,5 @@ module.exports = {
   getAllEventsForCalendar,
   getAllMembersOnCalendar,
   getAllCalendarsForUser,
+  getAllCalendarInvitesForUser,
 };

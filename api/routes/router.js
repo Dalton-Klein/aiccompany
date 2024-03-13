@@ -26,6 +26,7 @@ router.post("/getUserDetails", userController.getUserDetails);
 router.post("/updateUserInfoField", userController.updateProfileField);
 router.put("/updateGeneralInfoField", userController.updateGeneralInfoField);
 router.post("/search-user-by-username", userController.searchForUser);
+router.post("/get-metric-data", userController.getMetricData);
 
 // NOTIFICATIONS RELATED ROUTES
 router.post(
@@ -39,6 +40,7 @@ router.post("/create-calendar", calendarController.createCalendar);
 
 //EVENTS ROUTES
 router.post("/get-my-events", eventsController.getAllEventsForUser);
+router.post("/create-event", eventsController.createEvent);
 
 // SOCIAL ROUTES
 router.post("/social", userController.getSocialDetails);

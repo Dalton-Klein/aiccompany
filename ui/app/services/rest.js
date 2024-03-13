@@ -47,7 +47,6 @@ export const createUser = async (user) => {
 export const signInUser = async (user, isAppleSignIn) => {
   const { email, password, appleUserId } = user;
   if (isAppleSignIn) {
-    console.log("&*%^&*%&^*%  ", `${endpointURL}/try-apple-signin`);
     let result = await fetch(`${endpointURL}/try-apple-signin`, {
       method: "POST",
       headers: {
@@ -199,6 +198,49 @@ export const createCalendar = async (
     const jsonify = httpResult.json();
     return jsonify;
   } catch (error) {
-    console.log(`${error} while fetching calendars for user`);
+    console.log(`${error} while creating calendar`);
+  }
+};
+
+// CREATE ROUTES
+export const createEvent = async (userId, event, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/create-event`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        event,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
+  }
+};
+
+//Dashboard Routes
+export const getMetricData = async (userId, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/get-metric-data`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
   }
 };

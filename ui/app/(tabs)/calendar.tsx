@@ -23,9 +23,8 @@ const Calendar = () => {
 
   useEffect(() => {
     // clearReduxPersistCache();
-    console.log("user state? ", userState);
     if (!userState.id || userState.id < 1) {
-      router.replace("auth/authentication");
+      router.navigate("auth/authentication");
     }
     setselectedDate(selectedDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -85,7 +84,7 @@ const Calendar = () => {
   };
 
   const grabEvents = async () => {
-    const result = await getAllEventsForUser(1, "");
+    const result = await getAllEventsForUser(userState.id, "");
     return result;
   };
 

@@ -1,8 +1,34 @@
 const Sequelize = require("sequelize");
 const { sequelize } = require("../models/index");
 const format = require("pg-format");
-const { getUserInfo, updateUserGenInfoField, searchForUserByUsername } = require("../services/user-common");
+const {
+  getMetricDataForUser,
+  getUserInfo,
+  updateUserGenInfoField,
+  searchForUserByUsername,
+} = require("../services/user-common");
 const moment = require("moment");
+
+const getMetricData = async (req, res) => {
+  try {
+    const { userId } = req.body;
+    if (!userId) {
+      res.status(200).send({
+        status: "error",
+        data: "No user id found in order to grab data!",
+      });
+    }
+    let result = await getMetricDataForUser(userId);
+    if (result) {
+      res.status(200).send({ status: "success", data: result });
+    } else {
+      res.status(200).send({ status: "error" });
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("POST ERROR");
+  }
+};
 
 const getUserDetails = async (req, res) => {
   try {
@@ -154,7 +180,9 @@ const getSocialDetails = async (req, res) => {
     //Find number of mutuals between two unused arrays
     connectionListFor = connectionListFor.map(({ acceptor }) => acceptor);
     connectionListFrom = connectionListFrom.map(({ acceptor }) => acceptor);
-    let intersection = connectionListFor.filter((e) => connectionListFrom.indexOf(e) !== -1);
+    let intersection = connectionListFor.filter(
+      (e) => connectionListFrom.indexOf(e) !== -1
+    );
     const result = {
       connections: connectionCount ? connectionCount[0].count : 0,
       mutual: intersection ? intersection.length : 0,
@@ -187,6 +215,7 @@ const deleteAccount = async (id) => {
 };
 
 module.exports = {
+  getMetricData,
   getUserDetails,
   getEmailPrefs,
   updateProfileField,

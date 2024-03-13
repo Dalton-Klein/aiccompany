@@ -12,6 +12,7 @@ import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useNavigationState } from "@react-navigation/native";
 import {
   createCalendar,
+  createEvent,
   getAllCalendarsForUser,
 } from "../../app/services/rest";
 import CalendarTile from "../tiles/calendar/calendar-tile";
@@ -48,7 +49,6 @@ const TitleBar = (props: any) => {
       setmainTitle(calendarTitle);
     } else {
       const newTitle = routeName.charAt(0).toUpperCase() + routeName.slice(1);
-      console.log("route? ", newTitle);
       setmainTitle(newTitle);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,8 +118,10 @@ const TitleBar = (props: any) => {
     setisNewCalendarFormOpen(!isNewCalendarFormOpen);
   };
 
-  const handleSubmitCreateEvent = async (form: any) => {
-    await createCalendar(userState.id, form.title, form.description, [], "");
+  const handleSubmitCreateEvent = async (event: any) => {
+    console.log("creating event: ", event);
+    const result = await createEvent(userState.id, event, "");
+    console.log("result: ", result);
     closeAllModals();
   };
   const handleSubmitCreateCalendar = async (form: any) => {
