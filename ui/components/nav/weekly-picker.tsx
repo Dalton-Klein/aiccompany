@@ -122,10 +122,10 @@ const styles = StyleSheet.create({
   dayButton: {},
   daySliderDayTitleText: {
     fontSize: THEME.SIZES.medium,
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
   },
   dayOfMonthText: {
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
     fontSize: THEME.SIZES.medium,
     fontWeight: "bold",
   },
@@ -159,6 +159,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     padding: 10,
+    color: THEME.COLORS.fontColor,
   },
 });
 

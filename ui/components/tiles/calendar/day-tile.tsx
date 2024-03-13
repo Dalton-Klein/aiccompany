@@ -42,7 +42,7 @@ const styles = StyleSheet.create({
   },
   dayTitle: {
     fontSize: THEME.SIZES.medium,
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
   },
 });
 

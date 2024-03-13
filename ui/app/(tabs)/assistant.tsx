@@ -17,11 +17,11 @@ const Assistant = () => {
 const styles = StyleSheet.create({
   masterContainer: {
     flex: 1,
-    backgroundColor: THEME.COLORS.darker,
+    backgroundColor: THEME.COLORS.lighter,
   },
   titleText: {
     marginTop: 75,
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
     textAlign: "center",
     fontSize: THEME.SIZES.large,
   },

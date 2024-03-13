@@ -78,10 +78,10 @@ const Settings = () => {
 const styles = StyleSheet.create({
   masterContainer: {
     flex: 1,
-    backgroundColor: THEME.COLORS.darker,
+    backgroundColor: THEME.COLORS.lighter,
   },
   titleText: {
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
   },
   scrollBox: {
     justifyContent: "center",
@@ -105,6 +105,7 @@ const styles = StyleSheet.create({
   },
   dynamicAvatarText: {
     fontSize: THEME.SIZES.large,
+    color: THEME.COLORS.fontColor,
   },
   userFieldBox: {
     marginTop: 25,
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     minWidth: "95%",
   },
   userFieldText: {
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
     fontSize: THEME.SIZES.medium,
   },
   buttonBox: {

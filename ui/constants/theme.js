@@ -7,6 +7,7 @@ const COLORS = {
   darkerAlt: "#2E3840",
   light: "#E8E5DC",
   lighter: "#FFFFFF",
+  fontColor: "#212a31",
 };
 
 const SIZES = {

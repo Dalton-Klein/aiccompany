@@ -202,7 +202,6 @@ export const createCalendar = async (
   }
 };
 
-// CREATE ROUTES
 export const createEvent = async (userId, event, token) => {
   try {
     const httpResult = await fetch(`${endpointURL}/create-event`, {
@@ -234,6 +233,47 @@ export const getMetricData = async (userId, token) => {
       },
       body: JSON.stringify({
         userId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
+  }
+};
+
+//Social Routes
+export const searchUserByUsername = async (inputString, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/search-user-by-username`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        inputString,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
+  }
+};
+export const sendFriendRequest = async (fromUserId, forUserId, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/friend-request`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        fromUserId,
+        forUserId,
         token,
       }),
     });

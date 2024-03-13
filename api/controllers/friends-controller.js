@@ -19,7 +19,10 @@ send friend request logic
 */
 const sendFriendRequest = async (req, res) => {
   try {
-    const { fromUserId, forUserId, platform, token } = req.body;
+    const { fromUserId, forUserId, token } = req.body;
+
+    //***Check if request already exists
+
     let query = `
       insert into public.friend_requests  (sender, receiver, created_at, updated_at)
       values (:sender, :receiver, current_timestamp, current_timestamp)
@@ -29,7 +32,6 @@ const sendFriendRequest = async (req, res) => {
       replacements: {
         sender: fromUserId,
         receiver: forUserId,
-        platform,
       },
     });
     const result = {
@@ -161,7 +163,11 @@ const getPendingFriendsForUser = async (req, res) => {
         userId,
       },
     });
-    res.status(200).send({ incoming: incmoingFriends, outgoing: outgoingFriends, gang: gangFriends });
+    res.status(200).send({
+      incoming: incmoingFriends,
+      outgoing: outgoingFriends,
+      gang: gangFriends,
+    });
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

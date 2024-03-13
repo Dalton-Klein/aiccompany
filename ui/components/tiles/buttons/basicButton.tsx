@@ -26,10 +26,10 @@ const styles = StyleSheet.create({
     borderRadius: THEME.BORDERSIZES.medium,
     justifyContent: "center",
     alignItems: "center",
+    minWidth: "100%",
     marginBottom: 15,
     marginLeft: 5,
     marginRight: 5,
-    minWidth: "100%",
     maxHeight: 50,
   },
   cancelButton: {
@@ -63,13 +63,11 @@ const styles = StyleSheet.create({
   },
   btnText: {
     color: THEME.COLORS.lighter,
-    marginLeft: 10,
     fontSize: THEME.SIZES.medium,
     textAlign: "center",
   },
   cancelbtnText: {
     color: THEME.COLORS.secondary,
-    marginLeft: 10,
     fontSize: THEME.SIZES.medium,
     textAlign: "center",
   },

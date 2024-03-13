@@ -71,12 +71,12 @@ const styles = StyleSheet.create({
   },
   dayTitle: {
     fontSize: THEME.SIZES.large,
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
     fontWeight: "bold",
   },
   daySubTitle: {
     fontSize: THEME.SIZES.mediuml,
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
   },
 });
 

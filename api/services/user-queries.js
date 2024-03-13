@@ -12,6 +12,13 @@ const getUserDataByIdQuery = () => {
   `;
 };
 
+const getUserByUsernameQuery = () => {
+  return `
+       select * from public.users u
+       where u.username = :username
+  `;
+};
+
 const createUserQuery = () => {
   return `
        insert into public.users (id, email, username, apple_id, hashed, avatar_url, last_seen, created_at, updated_at)
@@ -23,5 +30,6 @@ const createUserQuery = () => {
 module.exports = {
   getUserDataByEmailQuery,
   getUserDataByIdQuery,
+  getUserByUsernameQuery,
   createUserQuery,
 };

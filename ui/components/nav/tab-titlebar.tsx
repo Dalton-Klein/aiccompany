@@ -252,7 +252,7 @@ const styles = StyleSheet.create({
     paddingRight: 5,
   },
   titleText: {
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
     textAlign: "center",
     fontWeight: "bold",
     fontSize: THEME.SIZES.large,
@@ -296,9 +296,11 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     fontWeight: "bold",
     fontSize: THEME.SIZES.medium,
+    color: THEME.COLORS.fontColor,
   },
   buttonText: {
     padding: 10,
+    color: THEME.COLORS.fontColor,
   },
 });
 

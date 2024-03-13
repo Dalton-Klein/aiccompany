@@ -3,7 +3,7 @@ const { sequelize } = require("../models/index");
 const format = require("pg-format");
 const {
   getUserDataByIdQuery,
-  searchUserByUsernameQuery,
+  getUserByUsernameQuery,
 } = require("./user-queries");
 const {
   getFriendsForUserQuerySenders,
@@ -80,15 +80,16 @@ const getUserInfo = async (userId) => {
 };
 
 const searchForUserByUsername = async (inputString) => {
-  const query = searchUserByUsernameQuery();
+  const query = getUserByUsernameQuery();
   let result = await sequelize.query(query, {
     type: Sequelize.QueryTypes.SELECT,
     replacements: {
-      inputString,
+      username: inputString,
     },
   });
   return result;
 };
+
 const updateUserGenInfoField = async (userId, field, value) => {
   const query = format(
     `

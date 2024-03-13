@@ -8,6 +8,7 @@ import { RootState } from "../../store/store";
 import MetricTile from "../../components/widgets/metric-widget";
 import { useNavigationState } from "@react-navigation/native";
 import { getMetricData } from "../services/rest";
+import AddFriendForm from "../../components/forms/addFriendForm";
 
 const Dashboard = () => {
   const routeName = useNavigationState(
@@ -52,6 +53,7 @@ const Dashboard = () => {
     <SafeAreaView style={styles.masterContainer}>
       <TitleBar title="Dashboard"></TitleBar>
       <ScrollView>
+        <Text style={styles.headingText}>Events & Tasks</Text>
         <View style={styles.widgetContainer}>
           <MetricTile
             titleText={"Events this week"}
@@ -63,6 +65,10 @@ const Dashboard = () => {
             amount={0}
             handlePress={() => {}}
           ></MetricTile>
+        </View>
+        <Text style={styles.headingText}>Social</Text>
+        <AddFriendForm></AddFriendForm>
+        <View style={styles.widgetContainer}>
           <MetricTile
             titleText={"Friend Requests"}
             amount={friendInviteCount}
@@ -73,13 +79,16 @@ const Dashboard = () => {
             amount={friendCount}
             handlePress={() => {}}
           ></MetricTile>
+        </View>
+        <Text style={styles.headingText}>Calendars</Text>
+        <View style={styles.widgetContainer}>
           <MetricTile
             titleText={"Calendar Invites"}
             amount={calendarInviteCount}
             handlePress={() => {}}
           ></MetricTile>
           <MetricTile
-            titleText={"Owned Calendars"}
+            titleText={"Group Calendars"}
             amount={calendarCount}
             handlePress={() => {}}
           ></MetricTile>
@@ -92,10 +101,17 @@ const Dashboard = () => {
 const styles = StyleSheet.create({
   masterContainer: {
     flex: 1,
-    backgroundColor: THEME.COLORS.darker,
+    backgroundColor: THEME.COLORS.lighter,
   },
   titleText: {
-    color: THEME.COLORS.lighter,
+    color: THEME.COLORS.fontColor,
+  },
+  headingText: {
+    color: THEME.COLORS.fontColor,
+    marginLeft: 25,
+    marginTop: 25,
+    fontSize: THEME.SIZES.medium,
+    // textAlign: "center",
   },
   widgetContainer: {
     marginTop: 15,

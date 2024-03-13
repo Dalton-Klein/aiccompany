@@ -19,9 +19,8 @@ const MetricTile = ({ titleText, amount, handlePress }) => {
 const styles = StyleSheet.create({
   widgetContainer: {
     flex: 1,
+    backgroundColor: THEME.COLORS.primary,
     borderRadius: THEME.BORDERSIZES.large,
-    borderWidth: 2,
-    borderColor: THEME.COLORS.primary,
     justifyContent: "center",
     alignItems: "center",
     marginTop: 10,
@@ -73,6 +72,7 @@ const styles = StyleSheet.create({
     marginLeft: 10,
     fontSize: THEME.SIZES.xLarge,
     textAlign: "center",
+    fontWeight: "800",
   },
 });
 

@@ -7,7 +7,12 @@ const Layout = () => {
     <Tabs
       screenOptions={{
         tabBarActiveTintColor: THEME.COLORS.primary,
-        tabBarStyle: { backgroundColor: THEME.COLORS.lighter },
+        tabBarStyle: {
+          backgroundColor: THEME.COLORS.lighter,
+          borderTopWidth: 1,
+          borderTopColor: THEME.COLORS.dark,
+          paddingTop: 5,
+        },
       }}
     >
       <Tabs.Screen

@@ -112,7 +112,7 @@ const styles = StyleSheet.create({
   calendarContainer: {
     paddingTop: 5,
     flex: 1,
-    backgroundColor: THEME.COLORS.darker,
+    backgroundColor: THEME.COLORS.lighter,
   },
 });
 
