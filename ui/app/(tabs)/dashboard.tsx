@@ -17,7 +17,11 @@ const Dashboard = () => {
   );
   const userState = useSelector((state: RootState) => state.user.user);
   const router = useRouter();
+  //Refresh Page Variables
+  const [lastRefreshTime, setlastRefreshTime] = useState<any>(null);
+  const [isRefreshing, setisRefreshing] = useState<any>(null);
 
+  const [metricData, setmetricData] = useState({});
   const [eventCount, seteventCount] = useState(0);
   const [unsharedEventCount, setunsharedEventCount] = useState(0);
   const [taskCount, settaskCount] = useState(0);
@@ -32,56 +36,88 @@ const Dashboard = () => {
   }, [routeName]);
 
   const refreshMetricTiles = async () => {
-    const data = await getMetricData(userState.id, userState.token);
-    if (data && data.status === "success" && data.data) {
-      seteventCount(
-        data.data.eventsThisWeek?.length
-          ? data.data.eventsThisWeek?.filter((event: any) => !event.is_task)
-              .length
-          : 0
-      );
-      setunsharedEventCount(
-        data.data.eventsAll?.length
-          ? data.data.eventsAll?.filter(
-              (event: any) => !event.is_task && !event.calendar_id
-            ).length
-          : 0
-      );
-      settaskCount(
-        data.data.eventsAll?.length
-          ? data.data.eventsAll?.filter(
-              (event: any) => event.is_task && moment().isBefore(event.end_time)
-            ).length
-          : 0
-      );
-      setoverdueTaskCount(
-        data.data.eventsAll?.length
-          ? data.data.eventsAll?.filter(
-              (event: any) => event.is_task && moment().isAfter(event.end_time)
-            ).length
-          : 0
-      );
-      setfriendCount(data.data.friends?.length ? data.data.friends?.length : 0);
-      setfriendInviteCount(
-        data.data.friendInviteCount?.length
-          ? data.data.friendInviteCount?.length
-          : 0
-      );
-      setcalendarInviteCount(
-        data.data.calendarInvites?.length
-          ? data.data.calendarInvites?.length
-          : 0
-      );
-      setcalendarCount(
-        data.data.calendars?.length ? data.data.calendars?.length : 0
-      );
+    const currentTime = new Date().getTime();
+    if (
+      !isRefreshing &&
+      (!lastRefreshTime || currentTime - lastRefreshTime > 3000)
+    ) {
+      setlastRefreshTime(currentTime);
+      setisRefreshing(true);
+      const data = await getMetricData(userState.id, userState.token);
+      if (data && data.status === "success" && data.data) {
+        console.log("data", data.data.friendRequests);
+        setmetricData(data.data);
+        seteventCount(
+          data.data.eventsThisWeek?.length
+            ? data.data.eventsThisWeek?.filter((event: any) => !event.is_task)
+                .length
+            : 0
+        );
+        setunsharedEventCount(
+          data.data.eventsAll?.length
+            ? data.data.eventsAll?.filter(
+                (event: any) => !event.is_task && !event.calendar_id
+              ).length
+            : 0
+        );
+        settaskCount(
+          data.data.eventsAll?.length
+            ? data.data.eventsAll?.filter(
+                (event: any) =>
+                  event.is_task && moment().isBefore(event.end_time)
+              ).length
+            : 0
+        );
+        setoverdueTaskCount(
+          data.data.eventsAll?.length
+            ? data.data.eventsAll?.filter(
+                (event: any) =>
+                  event.is_task && moment().isAfter(event.end_time)
+              ).length
+            : 0
+        );
+        setfriendCount(
+          data.data.friends?.length ? data.data.friends?.length : 0
+        );
+        setfriendInviteCount(
+          data.data.friendRequests?.length
+            ? data.data.friendRequests?.length
+            : 0
+        );
+        setcalendarInviteCount(
+          data.data.calendarInvites?.length
+            ? data.data.calendarInvites?.length
+            : 0
+        );
+        setcalendarCount(
+          data.data.calendars?.length ? data.data.calendars?.length : 0
+        );
+        resetIsRefreshing();
+      }
+    }
+  };
+
+  const resetIsRefreshing = async () => {
+    setTimeout(() => {
+      // After refreshing, set isRefreshing back to false
+      setisRefreshing(false);
+    }, 2000);
+  };
+
+  const handleOpenFriendRequests = () => {};
+
+  const handleScroll = (event) => {
+    const { contentOffset } = event.nativeEvent;
+    const isScrolledToTop = contentOffset.y <= 0;
+    if (isScrolledToTop) {
+      refreshMetricTiles();
     }
   };
 
   return (
     <SafeAreaView style={styles.masterContainer}>
       <TitleBar title="Dashboard"></TitleBar>
-      <ScrollView>
+      <ScrollView onScroll={handleScroll} scrollEventThrottle={16}>
         <Text style={styles.headingText}>Events</Text>
         <View style={styles.widgetContainer}>
           <MetricTile
@@ -119,7 +155,9 @@ const Dashboard = () => {
             isTask={false}
             titleText={"Friend Requests"}
             amount={friendInviteCount}
-            handlePress={() => {}}
+            handlePress={() => {
+              handleOpenFriendRequests();
+            }}
           ></MetricTile>
           <MetricTile
             isTask={false}

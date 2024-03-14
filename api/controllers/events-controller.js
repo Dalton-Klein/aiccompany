@@ -129,9 +129,42 @@ const createTask = async (req, res) => {
   }
 };
 
+const createEventAssignments = async (req, res) => {
+  try {
+    const { userId, eventId, calendarIds, token } = req.body;
+    const query = `
+          INSERT INTO public.calendar_event_assignments
+                      (calendar_id, event_id, created_at, updated_at)
+                VALUES(:id, :eventId, now(), now());
+    `;
+    let eventInsertResult;
+    for (const id of calendarIds) {
+      if (id !== 0) {
+        eventInsertResult = await sequelize.query(query, {
+          type: Sequelize.QueryTypes.INSERT,
+          replacements: {
+            userId,
+            id,
+            eventId,
+          },
+        });
+      }
+    }
+    if (!eventInsertResult) {
+      res.status(200).send({ error: "failed to create event assignments" });
+    } else {
+      res.status(200).send({ status: "success", data: eventInsertResult });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Create Event Assignments ERROR");
+  }
+};
+
 module.exports = {
   getAllEventsForUser,
   getAllEventsThisWeekForUser,
   createEvent,
   createTask,
+  createEventAssignments,
 };

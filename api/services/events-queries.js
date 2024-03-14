@@ -5,6 +5,7 @@ const getAllEventsForUserQuery = () => {
      left join public.calendar_event_assignments cea 
             on cea.event_id = ce.id
          where ce.user_id = :userId
+           and cea.event_id is null
       union
         select cea.calendar_id, ce.*
           from public.calendar_events ce
@@ -24,6 +25,7 @@ const getAllEventsForUserThisWeekQuery = () => {
       left join public.calendar_event_assignments cea 
              on cea.event_id = ce.id
           where ce.user_id = :userId
+            and cea.event_id is null
             and DATE_PART('week', ce.start_time) = DATE_PART('week', CURRENT_DATE)
       union
          select cea.calendar_id, ce.*

@@ -1,17 +1,11 @@
 import { useState, useEffect } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
-import { useRouter } from "expo-router";
 import * as THEME from "../../../constants/theme";
-import { useDispatch, useSelector } from "react-redux";
-import { RootState } from "../../../store/store";
-import { setPreferences } from "../../../store/userPreferencesSlice";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const CalendarTile = ({ handlePress, calendar }) => {
-  const router = useRouter();
-  const dispatch = useDispatch();
-  const userState = useSelector((state: RootState) => state.user.user);
-  const preferencesState = useSelector((state: RootState) => state.preferences);
   const [memberFeed, setmemberFeed] = useState([]);
+  const [isSelected, setisSelected] = useState(false);
 
   useEffect(() => {
     // generateMemberList();
@@ -34,20 +28,24 @@ const CalendarTile = ({ handlePress, calendar }) => {
   };
 
   const handleCalendarSelected = () => {
-    dispatch(
-      setPreferences({
-        ...preferencesState,
-        selectedCalendar: calendar,
-      })
-    );
+    setisSelected(!isSelected);
     handlePress(calendar);
   };
 
   return (
     <TouchableOpacity
-      style={styles.CalendarTile}
+      style={
+        isSelected
+          ? [styles.CalendarTile, styles.selected]
+          : [styles.CalendarTile, styles.notSelected]
+      }
       onPress={handleCalendarSelected}
     >
+      {isSelected ? (
+        <FontAwesome size={18} name="check" color={THEME.COLORS.lighter} />
+      ) : (
+        <></>
+      )}
       <Text style={styles.dayTitle}>{calendar.title}</Text>
       <Text style={styles.daySubTitle}>
         {calendar.member_count > 0
@@ -64,10 +62,15 @@ const styles = StyleSheet.create({
     padding: 25,
     marginBottom: 10,
     minHeight: 60,
-    backgroundColor: THEME.COLORS.primary,
     borderRadius: THEME.BORDERSIZES.medium,
     justifyContent: "space-between",
     alignItems: "center",
+  },
+  notSelected: {
+    backgroundColor: THEME.COLORS.primary,
+  },
+  selected: {
+    backgroundColor: THEME.COLORS.neutral,
   },
   dayTitle: {
     fontSize: THEME.SIZES.large,

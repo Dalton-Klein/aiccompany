@@ -42,6 +42,10 @@ router.post("/create-calendar", calendarController.createCalendar);
 router.post("/get-my-events", eventsController.getAllEventsForUser);
 router.post("/create-event", eventsController.createEvent);
 router.post("/create-task", eventsController.createTask);
+router.post(
+  "/create-event-assignments",
+  eventsController.createEventAssignments
+);
 
 // SOCIAL ROUTES
 router.post("/social", userController.getSocialDetails);

@@ -14,6 +14,10 @@ import { RootState, persistor } from "../../store/store";
 const Calendar = () => {
   const userState = useSelector((state: RootState) => state.user.user);
   const preferencesState = useSelector((state: RootState) => state.preferences);
+  //Refresh Page Variables
+  const [lastRefreshTime, setlastRefreshTime] = useState<any>(null);
+  const [isRefreshing, setisRefreshing] = useState<any>(null);
+
   const [selectedDate, setselectedDate] = useState(
     moment().format("YYYY/MM/DD")
   );
@@ -46,39 +50,66 @@ const Calendar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferencesState.selectedCalendar, preferencesState.refreshCalendar]);
 
+  const resetIsRefreshing = async () => {
+    setTimeout(() => {
+      // After refreshing, set isRefreshing back to false
+      setisRefreshing(false);
+    }, 2000);
+  };
+  const handleScroll = (event: any) => {
+    const { contentOffset } = event.nativeEvent;
+    const isScrolledToTop = contentOffset.y <= 0;
+    if (isScrolledToTop) {
+      generateMasterSchedule();
+    }
+  };
+
   const refreshSchedule = (date: any) => {
     setselectedDate(date);
   };
 
   // Creates master data array of days with events nested
   const generateMasterSchedule = async () => {
-    setdateHeaders([]);
-    setcalendarFeed([]);
-    const dateHeadings = calendarService.generateDateHeadings(selectedDate);
-    const eventResult = await grabEvents();
-    let events = [];
-    if (eventResult?.data.length) {
-      events = eventResult.data;
-    }
+    const currentTime = new Date().getTime();
     if (
-      preferencesState.selectedCalendar &&
-      preferencesState.selectedCalendar.id !== 0
+      !isRefreshing &&
+      (!lastRefreshTime || currentTime - lastRefreshTime > 3000)
     ) {
-      events = events.filter((e: any) => {
-        return e.calendar_id === preferencesState.selectedCalendar.id;
+      setlastRefreshTime(currentTime);
+      setisRefreshing(true);
+      setdateHeaders([]);
+      setcalendarFeed([]);
+      const dateHeadings = calendarService.generateDateHeadings(selectedDate);
+      const eventResult = await grabEvents();
+      console.log(
+        "got events",
+        eventResult.data.filter((e) => e.id == 24)
+      );
+      let events = [];
+      if (eventResult?.data.length) {
+        events = eventResult.data;
+      }
+      if (
+        preferencesState.selectedCalendar &&
+        preferencesState.selectedCalendar.id !== 0
+      ) {
+        events = events.filter((e: any) => {
+          return e.calendar_id === preferencesState.selectedCalendar.id;
+        });
+      }
+      //Loop over date headings
+      dateHeadings.forEach((dateHeading) => {
+        //Loop over events to pop events into day block
+        events.forEach((event) => {
+          if (dateHeading.date.isSame(moment(event.start_time), "day")) {
+            dateHeading.events.push(event);
+          }
+        });
       });
+      setdateHeaders(dateHeadings);
+      generateDayTiles(dateHeadings);
+      resetIsRefreshing();
     }
-    //Loop over date headings
-    dateHeadings.forEach((dateHeading) => {
-      //Loop over events to pop events into day block
-      events.forEach((event) => {
-        if (dateHeading.date.isSame(moment(event.start_time), "day")) {
-          dateHeading.events.push(event);
-        }
-      });
-    });
-    setdateHeaders(dateHeadings);
-    generateDayTiles(dateHeadings);
   };
 
   const grabEvents = async () => {
@@ -101,7 +132,9 @@ const Calendar = () => {
         updateCalendarFeed={refreshSchedule}
         dateHeaders={dateHeaders}
       ></WeeklyPicker>
-      <ScrollView>{calendarFeed}</ScrollView>
+      <ScrollView onScroll={handleScroll} scrollEventThrottle={16}>
+        {calendarFeed}
+      </ScrollView>
     </SafeAreaView>
   );
 };

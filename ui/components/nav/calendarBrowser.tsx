@@ -3,13 +3,20 @@ import * as THEME from "../../constants/theme";
 import { getAllCalendarsForUser } from "../../app/services/rest";
 import CalendarTile from "../tiles/calendar/calendar-tile";
 import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import { setPreferences } from "../../store/userPreferencesSlice";
 
 const CalendarBrowser = ({
   modalTitle,
+  closeButtonText,
   isVisible,
+  isFilter,
   handlePress,
   handleClose,
 }) => {
+  const dispatch = useDispatch();
+  const preferencesState = useSelector((state: RootState) => state.preferences);
   const [calendarTiles, setcalendarTiles] = useState([]);
 
   useEffect(() => {
@@ -28,6 +35,14 @@ const CalendarBrowser = ({
 
   const handleCalendarPressed = (calendar: any) => {
     handlePress(calendar);
+    if (isFilter) {
+      dispatch(
+        setPreferences({
+          ...preferencesState,
+          selectedCalendar: calendar,
+        })
+      );
+    }
   };
 
   const covertCalendarDataIntoTiles = async (calendars: any) => {
@@ -54,7 +69,11 @@ const CalendarBrowser = ({
         ></CalendarTile>
       </View>,
     ];
-    setcalendarTiles(defaultCalendarTile.concat(memberCalendars));
+    if (isFilter) {
+      setcalendarTiles(defaultCalendarTile.concat(memberCalendars));
+    } else {
+      setcalendarTiles(memberCalendars);
+    }
   };
 
   return (
@@ -66,9 +85,11 @@ const CalendarBrowser = ({
           {/* Close Modal Button */}
           <TouchableOpacity
             style={styles.expandCalendarButton}
-            onPress={handleClose}
+            onPress={() => {
+              handleClose();
+            }}
           >
-            <Text style={styles.buttonText}>Close</Text>
+            <Text style={styles.buttonText}>{closeButtonText}</Text>
           </TouchableOpacity>
         </View>
       </View>

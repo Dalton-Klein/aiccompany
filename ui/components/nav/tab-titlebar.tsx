@@ -124,15 +124,15 @@ const TitleBar = (props: any) => {
     setnewEventId(eventResult.data.id);
   };
 
-  const handleAddAssignmentsForEvent = async (calendarIds: number[]) => {
+  const handleAddAssignmentsForEvent = async () => {
     if (newEventId !== 0) {
-      const assignmentResult = await createEventAssignments(
+      await createEventAssignments(
         userState.id,
         newEventId,
-        calendarIds,
+        calendarsSelected.map((calendar: any) => calendar.id),
         ""
       );
-      console.log("assignment result: ", assignmentResult);
+      setcalendarsSelected([]);
       setnewEventId(0);
     }
   };
@@ -159,6 +159,7 @@ const TitleBar = (props: any) => {
     setisCalendarPickerOpen(false);
     setisNewEventFormOpen(false);
     setisNewTaskFormOpen(false);
+    setisCalendarSelectionOpen(false);
   };
 
   return (
@@ -200,7 +201,9 @@ const TitleBar = (props: any) => {
       {/* MODAL- Calendar Filter Modal */}
       <CalendarBrowser
         modalTitle={"Filter By Calendar"}
+        closeButtonText={"Close"}
         isVisible={isCalendarPickerOpen}
+        isFilter={true}
         handlePress={(calendar: any) => {
           handleCalendarSelectedForFilter(calendar);
         }}
@@ -209,11 +212,16 @@ const TitleBar = (props: any) => {
       {/* MODAL- Calendar Assignment Selection */}
       <CalendarBrowser
         modalTitle={"Tap calendars to share this event in"}
+        closeButtonText={"Done"}
         isVisible={isCalendarSelectionOpen}
+        isFilter={false}
         handlePress={(calendar: any) => {
           handleCalendarSelectedForAssignment(calendar);
         }}
-        handleClose={closeAllModals}
+        handleClose={() => {
+          handleAddAssignmentsForEvent();
+          closeAllModals();
+        }}
       ></CalendarBrowser>
       {/* MODAL- Create Modal */}
       <CreateForm
