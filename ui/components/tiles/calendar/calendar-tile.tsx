@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
 import { setPreferences } from "../../../store/userPreferencesSlice";
 
-const CalendarTile = (props: any) => {
+const CalendarTile = ({ handlePress, calendar }) => {
   const router = useRouter();
   const dispatch = useDispatch();
   const userState = useSelector((state: RootState) => state.user.user);
@@ -19,7 +19,7 @@ const CalendarTile = (props: any) => {
   }, []);
 
   const generateMemberList = () => {
-    let allMembers = props.members.map((member: any) =>
+    let allMembers = calendar.members.map((member: any) =>
       turnMemberIntoTile(member)
     );
     setmemberFeed(allMembers.slice(0, 3));
@@ -37,10 +37,10 @@ const CalendarTile = (props: any) => {
     dispatch(
       setPreferences({
         ...preferencesState,
-        selectedCalendar: props,
+        selectedCalendar: calendar,
       })
     );
-    props.closeModal(props);
+    handlePress(calendar);
   };
 
   return (
@@ -48,10 +48,10 @@ const CalendarTile = (props: any) => {
       style={styles.CalendarTile}
       onPress={handleCalendarSelected}
     >
-      <Text style={styles.dayTitle}>{props.title}</Text>
+      <Text style={styles.dayTitle}>{calendar.title}</Text>
       <Text style={styles.daySubTitle}>
-        {props.member_count > 0
-          ? `${props.member_count} members`
+        {calendar.member_count > 0
+          ? `${calendar.member_count} members`
           : "All calendars"}{" "}
       </Text>
       {/* {memberFeed} */}
@@ -71,12 +71,13 @@ const styles = StyleSheet.create({
   },
   dayTitle: {
     fontSize: THEME.SIZES.large,
-    color: THEME.COLORS.fontColor,
-    fontWeight: "bold",
+    color: THEME.COLORS.lighter,
+    fontWeight: "700",
   },
   daySubTitle: {
-    fontSize: THEME.SIZES.mediuml,
-    color: THEME.COLORS.fontColor,
+    fontSize: THEME.SIZES.small,
+    fontWeight: "300",
+    color: THEME.COLORS.lighter,
   },
 });
 

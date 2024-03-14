@@ -10,7 +10,6 @@ import WeeklyPicker from "../../components/nav/weekly-picker";
 import TitleBar from "../../components/nav/tab-titlebar";
 import { useSelector } from "react-redux";
 import { RootState, persistor } from "../../store/store";
-import userPreferencesSlice from "../../store/userPreferencesSlice";
 
 const Calendar = () => {
   const userState = useSelector((state: RootState) => state.user.user);
@@ -33,7 +32,6 @@ const Calendar = () => {
   //This function will clear a bad cache of state
   const clearReduxPersistCache = async () => {
     await persistor.purge();
-    console.log("Redux Persist cache cleared!");
   };
 
   useEffect(() => {
@@ -46,7 +44,7 @@ const Calendar = () => {
       generateMasterSchedule();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferencesState.selectedCalendar]);
+  }, [preferencesState.selectedCalendar, preferencesState.refreshCalendar]);
 
   const refreshSchedule = (date: any) => {
     setselectedDate(date);

@@ -13,6 +13,7 @@ const initialState: Preferences = {
     rank: [],
   },
   selectedCalendar: { id: 0 },
+  refreshCalendar: false,
 };
 
 const preferencesSlice = createSlice({

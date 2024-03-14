@@ -31,19 +31,23 @@ const AddFriendForm = () => {
       setisResultModalVisible(true);
     } else {
       const searchResult = await searchUserByUsername(user, "");
-      console.log("searh res ", searchResult);
       if (searchResult.data.length) {
         const requestResult = await sendFriendRequest(
           userState.id,
           searchResult.data[0].id,
           ""
         );
-        console.log("request res ", requestResult);
         if (requestResult && requestResult.status === "success") {
           setresultText(`Request sent to ${user}!`);
           setisResultModalVisible(true);
         } else {
-          setresultText(`Problem sending request!`);
+          if (requestResult.data) {
+            //Specific problem is given from api
+            setresultText(requestResult.data);
+          } else {
+            //No speicifc problem given from api
+            setresultText(`Problem sending request!`);
+          }
           setisResultModalVisible(true);
         }
       } else {
@@ -103,6 +107,7 @@ const styles = StyleSheet.create({
     marginTop: 15,
   },
   textInput: {
+    marginTop: 5,
     marginBottom: 15,
     marginLeft: 15,
     padding: 5,

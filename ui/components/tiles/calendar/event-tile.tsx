@@ -8,6 +8,7 @@ const EventTile = (props) => {
   const router = useRouter();
   const [eventStartTime, seteventStartTime] = useState("");
   const [eventEndTime, seteventEndTime] = useState("");
+  const [isTask, setisTask] = useState(false);
 
   useEffect(() => {
     setTileData();
@@ -15,6 +16,7 @@ const EventTile = (props) => {
   }, []);
 
   const setTileData = () => {
+    setisTask(props.is_task);
     seteventStartTime(moment(props.start_time).format("h:mm A"));
     let formattedDifference = moment
       .duration(moment(props.end_time).diff(moment(props.start_time)))
@@ -23,11 +25,17 @@ const EventTile = (props) => {
     if (formattedDifference.slice(0, 2) === "an") {
       formattedDifference = `1 ${formattedDifference.slice(2, 1000)}`;
     }
-    seteventEndTime(formattedDifference);
+    seteventEndTime(props.is_task ? "1 hour" : formattedDifference);
   };
 
   return (
-    <TouchableOpacity style={styles.eventTile}>
+    <TouchableOpacity
+      style={
+        isTask
+          ? [styles.eventTile, styles.taskColor]
+          : [styles.eventTile, styles.eventColor]
+      }
+    >
       <View>
         <Text style={styles.eventStartTime}>{eventStartTime}</Text>
         <Text style={styles.eventStartTime}>{eventEndTime}</Text>
@@ -46,12 +54,26 @@ const styles = StyleSheet.create({
     paddingTop: 10,
     paddingBottom: 10,
     paddingLeft: 25,
+    marginRight: 10,
     display: "flex",
     flexDirection: "row",
     justifyContent: "flex-start",
     alignItems: "center",
-    backgroundColor: THEME.COLORS.primary,
     borderRadius: THEME.BORDERSIZES.large,
+    shadowColor: THEME.COLORS.darker,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  eventColor: {
+    backgroundColor: THEME.COLORS.primary,
+  },
+  taskColor: {
+    backgroundColor: THEME.COLORS.secondary,
   },
   eventDetails: {
     marginLeft: 35,
@@ -63,6 +85,7 @@ const styles = StyleSheet.create({
   },
   eventNotes: {
     fontSize: THEME.SIZES.medium,
+    fontWeight: "200",
     color: THEME.COLORS.lighter,
   },
   eventStartTime: {

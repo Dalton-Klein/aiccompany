@@ -1,31 +1,70 @@
 import {
   Text,
-  Image,
   TouchableOpacity,
   View,
   Modal,
   TextInput,
+  ScrollView,
 } from "react-native";
 import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import DateTimePickerModal from "react-native-modal-datetime-picker";
+import moment from "moment";
 
-const CreateCalendarForm = ({ isModalVisible, handleCreate, handleCancel }) => {
+const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
+  const [errorText, seterrorText] = useState("");
   const [title, settitle] = useState("");
-  const [description, setdescription] = useState("");
+  const [notes, setnotes] = useState("");
+  const [isEndDatePickerVisible, setisEndDatePickerVisible] = useState(false);
+  const [selectedEndDate, setSelectedEndDate] = useState(null);
+
+  useEffect(() => {
+    setSelectedEndDate(null);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleSubmitForm = () => {
-    handleCreate({ title, description });
+    let hasError = false;
+    if (title.length < 3) {
+      seterrorText("Title too short!");
+      hasError = true;
+    }
+    if (!selectedEndDate) {
+      seterrorText("Must choose Event End Time!");
+      hasError = true;
+    }
+    if (!hasError) {
+      handleCreate({
+        title,
+        notes,
+        end_time: selectedEndDate,
+      });
+      seterrorText("");
+    }
+  };
+
+  const showEndPicker = () => {
+    setisEndDatePickerVisible(true);
+  };
+
+  const hideAllDatePickers = () => {
+    setisEndDatePickerVisible(false);
+  };
+
+  const handleConfirmEndTime = (date: any) => {
+    setSelectedEndDate(date);
+    hideAllDatePickers();
   };
 
   return (
     <Modal animationType="slide" transparent={true} visible={isModalVisible}>
-      <View style={styles.centeredView}>
+      <ScrollView contentContainerStyle={styles.centeredView}>
         <View style={styles.modalView}>
           <TextInput
             style={styles.textInput}
-            placeholder={"Calendar Name"}
+            placeholder={"Task Name"}
             placeholderTextColor="grey"
             onChangeText={(value) => {
               settitle(value);
@@ -33,17 +72,39 @@ const CreateCalendarForm = ({ isModalVisible, handleCreate, handleCancel }) => {
           ></TextInput>
           <TextInput
             style={styles.textInput}
-            placeholder={"Calendar Description"}
+            placeholder={"Task Notes"}
             placeholderTextColor="grey"
             onChangeText={(value) => {
-              setdescription(value);
+              setnotes(value);
             }}
           ></TextInput>
+          <TouchableOpacity onPress={showEndPicker}>
+            <Text style={styles.datePickerText}>Select Task Deadline</Text>
+          </TouchableOpacity>
+          {selectedEndDate ? (
+            <Text style={styles.datePickedText}>
+              {moment(selectedEndDate).format("MMMM Do YYYY, h:mm a")}
+            </Text>
+          ) : (
+            <></>
+          )}
+
+          <DateTimePickerModal
+            isVisible={isEndDatePickerVisible}
+            mode="datetime"
+            onConfirm={handleConfirmEndTime}
+            onCancel={hideAllDatePickers}
+          />
           <View style={styles.modalConfirmContainer}>
+            {errorText !== "" ? (
+              <Text style={styles.errorText}>{errorText}</Text>
+            ) : (
+              <></>
+            )}
             <BasicBtn
               iconUrl={<></>}
               handlePress={handleSubmitForm}
-              buttonText={"Create Calendar"}
+              buttonText={"Create Task"}
               isCancel={false}
             />
             <BasicBtn
@@ -54,7 +115,7 @@ const CreateCalendarForm = ({ isModalVisible, handleCreate, handleCancel }) => {
             />
           </View>
         </View>
-      </View>
+      </ScrollView>
     </Modal>
   );
 };
@@ -130,6 +191,21 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     minHeight: 150,
   },
+  datePickerText: {
+    marginBottom: 10,
+    marginTop: 10,
+    color: THEME.COLORS.primary,
+    fontSize: THEME.SIZES.medium,
+  },
+  datePickedText: {
+    marginBottom: 15,
+    color: THEME.COLORS.darker,
+    fontSize: THEME.SIZES.medium,
+  },
+  errorText: {
+    marginTop: 15,
+    color: "red",
+  },
 });
 
-export default CreateCalendarForm;
+export default CreateTaskForm;

@@ -14,7 +14,10 @@ const {
   getAllCalendarInvitesForUser,
   getAllCalendarsForUser,
 } = require("./calendar-get-queries");
-const { getAllEventsForUserThisWeekQuery } = require("./events-queries");
+const {
+  getAllEventsForUserThisWeekQuery,
+  getAllEventsForUserQuery,
+} = require("./events-queries");
 
 const getMetricDataForUser = async (userId) => {
   let query = getFriendsForUserQuerySenders();
@@ -53,7 +56,14 @@ const getMetricDataForUser = async (userId) => {
     },
   });
   query = getAllEventsForUserThisWeekQuery();
-  let eventsResult = await sequelize.query(query, {
+  let eventsResultWeek = await sequelize.query(query, {
+    type: Sequelize.QueryTypes.SELECT,
+    replacements: {
+      userId,
+    },
+  });
+  query = getAllEventsForUserQuery();
+  let eventsResultAll = await sequelize.query(query, {
     type: Sequelize.QueryTypes.SELECT,
     replacements: {
       userId,
@@ -64,7 +74,8 @@ const getMetricDataForUser = async (userId) => {
     friendRequests: friendRequestsResult,
     calendarInvites: calendarInviteResult,
     calendars: calendarResult,
-    events: eventsResult,
+    eventsThisWeek: eventsResultWeek,
+    eventsAll: eventsResultAll,
   };
 };
 

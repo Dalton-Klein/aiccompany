@@ -19,6 +19,7 @@ export interface User {
 export interface Preferences {
   discoverFilters: any;
   selectedCalendar: any;
+  refreshCalendar: boolean;
 }
 
 export interface SignIn {

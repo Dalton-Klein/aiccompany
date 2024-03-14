@@ -22,26 +22,47 @@ const sendFriendRequest = async (req, res) => {
     const { fromUserId, forUserId, token } = req.body;
 
     //***Check if request already exists
-
-    let query = `
-      insert into public.friend_requests  (sender, receiver, created_at, updated_at)
-      values (:sender, :receiver, current_timestamp, current_timestamp)
-    `;
-    const friendInsertResult = await sequelize.query(query, {
-      type: Sequelize.QueryTypes.INSERT,
+    let query = getIncomingPendingFriendsForUserQuery();
+    const incomingResult = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
       replacements: {
-        sender: fromUserId,
-        receiver: forUserId,
+        userId: fromUserId,
       },
     });
-    const result = {
-      status: "success",
-      data: "created friend request",
-    };
-    saveNotification(forUserId, 1, fromUserId);
-    updateUserGenInfoField(fromUserId, "last_seen", moment().format());
-    if (friendInsertResult) res.status(200).send(result);
-    else throw new Error("Failed to create friend request");
+    query = getOutgoingPendingFriendsForUserQuery();
+    const outgoingResult = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        userId: fromUserId,
+      },
+    });
+    const allPendingRequests = incomingResult.concat(outgoingResult);
+    console.log("all pending: ", allPendingRequests);
+    if (allPendingRequests.some((request) => request.user_id === forUserId)) {
+      res
+        .status(200)
+        .send({ staus: "error", data: "Pending request already exists!" });
+    } else {
+      query = `
+        insert into public.friend_requests  (sender, receiver, created_at, updated_at)
+        values (:sender, :receiver, current_timestamp, current_timestamp)
+      `;
+      const friendInsertResult = await sequelize.query(query, {
+        type: Sequelize.QueryTypes.INSERT,
+        replacements: {
+          sender: fromUserId,
+          receiver: forUserId,
+        },
+      });
+      const result = {
+        status: "success",
+        data: "created friend request",
+      };
+      saveNotification(forUserId, 1, fromUserId);
+      updateUserGenInfoField(fromUserId, "last_seen", moment().format());
+      if (friendInsertResult) res.status(200).send(result);
+      else throw new Error("Failed to create friend request");
+    }
   } catch (err) {
     console.log(err);
     res.status(500).send("POST ERROR");

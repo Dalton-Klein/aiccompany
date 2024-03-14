@@ -6,11 +6,11 @@ const Layout = () => {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: THEME.COLORS.primary,
+        tabBarActiveTintColor: THEME.COLORS.darker,
         tabBarStyle: {
           backgroundColor: THEME.COLORS.lighter,
           borderTopWidth: 1,
-          borderTopColor: THEME.COLORS.dark,
+          borderTopColor: THEME.COLORS.darker,
           paddingTop: 5,
         },
       }}

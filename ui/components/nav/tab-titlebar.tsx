@@ -13,36 +13,42 @@ import { useNavigationState } from "@react-navigation/native";
 import {
   createCalendar,
   createEvent,
+  createEventAssignments,
+  createTask,
   getAllCalendarsForUser,
 } from "../../app/services/rest";
 import CalendarTile from "../tiles/calendar/calendar-tile";
 import BasicBtn from "../tiles/buttons/basicButton";
 import CreateCalendarForm from "../forms/createCalendarForm";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import CreateEventForm from "../forms/createEventForm";
 import CreateForm from "../forms/createForm";
+import { setPreferences } from "../../store/userPreferencesSlice";
+import CreateTaskForm from "../forms/createTaskForm";
+import CalendarBrowser from "./calendarBrowser";
 
 const TitleBar = (props: any) => {
+  const dispatch = useDispatch();
   const userState = useSelector((state: RootState) => state.user.user);
+  const preferencesState = useSelector((state: RootState) => state.preferences);
+
   const [mainTitle, setmainTitle] = useState("Dashboard");
+  //For picking calendar to filter by
   const [isCalendarPickerOpen, setisCalendarPickerOpen] = useState(false);
+  //For selecting calendars to assign events
+  const [isCalendarSelectionOpen, setisCalendarSelectionOpen] = useState(false);
+  const [calendarsSelected, setcalendarsSelected] = useState([]);
+  const [newEventId, setnewEventId] = useState(0);
   const [isCreateMenuOpen, setisCreateMenuOpen] = useState(false);
   const [isNewCalendarFormOpen, setisNewCalendarFormOpen] = useState(false);
   const [isNewEventFormOpen, setisNewEventFormOpen] = useState(false);
-  const [calendarTiles, setcalendarTiles] = useState([]);
+  const [isNewTaskFormOpen, setisNewTaskFormOpen] = useState(false);
   const [calendarTitle, setcalendarTitle] = useState("Master");
 
   const routeName = useNavigationState(
     (state) => state.routes[state.index].name
   );
-
-  useEffect(() => {
-    if (isCalendarPickerOpen) {
-      refreshCalendars();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isCalendarPickerOpen]);
 
   useEffect(() => {
     if (routeName === "calendar") {
@@ -54,40 +60,21 @@ const TitleBar = (props: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName, calendarTitle]);
 
-  const refreshCalendars = async () => {
-    const results = await getAllCalendarsForUser(1, "");
-    if (results.status === "success" && results.data.length) {
-      covertCalendarDataIntoTiles(results.data);
-    } else {
-      covertCalendarDataIntoTiles([]);
-    }
-  };
-
-  const covertCalendarDataIntoTiles = async (calendars: any) => {
-    const memberCalendars = calendars.map((calendar) => (
-      <View key={calendar.id}>
-        <CalendarTile {...calendar} closeModal={closeModal}></CalendarTile>
-      </View>
-    ));
-    const defaultCalendar = {
-      title: "Master",
-      member_count: 0,
-      id: 0,
-    };
-    const defaultCalendarTile = [
-      <View key={0}>
-        <CalendarTile
-          {...defaultCalendar}
-          closeModal={closeModal}
-        ></CalendarTile>
-      </View>,
-    ];
-    setcalendarTiles(defaultCalendarTile.concat(memberCalendars));
-  };
-
-  const closeModal = (calendar: any) => {
+  const handleCalendarSelectedForFilter = (calendar: any) => {
     handleOpenCalendarPicker();
     setcalendarTitle(calendar.title);
+  };
+
+  const handleCalendarSelectedForAssignment = (cal: any) => {
+    //This either adds or removes a calendar from the array of selected calendars
+    if (calendarsSelected.some((calendar: any) => calendar.id === cal.id)) {
+      const updatedCalendars = calendarsSelected.filter(
+        (calendar) => calendar.id !== cal.id
+      );
+      setcalendarsSelected(updatedCalendars);
+    } else {
+      setcalendarsSelected([...calendarsSelected, cal]);
+    }
   };
 
   const handleOpenCalendarPicker = async () => {
@@ -113,17 +100,54 @@ const TitleBar = (props: any) => {
     setisNewEventFormOpen(true);
   };
 
+  const handleOpenCreateTaskForm = () => {
+    setisCreateMenuOpen(false);
+    setisNewTaskFormOpen(true);
+  };
+
   const handleOpenCreateCalendarForm = () => {
     setisCreateMenuOpen(false);
     setisNewCalendarFormOpen(!isNewCalendarFormOpen);
   };
 
   const handleSubmitCreateEvent = async (event: any) => {
-    console.log("creating event: ", event);
-    const result = await createEvent(userState.id, event, "");
-    console.log("result: ", result);
+    const eventResult = await createEvent(userState.id, event, "");
+    console.log("event result: ", eventResult);
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        refreshCalendar: !preferencesState.refreshCalendar,
+      })
+    );
+    setisNewEventFormOpen(false);
+    setisCalendarSelectionOpen(true);
+    setnewEventId(eventResult.data.id);
+  };
+
+  const handleAddAssignmentsForEvent = async (calendarIds: number[]) => {
+    if (newEventId !== 0) {
+      const assignmentResult = await createEventAssignments(
+        userState.id,
+        newEventId,
+        calendarIds,
+        ""
+      );
+      console.log("assignment result: ", assignmentResult);
+      setnewEventId(0);
+    }
+  };
+
+  const handleSubmitCreateTask = async (task: any) => {
+    await createTask(userState.id, task, "");
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        refreshCalendar: !preferencesState.refreshCalendar,
+      })
+    );
     closeAllModals();
   };
+
   const handleSubmitCreateCalendar = async (form: any) => {
     await createCalendar(userState.id, form.title, form.description, [], "");
     closeAllModals();
@@ -134,6 +158,7 @@ const TitleBar = (props: any) => {
     setisNewCalendarFormOpen(false);
     setisCalendarPickerOpen(false);
     setisNewEventFormOpen(false);
+    setisNewTaskFormOpen(false);
   };
 
   return (
@@ -173,29 +198,28 @@ const TitleBar = (props: any) => {
 
       {/* MODAL- Calendar Picker */}
       {/* MODAL- Calendar Filter Modal */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={isCalendarPickerOpen}
-      >
-        <View style={styles.centeredView}>
-          <View style={styles.modalView}>
-            <Text style={styles.modalTitleText}>Filter By Calendar</Text>
-            <View style={styles.modalGrid}>{calendarTiles}</View>
-            {/* Close Modal Button */}
-            <TouchableOpacity
-              style={styles.expandCalendarButton}
-              onPress={handleOpenCalendarPicker}
-            >
-              <Text style={styles.buttonText}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
+      <CalendarBrowser
+        modalTitle={"Filter By Calendar"}
+        isVisible={isCalendarPickerOpen}
+        handlePress={(calendar: any) => {
+          handleCalendarSelectedForFilter(calendar);
+        }}
+        handleClose={closeAllModals}
+      ></CalendarBrowser>
+      {/* MODAL- Calendar Assignment Selection */}
+      <CalendarBrowser
+        modalTitle={"Tap calendars to share this event in"}
+        isVisible={isCalendarSelectionOpen}
+        handlePress={(calendar: any) => {
+          handleCalendarSelectedForAssignment(calendar);
+        }}
+        handleClose={closeAllModals}
+      ></CalendarBrowser>
       {/* MODAL- Create Modal */}
       <CreateForm
         isModalVisible={isCreateMenuOpen}
         handleCreateEvent={handleOpenCreateEventForm}
+        handleCreateTask={handleOpenCreateTaskForm}
         handleCreateCalendar={handleOpenCreateCalendarForm}
         handleCancel={closeAllModals}
       ></CreateForm>
@@ -205,6 +229,11 @@ const TitleBar = (props: any) => {
         handleCreate={handleSubmitCreateEvent}
         handleCancel={closeAllModals}
       ></CreateEventForm>
+      <CreateTaskForm
+        isModalVisible={isNewTaskFormOpen}
+        handleCreate={handleSubmitCreateTask}
+        handleCancel={closeAllModals}
+      ></CreateTaskForm>
       {/* MODAL- Create Calendar Modal */}
       <CreateCalendarForm
         isModalVisible={isNewCalendarFormOpen}
@@ -254,53 +283,9 @@ const styles = StyleSheet.create({
   titleText: {
     color: THEME.COLORS.fontColor,
     textAlign: "center",
-    fontWeight: "bold",
+    fontWeight: "600",
     fontSize: THEME.SIZES.large,
     minWidth: "50%",
-  },
-  centeredView: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    marginTop: 22,
-  },
-  modalView: {
-    margin: 20,
-    backgroundColor: THEME.COLORS.lighter,
-    borderRadius: 20,
-    width: "90%",
-    padding: 35,
-    alignItems: "center",
-    shadowColor: "#000",
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  modalGrid: {
-    minWidth: "100%",
-    marginBottom: 15,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    flexWrap: "wrap",
-  },
-  expandCalendarButton: {
-    borderRadius: THEME.BORDERSIZES.large,
-    borderColor: "black",
-    borderWidth: 2,
-  },
-  modalTitleText: {
-    marginBottom: 15,
-    fontWeight: "bold",
-    fontSize: THEME.SIZES.medium,
-    color: THEME.COLORS.fontColor,
-  },
-  buttonText: {
-    padding: 10,
-    color: THEME.COLORS.fontColor,
   },
 });
 

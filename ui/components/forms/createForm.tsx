@@ -14,6 +14,7 @@ import { useState } from "react";
 const CreateForm = ({
   isModalVisible,
   handleCreateEvent,
+  handleCreateTask,
   handleCreateCalendar,
   handleCancel,
 }) => {
@@ -26,6 +27,12 @@ const CreateForm = ({
               iconUrl={<></>}
               handlePress={handleCreateEvent}
               buttonText={"Create Event"}
+              isCancel={false}
+            />
+            <BasicBtn
+              iconUrl={<></>}
+              handlePress={handleCreateTask}
+              buttonText={"Create Task"}
               isCancel={false}
             />
             <BasicBtn

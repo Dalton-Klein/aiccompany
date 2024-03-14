@@ -26,6 +26,18 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: true,
       },
+      series_id: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      is_task: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
+      is_completed: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
     },
     { schema: "public", freezeTableName: true }
   );

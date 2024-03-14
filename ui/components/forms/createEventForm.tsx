@@ -92,6 +92,10 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     setisEndDatePickerVisible(true);
   };
 
+  const showSeriesEndPicker = () => {
+    setisSeriesEndDatePickerVisible(true);
+  };
+
   const hideAllDatePickers = () => {
     setisStartDatePickerVisible(false);
     setisEndDatePickerVisible(false);
@@ -218,7 +222,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
                 }}
                 buttonStyle={{ marginBottom: 5, marginTop: 5 }}
               />
-              <TouchableOpacity onPress={showStartPicker}>
+              <TouchableOpacity onPress={showSeriesEndPicker}>
                 <Text style={styles.datePickerText}>
                   Select Series End Date
                 </Text>
@@ -232,7 +236,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               )}
 
               <DateTimePickerModal
-                isVisible={isStartDatePickerVisible}
+                isVisible={isSeriesEndDatePickerVisible}
                 mode="datetime"
                 onConfirm={handleConfirmSeriesEndTime}
                 onCancel={hideAllDatePickers}

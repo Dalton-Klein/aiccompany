@@ -116,7 +116,6 @@ const AuthenticationForm = () => {
           router.navigate("dashboard");
         }
       }
-      console.log("result ", result);
     }
   };
 
@@ -129,6 +128,13 @@ const AuthenticationForm = () => {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.masterContainer}>
+          <Image
+            source={{
+              uri: "https://res.cloudinary.com/kultured-dev/image/upload/v1710353434/AccompanyMeLogov1-Large_tdejjd.png",
+            }}
+            style={styles.logoImage}
+            resizeMode="contain"
+          />
           <Text style={styles.titleText}>Accompany Me</Text>
 
           <Modal
@@ -327,6 +333,11 @@ const AuthenticationForm = () => {
 const styles = StyleSheet.create({
   masterContainer: {
     marginTop: 125,
+    alignItems: "center",
+  },
+  logoImage: {
+    width: 150, // Adjust the width and height according to your preference
+    height: 150,
   },
   titleText: {
     fontSize: THEME.SIZES.xxLarge,

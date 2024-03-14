@@ -3,9 +3,16 @@ import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import { useEffect, useState } from "react";
 
-const MetricTile = ({ titleText, amount, handlePress }) => {
+const MetricTile = ({ titleText, amount, handlePress, isTask }) => {
   return (
-    <TouchableOpacity style={styles.widgetContainer} onPress={handlePress}>
+    <TouchableOpacity
+      style={
+        isTask
+          ? [styles.widgetContainer, styles.taskColor]
+          : [styles.widgetContainer, styles.eventColor]
+      }
+      onPress={handlePress}
+    >
       <View style={styles.titleBox}>
         <Text style={styles.amountText}>{amount}</Text>
       </View>
@@ -19,7 +26,6 @@ const MetricTile = ({ titleText, amount, handlePress }) => {
 const styles = StyleSheet.create({
   widgetContainer: {
     flex: 1,
-    backgroundColor: THEME.COLORS.primary,
     borderRadius: THEME.BORDERSIZES.large,
     justifyContent: "center",
     alignItems: "center",
@@ -31,6 +37,20 @@ const styles = StyleSheet.create({
     maxWidth: 150,
     minHeight: 150,
     maxHeight: 150,
+    shadowColor: THEME.COLORS.darker,
+    shadowOffset: {
+      width: 2,
+      height: 2,
+    },
+    shadowOpacity: 0.4,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  eventColor: {
+    backgroundColor: THEME.COLORS.primary,
+  },
+  taskColor: {
+    backgroundColor: THEME.COLORS.secondary,
   },
   cancelButton: {
     backgroundColor: THEME.COLORS.lighter,
@@ -62,17 +82,16 @@ const styles = StyleSheet.create({
     borderRadius: THEME.SIZES.small / 1.25,
   },
   titleText: {
+    fontWeight: "300",
     color: THEME.COLORS.lighter,
-    marginLeft: 10,
     fontSize: THEME.SIZES.medium,
     textAlign: "center",
   },
   amountText: {
+    fontWeight: "900",
     color: THEME.COLORS.lighter,
-    marginLeft: 10,
     fontSize: THEME.SIZES.xLarge,
     textAlign: "center",
-    fontWeight: "800",
   },
 });
 

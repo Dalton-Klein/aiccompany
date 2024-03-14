@@ -304,7 +304,6 @@ exports.forgotPassword = async (req, res) => {
         email: req.body.email,
       },
     });
-    console.log("@@@ ", userResult);
     if (userResult === null) {
       res.send({
         error: "no account found with that email",
@@ -391,7 +390,6 @@ exports.tryAppleSignin = async (req, res) => {
     };
     const result = await sequelize.query(query, queryOptions);
     if (result && result.length > 0) {
-      console.log("result? ", result);
       let stateObject = result[0];
       stateObject.token = services.keyGen(15);
       stateObject.connection_count_sender = 0;

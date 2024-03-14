@@ -223,6 +223,54 @@ export const createEvent = async (userId, event, token) => {
   }
 };
 
+export const createTask = async (userId, task, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/create-task`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        task,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
+  }
+};
+
+export const createEventAssignments = async (
+  userId,
+  eventId,
+  calendarIds,
+  token
+) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/create-event-assignments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        eventId,
+        calendarIds,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event assignments`);
+  }
+};
+
 //Dashboard Routes
 export const getMetricData = async (userId, token) => {
   try {
