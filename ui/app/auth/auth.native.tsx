@@ -29,7 +29,7 @@ export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
         const result: any = await dispatch(
           signInUserThunk({ appleUserId: credential.user }, true)
         );
-        if (result && result.status === "success") {
+        if (result && result.status && result.status === "success") {
           handleSuccess(result);
         } else {
           handleCreateAccount(credential.user);

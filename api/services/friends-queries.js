@@ -72,8 +72,8 @@ const getPendingCalendarInvitesForUserQuery = () => {
 
 const getFriendInsertQuery = () => {
   return `
-  insert into public.friends (sender, acceptor, platform, created_at, updated_at)
-       values (:senderId, :acceptorId, :platform, now(), now())
+  insert into public.friends (sender, acceptor, created_at, updated_at)
+       values (:senderId, :acceptorId, now(), now())
   `;
 };
 

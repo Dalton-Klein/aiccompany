@@ -1,6 +1,10 @@
 const { sequelize } = require("../models/index");
 const Sequelize = require("sequelize");
-const { createNotificationQuery, removeNotificationQuery, getAllNotificationsQuery } = require("../services/notifications-queries");
+const {
+  createNotificationQuery,
+  removeNotificationQuery,
+  getAllNotificationsQuery,
+} = require("../services/notifications-queries");
 const { getUserInfo } = require("../services/user-common");
 const emailService = require("../services/auth");
 
@@ -35,26 +39,26 @@ const saveNotification = async (userId, typeId, otherUserId) => {
     ownerUserDetails = ownerUserDetails[0];
     const _io = global._io;
     //Send Private Notifcation to owner
-    _io.to(`notifications-${userId}`).emit("notification", {
-      id: notificationResult.id,
-      owner_id: ownerUserDetails.id,
-      type_id: typeId,
-      other_user_id: otherUserId,
-      other_username: otherUserDetails.username,
-      other_user_avatar_url: otherUserDetails.avatar_url,
-    });
+    // _io.to(`notifications-${userId}`).emit("notification", {
+    //   id: notificationResult.id,
+    //   owner_id: ownerUserDetails.id,
+    //   type_id: typeId,
+    //   other_user_id: otherUserId,
+    //   other_username: otherUserDetails.username,
+    //   other_user_avatar_url: otherUserDetails.avatar_url,
+    // });
     //Send Public Notification to home page
     if (typeId !== 3) {
-      _io.to(`notifications-general`).emit("notification", {
-        id: notificationResult.id,
-        owner_id: ownerUserDetails.id,
-        owner_username: ownerUserDetails.username,
-        owner_avatar_url: ownerUserDetails.avatar_url,
-        type_id: typeId,
-        other_user_id: otherUserId,
-        other_username: otherUserDetails.username,
-        other_user_avatar_url: otherUserDetails.avatar_url,
-      });
+      // _io.to(`notifications-general`).emit("notification", {
+      //   id: notificationResult.id,
+      //   owner_id: ownerUserDetails.id,
+      //   owner_username: ownerUserDetails.username,
+      //   owner_avatar_url: ownerUserDetails.avatar_url,
+      //   type_id: typeId,
+      //   other_user_id: otherUserId,
+      //   other_username: otherUserDetails.username,
+      //   other_user_avatar_url: otherUserDetails.avatar_url,
+      // });
     }
     //Send Email If User Is Opted In
     const emailNotifIdToSubjectIdMapping = {
@@ -65,7 +69,12 @@ const saveNotification = async (userId, typeId, otherUserId) => {
       5: 0,
     };
     if (ownerUserDetails.is_email_notifications) {
-      emailService.sendEmail({ body: { email: ownerUserDetails.email } }, "vKey", emailNotifIdToSubjectIdMapping[typeId], ownerUserDetails.username);
+      // emailService.sendEmail(
+      //   { body: { email: ownerUserDetails.email } },
+      //   "vKey",
+      //   emailNotifIdToSubjectIdMapping[typeId],
+      //   ownerUserDetails.username
+      // );
     }
     return;
   } catch (err) {

@@ -123,7 +123,8 @@ const getFriendDetails = async (friendId) => {
 const acceptFriendRequest = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
-    const { senderId, acceptorId, platform, pendingId } = req.body;
+    console.log("test: ", req.body);
+    const { senderId, acceptorId, pendingId } = req.body;
     const friendInsertQuery = getFriendInsertQuery();
     //Insert friend record
     const friendInsertResult = await sequelize.query(friendInsertQuery, {
@@ -131,10 +132,10 @@ const acceptFriendRequest = async (req, res) => {
       replacements: {
         senderId,
         acceptorId,
-        platform,
       },
       transaction,
     });
+    console.log("removing id: ", pendingId);
     const pendingDeletionQuery = removePendingFriendQuery();
     //Remove pending friend now that friend record created
     await sequelize.query(pendingDeletionQuery, {

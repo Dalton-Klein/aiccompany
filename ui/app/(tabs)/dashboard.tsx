@@ -10,6 +10,8 @@ import { useNavigationState } from "@react-navigation/native";
 import { getMetricData } from "../services/rest";
 import AddFriendForm from "../../components/forms/addFriendForm";
 import moment from "moment";
+import RequestsForm from "../../components/forms/requestsForm";
+import CalendarBrowser from "../../components/nav/calendarBrowser";
 
 const Dashboard = () => {
   const routeName = useNavigationState(
@@ -21,7 +23,7 @@ const Dashboard = () => {
   const [lastRefreshTime, setlastRefreshTime] = useState<any>(null);
   const [isRefreshing, setisRefreshing] = useState<any>(null);
 
-  const [metricData, setmetricData] = useState({});
+  const [metricData, setmetricData] = useState<any>({});
   const [eventCount, seteventCount] = useState(0);
   const [unsharedEventCount, setunsharedEventCount] = useState(0);
   const [taskCount, settaskCount] = useState(0);
@@ -30,22 +32,27 @@ const Dashboard = () => {
   const [friendInviteCount, setfriendInviteCount] = useState(0);
   const [calendarInviteCount, setcalendarInviteCount] = useState(0);
   const [calendarCount, setcalendarCount] = useState(0);
+
+  const [isFriendRequestsOpen, setisFriendRequestsOpen] = useState(false);
+  const [isCalendarRequestsOpen, setisCalendarRequestsOpen] = useState(false);
+  const [isCalendarPickerOpen, setisCalendarPickerOpen] = useState(false);
+
   useEffect(() => {
     refreshMetricTiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName]);
 
-  const refreshMetricTiles = async () => {
+  const refreshMetricTiles = async (forceRefresh = false) => {
     const currentTime = new Date().getTime();
     if (
-      !isRefreshing &&
-      (!lastRefreshTime || currentTime - lastRefreshTime > 3000)
+      forceRefresh ||
+      (!isRefreshing &&
+        (!lastRefreshTime || currentTime - lastRefreshTime > 3000))
     ) {
       setlastRefreshTime(currentTime);
       setisRefreshing(true);
       const data = await getMetricData(userState.id, userState.token);
-      if (data && data.status === "success" && data.data) {
-        console.log("data", data.data.friendRequests);
+      if (data && data.status && data.status === "success" && data.data) {
         setmetricData(data.data);
         seteventCount(
           data.data.eventsThisWeek?.length
@@ -104,7 +111,17 @@ const Dashboard = () => {
     }, 2000);
   };
 
-  const handleOpenFriendRequests = () => {};
+  const handleOpenFriendRequests = () => {
+    setisFriendRequestsOpen(true);
+  };
+
+  const handleOpenCalendarRequests = () => {
+    setisCalendarRequestsOpen(true);
+  };
+
+  const handleCalendarSelectedForManagement = (calendar: any) => {
+    setisCalendarPickerOpen(false);
+  };
 
   const handleScroll = (event) => {
     const { contentOffset } = event.nativeEvent;
@@ -172,16 +189,71 @@ const Dashboard = () => {
             isTask={false}
             titleText={"Calendar Invites"}
             amount={calendarInviteCount}
-            handlePress={() => {}}
+            handlePress={() => {
+              handleOpenCalendarRequests();
+            }}
           ></MetricTile>
           <MetricTile
             isTask={false}
             titleText={"Group Calendars"}
             amount={calendarCount}
-            handlePress={() => {}}
+            handlePress={() => {
+              setisCalendarPickerOpen(true);
+            }}
           ></MetricTile>
         </View>
       </ScrollView>
+
+      {/* START CONDITIONAL MODALS */}
+      <RequestsForm
+        isModalVisible={isFriendRequestsOpen}
+        title={"Friend Requests"}
+        isFriendRequests={true}
+        requests={
+          metricData &&
+          metricData.friendRequests &&
+          metricData.friendRequests.length
+            ? metricData.friendRequests
+            : []
+        }
+        handleRefresh={async () => {
+          refreshMetricTiles(true);
+        }}
+        handleClose={() => {
+          setisFriendRequestsOpen(false);
+        }}
+      ></RequestsForm>
+      <RequestsForm
+        isModalVisible={isCalendarRequestsOpen}
+        title={"Calendar Invites"}
+        isFriendRequests={false}
+        requests={
+          metricData &&
+          metricData.calendarInvites &&
+          metricData.calendarInvites.length
+            ? metricData.calendarInvites
+            : []
+        }
+        handleRefresh={async () => {
+          refreshMetricTiles(true);
+        }}
+        handleClose={() => {
+          setisCalendarRequestsOpen(false);
+        }}
+      ></RequestsForm>
+      {/* MODAL- Calendar Management Modal */}
+      <CalendarBrowser
+        modalTitle={"Choose Calendar To Manage"}
+        closeButtonText={"Close"}
+        isVisible={isCalendarPickerOpen}
+        isFilter={false}
+        handlePress={(calendar: any) => {
+          handleCalendarSelectedForManagement(calendar);
+        }}
+        handleClose={() => {
+          setisCalendarPickerOpen(false);
+        }}
+      ></CalendarBrowser>
     </SafeAreaView>
   );
 };

@@ -3,6 +3,11 @@ const Sequelize = require("sequelize");
 const { sequelize } = require("../models/index");
 const { updateUserGenInfoField } = require("../services/user-common");
 const moment = require("moment");
+const {
+  getCalendarMemberInsertQuery,
+  removePendingCalendarInviteQuery,
+} = require("../services/calendar-insert-queries");
+const { saveNotification } = require("../controllers/notifications-controller");
 
 /*
 get calendars
@@ -69,7 +74,42 @@ const createCalendar = async (req, res) => {
   }
 };
 
+const acceptCalendarInvite = async (req, res) => {
+  const transaction = await sequelize.transaction();
+  try {
+    const { calendarId, userId, pendingId } = req.body;
+    const calendarInsertQuery = getCalendarMemberInsertQuery();
+    //Insert friend record
+    const friendInsertResult = await sequelize.query(calendarInsertQuery, {
+      type: Sequelize.QueryTypes.INSERT,
+      replacements: {
+        calendarId,
+        userId,
+      },
+      transaction,
+    });
+    const pendingDeletionQuery = removePendingCalendarInviteQuery();
+    //Remove pending friend now that friend record created
+    await sequelize.query(pendingDeletionQuery, {
+      type: Sequelize.QueryTypes.INSERT,
+      replacements: {
+        id: pendingId,
+      },
+      transaction,
+    });
+    // saveNotification(senderId, 2, acceptorId);
+    updateUserGenInfoField(userId, "last_seen", moment().format());
+    transaction.commit();
+    res.status(200).send(friendInsertResult);
+  } catch (err) {
+    console.log(err);
+    transaction.rollback();
+    res.status(500).send("POST ERROR");
+  }
+};
+
 module.exports = {
   getAllCalendarsForUser,
   createCalendar,
+  acceptCalendarInvite,
 };

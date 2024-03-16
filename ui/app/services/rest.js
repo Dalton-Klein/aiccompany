@@ -332,3 +332,52 @@ export const sendFriendRequest = async (fromUserId, forUserId, token) => {
     console.log(`${error} while creating event`);
   }
 };
+
+export const acceptFriendRequest = async (request, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/accept-friend`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        senderId: request.senderId,
+        acceptorId: request.receiver,
+        pendingId: request.pendingId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
+  }
+};
+
+export const acceptCalendarInvite = async (
+  calendarId,
+  userId,
+  pendingId,
+  token
+) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/accept-calendar-invite`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarId,
+        userId,
+        pendingId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
+  }
+};

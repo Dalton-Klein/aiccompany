@@ -26,7 +26,12 @@ const CalendarBrowser = ({
 
   const refreshCalendars = async () => {
     const results = await getAllCalendarsForUser(1, "");
-    if (results.status === "success" && results.data.length) {
+    if (
+      results &&
+      results.status &&
+      results.status === "success" &&
+      results.data.length
+    ) {
       covertCalendarDataIntoTiles(results.data);
     } else {
       covertCalendarDataIntoTiles([]);

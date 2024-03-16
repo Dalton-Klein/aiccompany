@@ -37,7 +37,11 @@ const AddFriendForm = () => {
           searchResult.data[0].id,
           ""
         );
-        if (requestResult && requestResult.status === "success") {
+        if (
+          requestResult &&
+          requestResult.status &&
+          requestResult.status === "success"
+        ) {
           setresultText(`Request sent to ${user}!`);
           setisResultModalVisible(true);
         } else {
@@ -76,7 +80,7 @@ const AddFriendForm = () => {
           setuser(value);
         }}
       ></TextInput>
-      <TouchableOpacity style={styles.btnContainer} onPress={tryAddFriend}>
+      <TouchableOpacity style={styles.sendBtnContainer} onPress={tryAddFriend}>
         <Text style={styles.btnText}>Send</Text>
       </TouchableOpacity>
       {/* Result Modal */}
@@ -114,6 +118,20 @@ const styles = StyleSheet.create({
     borderRadius: THEME.BORDERSIZES.medium,
     borderColor: THEME.COLORS.primary,
     minWidth: "70%",
+  },
+  sendBtnContainer: {
+    flex: 1,
+    backgroundColor: THEME.COLORS.primary,
+    borderRadius: THEME.BORDERSIZES.medium,
+    justifyContent: "center",
+    alignItems: "center",
+    marginLeft: 5,
+    marginRight: 20,
+    maxHeight: 50,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingRight: 20,
+    paddingLeft: 20,
   },
   btnContainer: {
     flex: 1,

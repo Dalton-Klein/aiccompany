@@ -26,6 +26,7 @@ const Calendar = () => {
 
   useEffect(() => {
     // clearReduxPersistCache();
+
     if (!userState.id || userState.id < 1) {
       router.navigate("auth/authentication");
     }
@@ -81,10 +82,6 @@ const Calendar = () => {
       setcalendarFeed([]);
       const dateHeadings = calendarService.generateDateHeadings(selectedDate);
       const eventResult = await grabEvents();
-      console.log(
-        "got events",
-        eventResult.data.filter((e) => e.id == 24)
-      );
       let events = [];
       if (eventResult?.data.length) {
         events = eventResult.data;

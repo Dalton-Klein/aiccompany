@@ -34,8 +34,10 @@ const getAllCalendarsForUser = () => {
 
 const getAllCalendarInvitesForUser = () => {
   return `
-    select ci.* 
+    select ci.*, c.title
       from public.calendar_invites ci
+      join public.calendars c
+        on c.id = ci.calendar_id
      where ci.receiver = :userId
   `;
 };
