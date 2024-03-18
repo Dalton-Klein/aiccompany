@@ -45,6 +45,58 @@ const getAllCalendarsForUser = async (req, res) => {
   }
 };
 
+const getDataForCalendar = async (req, res) => {
+  try {
+    const { calendarId, token } = req.body;
+    let query = `
+         select c.*
+           from public.calendars c
+          where c.id = :calendarId
+    `;
+    const caldarResult = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        calendarId,
+      },
+    });
+    query = `
+         select cm.*
+           from public.calendar_members cm
+          where cm.calendar_id = :calendarId
+    `;
+    const memberResult = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        calendarId,
+      },
+    });
+    query = `
+         select ci.*, u.username, u.avatar_url
+           from public.calendar_invites ci
+           join public.users u
+             on u.id = ci.receiver
+          where ci.calendar_id = :calendarId
+    `;
+    const inviteResult = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        calendarId,
+      },
+    });
+    const result = {
+      status: "success",
+      data: caldarResult[0],
+      memberResult,
+      inviteResult,
+    };
+    if (caldarResult) res.status(200).send(result);
+    else throw new Error("Failed to get events");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("POST ERROR");
+  }
+};
+
 const createCalendar = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
@@ -110,6 +162,7 @@ const acceptCalendarInvite = async (req, res) => {
 
 module.exports = {
   getAllCalendarsForUser,
+  getDataForCalendar,
   createCalendar,
   acceptCalendarInvite,
 };

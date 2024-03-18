@@ -121,6 +121,7 @@ const Dashboard = () => {
 
   const handleCalendarSelectedForManagement = (calendar: any) => {
     setisCalendarPickerOpen(false);
+    router.navigate(`/calendar-manager/${calendar.id}`);
   };
 
   const handleScroll = (event) => {

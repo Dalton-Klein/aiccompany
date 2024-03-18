@@ -172,6 +172,26 @@ export const getAllCalendarsForUser = async (userId, token) => {
   }
 };
 
+export const getCalendarsData = async (calendarId, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/get-calendar-data`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while fetching calendars for user`);
+  }
+};
+
 // CREATE ROUTES
 export const createCalendar = async (
   userId,
