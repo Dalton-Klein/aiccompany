@@ -20,9 +20,22 @@ send friend request logic
 const sendFriendRequest = async (req, res) => {
   try {
     const { fromUserId, forUserId, token } = req.body;
-
+    let query = getFriendsForUserQuerySenders();
+    const friendsResultSender = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        userId: fromUserId,
+      },
+    });
+    query = getFriendsForUserQuerySenders();
+    const friendsResultAcceptor = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        userId: fromUserId,
+      },
+    });
     //***Check if request already exists
-    let query = getIncomingPendingFriendsForUserQuery();
+    query = getIncomingPendingFriendsForUserQuery();
     const incomingResult = await sequelize.query(query, {
       type: Sequelize.QueryTypes.SELECT,
       replacements: {
@@ -36,9 +49,17 @@ const sendFriendRequest = async (req, res) => {
         userId: fromUserId,
       },
     });
+    const allExistingFriends = friendsResultSender.concat(
+      friendsResultAcceptor
+    );
     const allPendingRequests = incomingResult.concat(outgoingResult);
-    console.log("all pending: ", allPendingRequests);
-    if (allPendingRequests.some((request) => request.user_id === forUserId)) {
+    if (allExistingFriends.some((request) => request.user_id === forUserId)) {
+      res
+        .status(200)
+        .send({ staus: "error", data: "You are already friends!" });
+    } else if (
+      allPendingRequests.some((request) => request.user_id === forUserId)
+    ) {
       res
         .status(200)
         .send({ staus: "error", data: "Pending request already exists!" });

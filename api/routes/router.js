@@ -52,6 +52,7 @@ router.post(
 );
 
 // SOCIAL ROUTES
+router.post("/get-user-search-data", userController.getUserSearchData);
 router.post("/social", userController.getSocialDetails);
 router.post("/friend-request", friendsController.sendFriendRequest);
 router.post("/accept-friend", friendsController.acceptFriendRequest);

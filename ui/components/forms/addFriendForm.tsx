@@ -5,32 +5,72 @@ import {
   View,
   TextInput,
   Modal,
+  FlatList,
 } from "react-native";
 import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import { useEffect, useRef, useState } from "react";
-import BasicBtn from "../tiles/buttons/basicButton";
 import {
+  fetchUserSearchData,
   searchUserByUsername,
   sendFriendRequest,
 } from "../../app/services/rest";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import Autocomplete from "react-native-autocomplete-input";
 
-const AddFriendForm = () => {
+const AddFriendForm = ({ handleTextInputFocus }) => {
   const userState = useSelector((state: RootState) => state.user.user);
   const textInputRef = useRef(null);
 
-  const [user, setuser] = useState("");
+  const [searchQuery, setsearchQuery] = useState("");
+  const [userData, setuserData] = useState([]);
+  const [suggestions, setsuggestions] = useState([]);
   const [resultText, setresultText] = useState("");
   const [isResultModalVisible, setisResultModalVisible] = useState(false);
 
+  useEffect(() => {
+    getUsersForSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (searchQuery === "") {
+      setsuggestions([]);
+    } else {
+      setsuggestions(
+        userData.filter((user) => {
+          if (user.username.toLowerCase().includes(searchQuery.toLowerCase())) {
+            if (user.username === userState.username) {
+              return false;
+            } else {
+              return true;
+            }
+          } else {
+            return false;
+          }
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
+
+  const getUsersForSearch = async () => {
+    const result = await fetchUserSearchData("");
+    setuserData(result);
+  };
+
+  // Function to handle suggestion selection
+  const handleSuggestionSelect = (user: any) => {
+    setsearchQuery(user.username); // Fill the text input with the selected username
+  };
+
   const tryAddFriend = async () => {
-    if (user.length < 3) {
-      setresultText(`${user} is not a valid username!`);
+    if (searchQuery.length < 3) {
+      setresultText(`${searchQuery} is not a valid username!`);
       setisResultModalVisible(true);
     } else {
-      const searchResult = await searchUserByUsername(user, "");
+      const searchResult = await searchUserByUsername(searchQuery, "");
       if (searchResult.data.length) {
         const requestResult = await sendFriendRequest(
           userState.id,
@@ -42,7 +82,7 @@ const AddFriendForm = () => {
           requestResult.status &&
           requestResult.status === "success"
         ) {
-          setresultText(`Request sent to ${user}!`);
+          setresultText(`Request sent to ${searchQuery}!`);
           setisResultModalVisible(true);
         } else {
           if (requestResult.data) {
@@ -55,14 +95,15 @@ const AddFriendForm = () => {
           setisResultModalVisible(true);
         }
       } else {
-        setresultText(`${user} is not a valid username!`);
+        setresultText(`${searchQuery} is not a valid username!`);
         setisResultModalVisible(true);
       }
     }
   };
 
   const closeModal = () => {
-    setuser("");
+    setsearchQuery("");
+    setsuggestions([]);
     if (textInputRef.current) {
       textInputRef.current.clear();
     }
@@ -71,18 +112,42 @@ const AddFriendForm = () => {
 
   return (
     <View style={styles.parentBox}>
-      <TextInput
-        ref={textInputRef}
-        style={styles.textInput}
-        placeholder={"Add friend by username..."}
-        placeholderTextColor="grey"
-        onChangeText={(value) => {
-          setuser(value);
+      <View style={styles.searchBox}>
+        <TextInput
+          ref={textInputRef}
+          style={styles.textInput}
+          placeholder={"Add friend by username..."}
+          placeholderTextColor="grey"
+          value={searchQuery}
+          onChangeText={(value) => {
+            setsearchQuery(value);
+          }}
+          onFocus={handleTextInputFocus}
+        ></TextInput>
+        <TouchableOpacity
+          style={styles.sendBtnContainer}
+          onPress={tryAddFriend}
+        >
+          <Text style={styles.btnText}>Send</Text>
+        </TouchableOpacity>
+      </View>
+      <FlatList
+        style={styles.suggestionList}
+        data={suggestions}
+        renderItem={({ item, index }) => (
+          <TouchableOpacity
+            onPress={() => handleSuggestionSelect(item)}
+            key={item.id}
+            style={styles.userTile}
+          >
+            <Text style={styles.suggestionText}>{item.username}</Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => {
+          return item ? item.id : "0";
         }}
-      ></TextInput>
-      <TouchableOpacity style={styles.sendBtnContainer} onPress={tryAddFriend}>
-        <Text style={styles.btnText}>Send</Text>
-      </TouchableOpacity>
+        horizontal
+      />
       {/* Result Modal */}
       <Modal
         animationType="slide"
@@ -104,11 +169,16 @@ const AddFriendForm = () => {
 
 const styles = StyleSheet.create({
   parentBox: {
+    justifyContent: "flex-start",
+    alignItems: "flex-start",
+    minWidth: "95%",
+    marginTop: 15,
+  },
+  searchBox: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     minWidth: "95%",
-    marginTop: 15,
   },
   textInput: {
     marginTop: 5,
@@ -117,7 +187,7 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: THEME.BORDERSIZES.medium,
     borderColor: THEME.COLORS.primary,
-    minWidth: "70%",
+    minWidth: "65%",
   },
   sendBtnContainer: {
     flex: 1,
@@ -130,8 +200,8 @@ const styles = StyleSheet.create({
     maxHeight: 50,
     paddingTop: 10,
     paddingBottom: 10,
-    paddingRight: 20,
-    paddingLeft: 20,
+    paddingRight: 10,
+    paddingLeft: 10,
   },
   btnContainer: {
     flex: 1,
@@ -151,6 +221,29 @@ const styles = StyleSheet.create({
     color: THEME.COLORS.lighter,
     fontSize: THEME.SIZES.medium,
     textAlign: "center",
+  },
+  suggestionList: {
+    minWidth: "90%",
+    marginLeft: 5,
+    marginRight: 5,
+  },
+  suggestionText: {
+    color: THEME.COLORS.fontColor,
+  },
+  userTile: {
+    backgroundColor: THEME.COLORS.light,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 5,
+    marginBottom: 5,
+    marginRight: 5,
+    marginLeft: 5,
+    paddingRight: 15,
+    paddingLeft: 15,
+    minWidth: "20%",
+    minHeight: 50,
+    borderRadius: THEME.BORDERSIZES.large,
   },
   centeredView: {
     flex: 1,

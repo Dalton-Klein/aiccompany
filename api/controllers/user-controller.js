@@ -213,6 +213,27 @@ const deleteAccount = async (id) => {
   });
 };
 
+const getUserSearchData = async (req, res) => {
+  try {
+    const { token } = req.body;
+    // const query = format('SELECT * FROM %I WHERE my_col = %L %s', 'my_table', 34, 'LIMIT 10');
+    let query = `select u.username, u.id, u.avatar_url
+         from public.users u
+    `;
+    const data = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+    });
+    if (data && data.length) {
+      res.status(200).send(data);
+    } else {
+      throw new Error("Could not fetch search results!");
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("POST ERROR");
+  }
+};
+
 module.exports = {
   getMetricData,
   getUserDetails,
@@ -223,4 +244,5 @@ module.exports = {
   getSocialDetails,
   deleteAccount,
   searchForUser,
+  getUserSearchData,
 };

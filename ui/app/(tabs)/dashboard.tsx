@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { View, SafeAreaView, Text, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import * as THEME from "../../constants/theme";
@@ -19,6 +19,8 @@ const Dashboard = () => {
   );
   const userState = useSelector((state: RootState) => state.user.user);
   const router = useRouter();
+  const scrollViewRef = useRef(null);
+
   //Refresh Page Variables
   const [lastRefreshTime, setlastRefreshTime] = useState<any>(null);
   const [isRefreshing, setisRefreshing] = useState<any>(null);
@@ -132,10 +134,18 @@ const Dashboard = () => {
     }
   };
 
+  const handleTextInputFocus = () => {
+    scrollViewRef.current.scrollToEnd({ animated: true });
+  };
+
   return (
     <SafeAreaView style={styles.masterContainer}>
       <TitleBar title="Dashboard"></TitleBar>
-      <ScrollView onScroll={handleScroll} scrollEventThrottle={16}>
+      <ScrollView
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        ref={scrollViewRef}
+      >
         <Text style={styles.headingText}>Events</Text>
         <View style={styles.widgetContainer}>
           <MetricTile
@@ -167,7 +177,11 @@ const Dashboard = () => {
           ></MetricTile>
         </View>
         <Text style={styles.headingText}>Social</Text>
-        <AddFriendForm></AddFriendForm>
+        <AddFriendForm
+          handleTextInputFocus={() => {
+            handleTextInputFocus();
+          }}
+        ></AddFriendForm>
         <View style={styles.widgetContainer}>
           <MetricTile
             isTask={false}

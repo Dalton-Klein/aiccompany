@@ -115,6 +115,22 @@ export const resetPassword = async (email, vKey, password) => {
 };
 
 //USER RELATED REQUESTS
+export const fetchUserSearchData = async (token) => {
+  let result = await fetch(`${endpointURL}/get-user-search-data`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      token,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => data)
+    .catch((err) => console.log("FETCH USER SEARCH DATA ERROR", err));
+  return result;
+};
+
 export const fetchUserData = async (userId) => {
   let result = await fetch(`${endpointURL}/getUserDetails`, {
     method: "POST",
