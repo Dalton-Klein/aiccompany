@@ -375,6 +375,33 @@ export const acceptFriendRequest = async (request, token) => {
   }
 };
 
+export const sendCalendarInvite = async (
+  calendarId,
+  fromUserId,
+  forUserId,
+  token
+) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/calendar-invite`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarId,
+        fromUserId,
+        forUserId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
+  }
+};
+
 export const acceptCalendarInvite = async (
   calendarId,
   userId,

@@ -47,7 +47,6 @@ const searchForUser = async (req, res) => {
   try {
     const { inputString } = req.body;
     let result = await searchForUserByUsername(inputString);
-    console.log("result ", result);
     res.status(200).send({ data: result });
   } catch (err) {
     console.log(err);

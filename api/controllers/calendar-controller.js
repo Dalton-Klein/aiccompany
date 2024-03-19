@@ -4,6 +4,9 @@ const { sequelize } = require("../models/index");
 const { updateUserGenInfoField } = require("../services/user-common");
 const moment = require("moment");
 const {
+  getPendingCalendarInvitesForUserQuery,
+} = require("../services/calendar-get-queries");
+const {
   getCalendarMemberInsertQuery,
   removePendingCalendarInviteQuery,
 } = require("../services/calendar-insert-queries");
@@ -60,8 +63,10 @@ const getDataForCalendar = async (req, res) => {
       },
     });
     query = `
-         select cm.*
+         select cm.*, u.username, u.avatar_url
            from public.calendar_members cm
+           join public.users u
+             on u.id = cm.user_id
           where cm.calendar_id = :calendarId
     `;
     const memberResult = await sequelize.query(query, {
@@ -126,13 +131,63 @@ const createCalendar = async (req, res) => {
   }
 };
 
+/*
+send calendar request logic
+*/
+const sendCalendarInvite = async (req, res) => {
+  try {
+    const { calendarId, fromUserId, forUserId, token } = req.body;
+
+    //***Check if request already exists
+    let query = getPendingCalendarInvitesForUserQuery();
+    console.log("args: ", calendarId, fromUserId, forUserId);
+    const pendingResult = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        userId: forUserId,
+        calendarId: calendarId,
+      },
+    });
+    console.log("all pending: ", pendingResult);
+    if (pendingResult.some((request) => request.user_id === forUserId)) {
+      res
+        .status(200)
+        .send({ staus: "error", data: "Pending request already exists!" });
+    } else {
+      query = `
+        insert into public.calendar_invites  (calendar_id, sender, receiver, created_at, updated_at)
+        values (:calendarId, :sender, :receiver, current_timestamp, current_timestamp)
+      `;
+      const inviteInsertResult = await sequelize.query(query, {
+        type: Sequelize.QueryTypes.INSERT,
+        replacements: {
+          calendarId: calendarId,
+          sender: fromUserId,
+          receiver: forUserId,
+        },
+      });
+      const result = {
+        status: "success",
+        data: "created calendar request",
+      };
+      saveNotification(forUserId, 1, fromUserId);
+      updateUserGenInfoField(fromUserId, "last_seen", moment().format());
+      if (inviteInsertResult) res.status(200).send(result);
+      else throw new Error("Failed to create calendar request");
+    }
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("POST ERROR");
+  }
+};
+
 const acceptCalendarInvite = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
     const { calendarId, userId, pendingId } = req.body;
     const calendarInsertQuery = getCalendarMemberInsertQuery();
     //Insert friend record
-    const friendInsertResult = await sequelize.query(calendarInsertQuery, {
+    const memberInsertResult = await sequelize.query(calendarInsertQuery, {
       type: Sequelize.QueryTypes.INSERT,
       replacements: {
         calendarId,
@@ -152,7 +207,7 @@ const acceptCalendarInvite = async (req, res) => {
     // saveNotification(senderId, 2, acceptorId);
     updateUserGenInfoField(userId, "last_seen", moment().format());
     transaction.commit();
-    res.status(200).send(friendInsertResult);
+    res.status(200).send(memberInsertResult);
   } catch (err) {
     console.log(err);
     transaction.rollback();
@@ -164,5 +219,6 @@ module.exports = {
   getAllCalendarsForUser,
   getDataForCalendar,
   createCalendar,
+  sendCalendarInvite,
   acceptCalendarInvite,
 };

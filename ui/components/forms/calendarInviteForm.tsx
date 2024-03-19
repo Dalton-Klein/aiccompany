@@ -12,12 +12,13 @@ import { useEffect, useRef, useState } from "react";
 import BasicBtn from "../tiles/buttons/basicButton";
 import {
   searchUserByUsername,
+  sendCalendarInvite,
   sendFriendRequest,
 } from "../../app/services/rest";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 
-const CalendarInviteForm = () => {
+const CalendarInviteForm = ({ calendarId, handleRefresh }) => {
   const userState = useSelector((state: RootState) => state.user.user);
   const textInputRef = useRef(null);
 
@@ -25,14 +26,16 @@ const CalendarInviteForm = () => {
   const [resultText, setresultText] = useState("");
   const [isResultModalVisible, setisResultModalVisible] = useState(false);
 
-  const tryAddFriend = async () => {
+  const tryAddMember = async () => {
     if (user.length < 3) {
       setresultText(`${user} is not a valid username!`);
       setisResultModalVisible(true);
     } else {
       const searchResult = await searchUserByUsername(user, "");
       if (searchResult.data.length) {
-        const requestResult = await sendFriendRequest(
+        console.log("id? ", calendarId);
+        const requestResult = await sendCalendarInvite(
+          calendarId,
           userState.id,
           searchResult.data[0].id,
           ""
@@ -44,6 +47,7 @@ const CalendarInviteForm = () => {
         ) {
           setresultText(`Request sent to ${user}!`);
           setisResultModalVisible(true);
+          handleRefresh();
         } else {
           if (requestResult.data) {
             //Specific problem is given from api
@@ -80,7 +84,7 @@ const CalendarInviteForm = () => {
           setuser(value);
         }}
       ></TextInput>
-      <TouchableOpacity style={styles.sendBtnContainer} onPress={tryAddFriend}>
+      <TouchableOpacity style={styles.sendBtnContainer} onPress={tryAddMember}>
         <Text style={styles.btnText}>Send</Text>
       </TouchableOpacity>
       {/* Result Modal */}

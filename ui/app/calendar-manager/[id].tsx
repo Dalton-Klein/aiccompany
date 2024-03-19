@@ -6,6 +6,7 @@ import {
   Modal,
   TextInput,
   SafeAreaView,
+  ScrollView,
 } from "react-native";
 import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
@@ -14,6 +15,7 @@ import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CalendarInviteForm from "../../components/forms/calendarInviteForm";
 import { getCalendarsData } from "../services/rest";
+import MemberTile from "../../components/tiles/social/memberTile";
 
 const CalendarManager = () => {
   const router = useRouter();
@@ -28,12 +30,40 @@ const CalendarManager = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const handleRefresh = () => {
+    fetchData();
+  };
+
   const fetchData = async () => {
     const result = await getCalendarsData(id, "");
     settitle(result.data.title);
     setdescription(result.data.description);
     console.log("what? ", result);
+    if (result.memberResult && result.memberResult.length) {
+      convertMembersToTiles(result.memberResult);
+    }
+    if (result.inviteResult && result.inviteResult.length) {
+      convertInviteesToTiles(result.inviteResult);
+    }
   };
+
+  const convertMembersToTiles = (memberData) => {
+    let tiles = [];
+    memberData.forEach((member) => {
+      tiles.push(<MemberTile member={member} key={member.id}></MemberTile>);
+    });
+    console.log("mems", memberData);
+    setmemberTiles(tiles);
+  };
+
+  const convertInviteesToTiles = (memberData) => {
+    let tiles = [];
+    memberData.forEach((member) => {
+      tiles.push(<MemberTile member={member} key={member.id}></MemberTile>);
+    });
+    setinvitedTiles(tiles);
+  };
+
   const handleSubmitForm = () => {
     // handleCreate({ title, description });
   };
@@ -44,14 +74,14 @@ const CalendarManager = () => {
 
   return (
     <SafeAreaView>
-      <View>
-        <View style={styles.titleRow}>
-          <TouchableOpacity style={styles.backBtn} onPress={navigateBack}>
-            <Text>Back</Text>
-          </TouchableOpacity>
-          <Text style={styles.titleText}>Manage Calendar</Text>
-          <Text style={styles.backBtn}></Text>
-        </View>
+      <View style={styles.titleRow}>
+        <TouchableOpacity style={styles.backBtn} onPress={navigateBack}>
+          <Text>Back</Text>
+        </TouchableOpacity>
+        <Text style={styles.titleText}>Manage Calendar</Text>
+        <Text style={styles.backBtn}></Text>
+      </View>
+      <ScrollView>
         <Text style={styles.subTitle}>Title</Text>
         <View style={styles.fieldBox}>
           <TextInput
@@ -77,7 +107,10 @@ const CalendarManager = () => {
           ></TextInput>
         </View>
         <Text style={styles.subTitle}>Invite</Text>
-        <CalendarInviteForm></CalendarInviteForm>
+        <CalendarInviteForm
+          calendarId={id}
+          handleRefresh={handleRefresh}
+        ></CalendarInviteForm>
         <Text style={styles.subTitle}>Members</Text>
         {memberTiles.length ? (
           memberTiles
@@ -90,14 +123,14 @@ const CalendarManager = () => {
         ) : (
           <Text style={styles.nothingText}>Nothing to show here!</Text>
         )}
-        <View style={styles.confirmContainer}>
-          <BasicBtn
-            iconUrl={<></>}
-            handlePress={handleSubmitForm}
-            buttonText={"Save Calendar"}
-            isCancel={false}
-          />
-        </View>
+      </ScrollView>
+      <View style={styles.confirmContainer}>
+        <BasicBtn
+          iconUrl={<></>}
+          handlePress={handleSubmitForm}
+          buttonText={"Save Calendar"}
+          isCancel={false}
+        />
       </View>
     </SafeAreaView>
   );
@@ -108,7 +141,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 35,
+    marginBottom: 20,
     marginTop: 5,
   },
   titleText: {
@@ -127,7 +160,7 @@ const styles = StyleSheet.create({
   },
   fieldBox: {
     minWidth: "80%",
-    marginBottom: 15,
+    marginBottom: 5,
     marginLeft: 20,
     marginRight: 20,
     alignContent: "flex-start",
@@ -148,7 +181,6 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     borderColor: THEME.COLORS.secondary,
     minWidth: "80%",
-    borderWidth: 2,
   },
   subTitle: {
     color: THEME.COLORS.fontColor,
@@ -156,6 +188,7 @@ const styles = StyleSheet.create({
     fontSize: THEME.SIZES.large,
     marginLeft: 20,
     marginBottom: 10,
+    marginTop: 15,
   },
   btnText: {
     color: THEME.COLORS.lighter,

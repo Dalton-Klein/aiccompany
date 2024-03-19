@@ -42,10 +42,26 @@ const getAllCalendarInvitesForUser = () => {
   `;
 };
 
+const getPendingCalendarInvitesForUserQuery = () => {
+  return `
+         select c.id as requestId,
+                c.receiver as user_id,
+                u.id as id,
+                u.username,
+                u.avatar_url
+            from public.calendar_invites c
+            join public.users u 
+              on u.id = c.receiver
+          where c.receiver = :userId
+            and c.calendar_id = :calendarId
+`;
+};
+
 module.exports = {
   getAllEventsCreatedByUser,
   getAllEventsForCalendar,
   getAllMembersOnCalendar,
   getAllCalendarsForUser,
   getAllCalendarInvitesForUser,
+  getPendingCalendarInvitesForUserQuery,
 };
