@@ -129,7 +129,11 @@ const Calendar = () => {
         updateCalendarFeed={refreshSchedule}
         dateHeaders={dateHeaders}
       ></WeeklyPicker>
-      <ScrollView onScroll={handleScroll} scrollEventThrottle={16}>
+      <ScrollView
+        onScroll={handleScroll}
+        scrollEventThrottle={16}
+        keyboardShouldPersistTaps="always"
+      >
         {calendarFeed}
       </ScrollView>
     </SafeAreaView>

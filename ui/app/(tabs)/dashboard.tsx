@@ -142,6 +142,7 @@ const Dashboard = () => {
     <SafeAreaView style={styles.masterContainer}>
       <TitleBar title="Dashboard"></TitleBar>
       <ScrollView
+        keyboardShouldPersistTaps="always"
         onScroll={handleScroll}
         scrollEventThrottle={16}
         ref={scrollViewRef}

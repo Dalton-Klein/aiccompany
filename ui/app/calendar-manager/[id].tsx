@@ -108,7 +108,7 @@ const CalendarManager = () => {
         <Text style={styles.titleText}>Manage Calendar</Text>
         <Text style={styles.backBtn}></Text>
       </View>
-      <ScrollView>
+      <ScrollView keyboardShouldPersistTaps="always">
         <Text style={styles.subTitle}>Title</Text>
         <View style={styles.fieldBox}>
           <TextInput
