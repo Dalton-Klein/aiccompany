@@ -11,6 +11,7 @@ const {
   removePendingCalendarInviteQuery,
 } = require("../services/calendar-insert-queries");
 const { saveNotification } = require("../controllers/notifications-controller");
+const format = require("pg-format");
 
 /*
 get calendars
@@ -56,7 +57,7 @@ const getDataForCalendar = async (req, res) => {
            from public.calendars c
           where c.id = :calendarId
     `;
-    const caldarResult = await sequelize.query(query, {
+    const calendarResult = await sequelize.query(query, {
       type: Sequelize.QueryTypes.SELECT,
       replacements: {
         calendarId,
@@ -90,12 +91,51 @@ const getDataForCalendar = async (req, res) => {
     });
     const result = {
       status: "success",
-      data: caldarResult[0],
+      data: calendarResult[0],
       memberResult,
       inviteResult,
     };
-    if (caldarResult) res.status(200).send(result);
+    if (calendarResult) res.status(200).send(result);
     else throw new Error("Failed to get events");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("POST ERROR");
+  }
+};
+
+const updateDataForCalendar = async (req, res) => {
+  try {
+    const { calendarId, changes, token } = req.body;
+    let updateResult;
+    for (const change of changes) {
+      console.log("cahange? ", change);
+      const field = change.field;
+      const query = format(
+        `
+        update public.calendars
+          set %I = :value,
+              updated_at = current_timestamp
+        where id = :calendarId
+      `,
+        field
+      );
+      console.log("query? ", query);
+      updateResult = await sequelize.query(query, {
+        type: Sequelize.QueryTypes.UPDATE,
+        replacements: {
+          calendarId,
+          value: change.value,
+        },
+      });
+    }
+
+    const result = {
+      status: "success",
+      data: updateResult,
+    };
+    console.log("test? ", updateResult);
+    if (updateResult) res.status(200).send(result);
+    else throw new Error("Failed to update calendar data");
   } catch (err) {
     console.log(err);
     res.status(500).send("POST ERROR");
@@ -218,6 +258,7 @@ const acceptCalendarInvite = async (req, res) => {
 module.exports = {
   getAllCalendarsForUser,
   getDataForCalendar,
+  updateDataForCalendar,
   createCalendar,
   sendCalendarInvite,
   acceptCalendarInvite,

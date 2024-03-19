@@ -14,7 +14,7 @@ import BasicBtn from "../../components/tiles/buttons/basicButton";
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CalendarInviteForm from "../../components/forms/calendarInviteForm";
-import { getCalendarsData } from "../services/rest";
+import { getCalendarsData, updateCalendarsData } from "../services/rest";
 import MemberTile from "../../components/tiles/social/memberTile";
 
 const CalendarManager = () => {
@@ -24,6 +24,9 @@ const CalendarManager = () => {
   const [description, setdescription] = useState("");
   const [memberTiles, setmemberTiles] = useState([]);
   const [invitedTiles, setinvitedTiles] = useState([]);
+  const [unsavedChanges, setunsavedChanges] = useState([]);
+  const [isResultModalVisible, setisResultModalVisible] = useState(false);
+  const [resultText, setresultText] = useState("");
 
   useEffect(() => {
     fetchData();
@@ -47,7 +50,7 @@ const CalendarManager = () => {
     }
   };
 
-  const convertMembersToTiles = (memberData) => {
+  const convertMembersToTiles = (memberData: any[]) => {
     let tiles = [];
     memberData.forEach((member) => {
       tiles.push(<MemberTile member={member} key={member.id}></MemberTile>);
@@ -56,7 +59,7 @@ const CalendarManager = () => {
     setmemberTiles(tiles);
   };
 
-  const convertInviteesToTiles = (memberData) => {
+  const convertInviteesToTiles = (memberData: any[]) => {
     let tiles = [];
     memberData.forEach((member) => {
       tiles.push(<MemberTile member={member} key={member.id}></MemberTile>);
@@ -64,8 +67,32 @@ const CalendarManager = () => {
     setinvitedTiles(tiles);
   };
 
-  const handleSubmitForm = () => {
-    // handleCreate({ title, description });
+  const addUnsavedChange = (field: string, value: string) => {
+    const existingIndex = unsavedChanges.findIndex(
+      (item) => item.field === field
+    );
+
+    if (existingIndex === -1) {
+      // Field doesn't exist, add a new object
+      setunsavedChanges([...unsavedChanges, { field: field, value: value }]);
+    } else {
+      // Field exists, update the existing object
+      const updatedChanges = [...unsavedChanges];
+      updatedChanges[existingIndex].value = value;
+      setunsavedChanges(updatedChanges);
+    }
+  };
+
+  const handleSaveChanges = async () => {
+    if (!unsavedChanges.length) {
+      setresultText("No changes to title or description detected!");
+      setisResultModalVisible(true);
+    } else {
+      const saveResult = await updateCalendarsData(id, unsavedChanges, "");
+      console.log("save result: ", saveResult);
+      setresultText("Changes saved!");
+      setisResultModalVisible(true);
+    }
   };
 
   const navigateBack = () => {
@@ -90,6 +117,7 @@ const CalendarManager = () => {
             value={title}
             placeholderTextColor="grey"
             onChangeText={(value) => {
+              addUnsavedChange("title", value);
               settitle(value);
             }}
           ></TextInput>
@@ -102,6 +130,7 @@ const CalendarManager = () => {
             value={description}
             placeholderTextColor="grey"
             onChangeText={(value) => {
+              addUnsavedChange("description", value);
               setdescription(value);
             }}
           ></TextInput>
@@ -127,11 +156,31 @@ const CalendarManager = () => {
       <View style={styles.confirmContainer}>
         <BasicBtn
           iconUrl={<></>}
-          handlePress={handleSubmitForm}
+          handlePress={handleSaveChanges}
           buttonText={"Save Calendar"}
           isCancel={false}
         />
       </View>
+      {/* Result Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isResultModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>{resultText}</Text>
+            <TouchableOpacity
+              style={styles.btnContainer}
+              onPress={() => {
+                setisResultModalVisible(false);
+              }}
+            >
+              <Text style={styles.btnText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -194,6 +243,8 @@ const styles = StyleSheet.create({
     color: THEME.COLORS.lighter,
     marginLeft: 10,
     fontSize: THEME.SIZES.large,
+    paddingBottom: 10,
+    paddingTop: 10,
   },
   nothingText: {
     color: "grey",
@@ -208,6 +259,34 @@ const styles = StyleSheet.create({
     minHeight: 150,
     marginLeft: 20,
     marginRight: 20,
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: THEME.COLORS.lighter,
+    borderRadius: 20,
+    width: "90%",
+    minHeight: 200,
+    padding: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 20,
+    fontSize: THEME.SIZES.medium,
   },
 });
 

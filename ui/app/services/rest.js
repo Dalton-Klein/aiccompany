@@ -192,6 +192,27 @@ export const getCalendarsData = async (calendarId, token) => {
   }
 };
 
+export const updateCalendarsData = async (calendarId, changes, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/update-calendar-data`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        calendarId,
+        changes,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while fetching calendars for user`);
+  }
+};
+
 // CREATE ROUTES
 export const createCalendar = async (
   userId,

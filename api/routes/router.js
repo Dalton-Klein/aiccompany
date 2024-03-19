@@ -37,6 +37,7 @@ router.post(
 //CALENDAR ROUTES
 router.post("/get-my-calendars", calendarController.getAllCalendarsForUser);
 router.post("/get-calendar-data", calendarController.getDataForCalendar);
+router.post("/update-calendar-data", calendarController.updateDataForCalendar);
 router.post("/create-calendar", calendarController.createCalendar);
 router.post("/calendar-invite", calendarController.sendCalendarInvite);
 router.post("/accept-calendar-invite", calendarController.acceptCalendarInvite);
