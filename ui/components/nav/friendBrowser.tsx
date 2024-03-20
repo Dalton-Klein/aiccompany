@@ -52,7 +52,13 @@ const FriendBrowser = ({
         <View style={styles.modalView}>
           <Text style={styles.modalTitleText}>{modalTitle}</Text>
           <View style={styles.modalGrid}>
-            <ScrollView style={styles.friendScrollBox}>{userTiles}</ScrollView>
+            <ScrollView style={styles.friendScrollBox}>
+              {userTiles.length ? (
+                userTiles.length
+              ) : (
+                <Text style={styles.noFriendsText}>No friends yet!</Text>
+              )}
+            </ScrollView>
           </View>
           {/* Close Modal Button */}
           <TouchableOpacity
@@ -118,6 +124,13 @@ const styles = StyleSheet.create({
   buttonText: {
     padding: 10,
     color: THEME.COLORS.fontColor,
+  },
+  noFriendsText: {
+    marginBottom: 10,
+    marginTop: 10,
+    fontSize: THEME.SIZES.medium,
+    fontWeight: "300",
+    textAlign: "center",
   },
 });
 

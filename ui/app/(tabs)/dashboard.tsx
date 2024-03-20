@@ -14,6 +14,7 @@ import RequestsForm from "../../components/forms/requestsForm";
 import CalendarBrowser from "../../components/nav/calendarBrowser";
 import FriendBrowser from "../../components/nav/friendBrowser";
 import { setPreferences } from "../../store/userPreferencesSlice";
+import UnsharedEventsBrowser from "../../components/nav/unsharedEventsBrowser";
 
 const Dashboard = () => {
   const routeName = useNavigationState(
@@ -45,6 +46,8 @@ const Dashboard = () => {
   const [isCalendarRequestsOpen, setisCalendarRequestsOpen] = useState(false);
   const [isCalendarPickerOpen, setisCalendarPickerOpen] = useState(false);
   const [isFriendViewerOpen, setisFriendViewerOpen] = useState(false);
+  const [isUnsharedEventViewerOpen, setisUnsharedEventViewerOpen] =
+    useState(false);
 
   useEffect(() => {
     refreshMetricTiles();
@@ -185,13 +188,23 @@ const Dashboard = () => {
             isTask={false}
             titleText={"Events this week"}
             amount={eventCount}
-            handlePress={() => {}}
+            handlePress={() => {
+              dispatch(
+                setPreferences({
+                  ...preferencesState,
+                  selectedDate: moment().format("YYYY/MM/DD, h:mm:ss a"),
+                })
+              );
+              router.navigate(`/calendar`);
+            }}
           ></MetricTile>
           <MetricTile
             isTask={false}
             titleText={"Unshared Events"}
             amount={unsharedEventCount}
-            handlePress={() => {}}
+            handlePress={() => {
+              setisUnsharedEventViewerOpen(true);
+            }}
           ></MetricTile>
         </View>
         <Text style={styles.headingText}>Tasks</Text>
@@ -257,14 +270,14 @@ const Dashboard = () => {
           <MetricTile
             isTask={false}
             isNeutral={true}
-            titleText={"Accompanists"}
+            titleText={"Accompanists (Users)"}
             amount={totalUserCount}
             handlePress={() => {}}
           ></MetricTile>
           <MetricTile
             isTask={false}
             isNeutral={true}
-            titleText={"Events & Tasks"}
+            titleText={"Events & Tasks Created"}
             amount={totalEventCount}
             handlePress={() => {}}
           ></MetricTile>
@@ -330,6 +343,20 @@ const Dashboard = () => {
           setisFriendViewerOpen(false);
         }}
       ></FriendBrowser>
+      <UnsharedEventsBrowser
+        isVisible={isUnsharedEventViewerOpen}
+        events={metricData.eventsAll?.filter(
+          (event: any) =>
+            !event.is_task && !event.calendar_id && !event.is_cancelled
+        )}
+        handlePress={(id: number) => {
+          setisUnsharedEventViewerOpen(false);
+          router.navigate(`/event-manager/${id}`);
+        }}
+        handleClose={() => {
+          setisUnsharedEventViewerOpen(false);
+        }}
+      ></UnsharedEventsBrowser>
     </SafeAreaView>
   );
 };

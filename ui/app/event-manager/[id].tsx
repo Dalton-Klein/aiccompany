@@ -20,12 +20,14 @@ import {
   removeEventAssignments,
   updateEventsData,
 } from "../services/rest";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import CalendarTile from "../../components/tiles/calendar/calendar-tile";
 import moment from "moment";
+import { setPreferences } from "../../store/userPreferencesSlice";
 
 const EventManager = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const { id } = useLocalSearchParams();
   const userState = useSelector((state: RootState) => state.user.user);
@@ -118,6 +120,12 @@ const EventManager = () => {
       const saveResult = await updateEventsData(id, unsavedChanges, "");
       setresultText("Changes saved!");
       setisResultModalVisible(true);
+      dispatch(
+        setPreferences({
+          ...preferencesState,
+          refreshCalendar: !preferencesState.refreshCalendar,
+        })
+      );
     }
   };
 

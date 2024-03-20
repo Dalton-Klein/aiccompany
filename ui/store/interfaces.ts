@@ -19,6 +19,7 @@ export interface User {
 export interface Preferences {
   lastTabPage: string;
   selectedCalendar: any;
+  selectedDate: string;
   refreshCalendar: boolean;
 }
 

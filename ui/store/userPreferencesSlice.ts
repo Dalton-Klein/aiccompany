@@ -4,6 +4,7 @@ import { Preferences } from "./interfaces";
 const initialState: Preferences = {
   lastTabPage: "dashboard",
   selectedCalendar: { id: 0 },
+  selectedDate: "",
   refreshCalendar: false,
 };
 

@@ -47,8 +47,8 @@ const CalendarTile = ({ handlePress, calendar, isPreSelected = false }) => {
       ) : (
         <></>
       )}
-      <Text style={styles.dayTitle}>{calendar.title}</Text>
-      <Text style={styles.daySubTitle}>
+      <Text style={styles.calendarTitle}>{calendar.title}</Text>
+      <Text style={styles.calendarSubTitle}>
         {calendar.member_count > 0
           ? `${calendar.member_count} members`
           : "All calendars"}{" "}
@@ -73,12 +73,12 @@ const styles = StyleSheet.create({
   selected: {
     backgroundColor: THEME.COLORS.neutral,
   },
-  dayTitle: {
+  calendarTitle: {
     fontSize: THEME.SIZES.large,
     color: THEME.COLORS.lighter,
     fontWeight: "700",
   },
-  daySubTitle: {
+  calendarSubTitle: {
     fontSize: THEME.SIZES.small,
     fontWeight: "300",
     color: THEME.COLORS.lighter,

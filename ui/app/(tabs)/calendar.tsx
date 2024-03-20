@@ -44,13 +44,6 @@ const Calendar = () => {
   };
 
   useEffect(() => {
-    if (routeName === "calendar") {
-      generateMasterSchedule();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [routeName]);
-
-  useEffect(() => {
     generateMasterSchedule();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
@@ -61,6 +54,17 @@ const Calendar = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preferencesState.selectedCalendar, preferencesState.refreshCalendar]);
+
+  useEffect(() => {
+    if (
+      preferencesState &&
+      preferencesState.selectedDate &&
+      preferencesState.selectedDate !== ""
+    ) {
+      setselectedDate(preferencesState.selectedDate);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferencesState.selectedDate]);
 
   const resetIsRefreshing = async () => {
     setTimeout(() => {
@@ -85,7 +89,7 @@ const Calendar = () => {
     const currentTime = new Date().getTime();
     if (
       !isRefreshing &&
-      (!lastRefreshTime || currentTime - lastRefreshTime > 3000)
+      (!lastRefreshTime || currentTime - lastRefreshTime > 1000)
     ) {
       setlastRefreshTime(currentTime);
       setisRefreshing(true);
