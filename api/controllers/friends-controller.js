@@ -144,7 +144,6 @@ const getFriendDetails = async (friendId) => {
 const acceptFriendRequest = async (req, res) => {
   const transaction = await sequelize.transaction();
   try {
-    console.log("test: ", req.body);
     const { senderId, acceptorId, pendingId } = req.body;
     const friendInsertQuery = getFriendInsertQuery();
     //Insert friend record

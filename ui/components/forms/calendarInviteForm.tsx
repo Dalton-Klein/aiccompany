@@ -5,12 +5,14 @@ import {
   View,
   TextInput,
   Modal,
+  FlatList,
 } from "react-native";
 import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import { useEffect, useRef, useState } from "react";
 import BasicBtn from "../tiles/buttons/basicButton";
 import {
+  fetchUserSearchData,
   searchUserByUsername,
   sendCalendarInvite,
   sendFriendRequest,
@@ -22,16 +24,57 @@ const CalendarInviteForm = ({ calendarId, handleRefresh }) => {
   const userState = useSelector((state: RootState) => state.user.user);
   const textInputRef = useRef(null);
 
-  const [user, setuser] = useState("");
+  const [searchQuery, setsearchQuery] = useState("");
+  const [userData, setuserData] = useState([]);
   const [resultText, setresultText] = useState("");
   const [isResultModalVisible, setisResultModalVisible] = useState(false);
+  const [suggestions, setsuggestions] = useState([]);
+
+  useEffect(() => {
+    getUsersForSearch();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (searchQuery === "") {
+      setsuggestions([]);
+    } else {
+      setsuggestions(
+        userData.filter((user) => {
+          if (user.username.toLowerCase().includes(searchQuery.toLowerCase())) {
+            if (user.username === userState.username) {
+              return false;
+            } else {
+              return true;
+            }
+          } else {
+            return false;
+          }
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchQuery]);
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestions]);
+
+  const getUsersForSearch = async () => {
+    const result = await fetchUserSearchData("");
+    setuserData(result);
+  };
+
+  const handleSuggestionSelect = (user: any) => {
+    setsearchQuery(user.username); // Fill the text input with the selected username
+  };
 
   const tryAddMember = async () => {
-    if (user.length < 3) {
-      setresultText(`${user} is not a valid username!`);
+    if (searchQuery.length < 3) {
+      setresultText(`${searchQuery} is not a valid username!`);
       setisResultModalVisible(true);
     } else {
-      const searchResult = await searchUserByUsername(user, "");
+      const searchResult = await searchUserByUsername(searchQuery, "");
       if (searchResult.data.length) {
         console.log("id? ", calendarId);
         const requestResult = await sendCalendarInvite(
@@ -45,7 +88,7 @@ const CalendarInviteForm = ({ calendarId, handleRefresh }) => {
           requestResult.status &&
           requestResult.status === "success"
         ) {
-          setresultText(`Request sent to ${user}!`);
+          setresultText(`Request sent to ${searchQuery}!`);
           setisResultModalVisible(true);
           handleRefresh();
         } else {
@@ -59,14 +102,15 @@ const CalendarInviteForm = ({ calendarId, handleRefresh }) => {
           setisResultModalVisible(true);
         }
       } else {
-        setresultText(`${user} is not a valid username!`);
+        setresultText(`${searchQuery} is not a valid username!`);
         setisResultModalVisible(true);
       }
     }
   };
 
   const closeModal = () => {
-    setuser("");
+    setsearchQuery("");
+    setsuggestions([]);
     if (textInputRef.current) {
       textInputRef.current.clear();
     }
@@ -74,19 +118,44 @@ const CalendarInviteForm = ({ calendarId, handleRefresh }) => {
   };
 
   return (
-    <View style={styles.parentBox}>
-      <TextInput
-        ref={textInputRef}
-        style={styles.textInput}
-        placeholder={"Invite by username..."}
-        placeholderTextColor="grey"
-        onChangeText={(value) => {
-          setuser(value);
+    <View>
+      <View style={styles.parentBox}>
+        <View style={styles.searchBox}>
+          <TextInput
+            ref={textInputRef}
+            style={styles.textInput}
+            value={searchQuery}
+            placeholder={"Invite by username..."}
+            placeholderTextColor="grey"
+            onChangeText={(value) => {
+              setsearchQuery(value);
+            }}
+          ></TextInput>
+          <TouchableOpacity
+            style={styles.sendBtnContainer}
+            onPress={tryAddMember}
+          >
+            <Text style={styles.btnText}>Send</Text>
+          </TouchableOpacity>
+        </View>
+      </View>
+      <FlatList
+        style={styles.suggestionList}
+        data={suggestions}
+        renderItem={({ item, index }) => (
+          <TouchableOpacity
+            onPress={() => handleSuggestionSelect(item)}
+            key={item.id}
+            style={styles.userTile}
+          >
+            <Text style={styles.suggestionText}>{item.username}</Text>
+          </TouchableOpacity>
+        )}
+        keyExtractor={(item) => {
+          return item ? item.id : "0";
         }}
-      ></TextInput>
-      <TouchableOpacity style={styles.sendBtnContainer} onPress={tryAddMember}>
-        <Text style={styles.btnText}>Send</Text>
-      </TouchableOpacity>
+        horizontal
+      />
       {/* Result Modal */}
       <Modal
         animationType="slide"
@@ -110,10 +179,16 @@ const styles = StyleSheet.create({
   parentBox: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "center",
+    alignItems: "flex-start",
     minWidth: "95%",
     marginTop: 15,
     marginBottom: 15,
+  },
+  searchBox: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    minWidth: "95%",
   },
   textInput: {
     marginTop: 5,
@@ -122,7 +197,7 @@ const styles = StyleSheet.create({
     padding: 5,
     borderRadius: THEME.BORDERSIZES.medium,
     borderColor: THEME.COLORS.primary,
-    minWidth: "70%",
+    minWidth: "65%",
   },
   sendBtnContainer: {
     flex: 1,
@@ -135,8 +210,8 @@ const styles = StyleSheet.create({
     maxHeight: 50,
     paddingTop: 10,
     paddingBottom: 10,
-    paddingRight: 20,
-    paddingLeft: 20,
+    paddingRight: 10,
+    paddingLeft: 10,
   },
   btnContainer: {
     flex: 1,
@@ -184,6 +259,29 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 20,
     fontSize: THEME.SIZES.medium,
+  },
+  suggestionList: {
+    minWidth: "90%",
+    marginLeft: 5,
+    marginRight: 5,
+  },
+  suggestionText: {
+    color: THEME.COLORS.fontColor,
+  },
+  userTile: {
+    backgroundColor: THEME.COLORS.light,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    marginTop: 5,
+    marginBottom: 5,
+    marginRight: 5,
+    marginLeft: 5,
+    paddingRight: 15,
+    paddingLeft: 15,
+    minWidth: "20%",
+    minHeight: 50,
+    borderRadius: THEME.BORDERSIZES.large,
   },
 });
 

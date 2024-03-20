@@ -168,6 +168,27 @@ export const getAllEventsForUser = async (userId, token) => {
   }
 };
 
+export const getEventsData = async (userId, eventId, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/get-event-data`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        eventId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while fetching calendars for user`);
+  }
+};
+
 export const getAllCalendarsForUser = async (userId, token) => {
   try {
     const httpResult = await fetch(`${endpointURL}/get-my-calendars`, {

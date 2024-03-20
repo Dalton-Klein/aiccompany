@@ -44,6 +44,7 @@ router.post("/accept-calendar-invite", calendarController.acceptCalendarInvite);
 
 //EVENTS ROUTES
 router.post("/get-my-events", eventsController.getAllEventsForUser);
+router.post("/get-event-data", eventsController.getDataForEvent);
 router.post("/create-event", eventsController.createEvent);
 router.post("/create-task", eventsController.createTask);
 router.post(

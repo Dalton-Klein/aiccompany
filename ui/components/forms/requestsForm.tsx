@@ -57,7 +57,17 @@ const RequestsForm = ({
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <Text style={styles.modalTitleText}>{title}</Text>
-          <View style={styles.modalGrid}>{requestTiles}</View>
+          <View style={styles.modalGrid}>
+            {requestTiles.length ? (
+              requestTiles
+            ) : (
+              <Text style={styles.noRequestsText}>
+                {title === "Friend Requests"
+                  ? "No friend requests at the moment!"
+                  : "No calendar invites at the moment!"}
+              </Text>
+            )}
+          </View>
           <View style={styles.modalConfirmContainer}>
             <BasicBtn
               iconUrl={<></>}
@@ -100,6 +110,12 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     fontSize: THEME.SIZES.medium,
     color: THEME.COLORS.fontColor,
+  },
+  noRequestsText: {
+    marginBottom: 10,
+    marginTop: 10,
+    fontSize: THEME.SIZES.medium,
+    fontWeight: "300",
   },
   modalGrid: {
     minWidth: "100%",

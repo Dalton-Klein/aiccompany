@@ -17,7 +17,7 @@ export interface User {
 }
 
 export interface Preferences {
-  discoverFilters: any;
+  lastTabPage: string;
   selectedCalendar: any;
   refreshCalendar: boolean;
 }

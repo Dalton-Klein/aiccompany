@@ -3,7 +3,7 @@ import { View, SafeAreaView, Text, StyleSheet, ScrollView } from "react-native";
 import { useRouter } from "expo-router";
 import * as THEME from "../../constants/theme";
 import TitleBar from "../../components/nav/tab-titlebar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import MetricTile from "../../components/widgets/metric-widget";
 import { useNavigationState } from "@react-navigation/native";
@@ -12,12 +12,16 @@ import AddFriendForm from "../../components/forms/addFriendForm";
 import moment from "moment";
 import RequestsForm from "../../components/forms/requestsForm";
 import CalendarBrowser from "../../components/nav/calendarBrowser";
+import FriendBrowser from "../../components/nav/friendBrowser";
+import { setPreferences } from "../../store/userPreferencesSlice";
 
 const Dashboard = () => {
   const routeName = useNavigationState(
     (state) => state.routes[state.index].name
   );
+  const dispatch = useDispatch();
   const userState = useSelector((state: RootState) => state.user.user);
+  const preferencesState = useSelector((state: RootState) => state.preferences);
   const router = useRouter();
   const scrollViewRef = useRef(null);
 
@@ -38,9 +42,23 @@ const Dashboard = () => {
   const [isFriendRequestsOpen, setisFriendRequestsOpen] = useState(false);
   const [isCalendarRequestsOpen, setisCalendarRequestsOpen] = useState(false);
   const [isCalendarPickerOpen, setisCalendarPickerOpen] = useState(false);
+  const [isFriendViewerOpen, setisFriendViewerOpen] = useState(false);
 
   useEffect(() => {
     refreshMetricTiles();
+    if (
+      routeName === "dashboard" ||
+      routeName === "calendar" ||
+      routeName === "assistant" ||
+      routeName === "settings"
+    ) {
+      dispatch(
+        setPreferences({
+          ...preferencesState,
+          lastTabPage: routeName,
+        })
+      );
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName]);
 
@@ -196,7 +214,9 @@ const Dashboard = () => {
             isTask={false}
             titleText={"Friends"}
             amount={friendCount}
-            handlePress={() => {}}
+            handlePress={() => {
+              setisFriendViewerOpen(true);
+            }}
           ></MetricTile>
         </View>
         <Text style={styles.headingText}>Calendars</Text>
@@ -270,6 +290,15 @@ const Dashboard = () => {
           setisCalendarPickerOpen(false);
         }}
       ></CalendarBrowser>
+      <FriendBrowser
+        friends={metricData.friends}
+        modalTitle={"My Friends"}
+        closeButtonText={"Close"}
+        isVisible={isFriendViewerOpen}
+        handleClose={() => {
+          setisFriendViewerOpen(false);
+        }}
+      ></FriendBrowser>
     </SafeAreaView>
   );
 };

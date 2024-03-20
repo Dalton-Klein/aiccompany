@@ -40,7 +40,34 @@ const getAllEventsForUserThisWeekQuery = () => {
   `;
 };
 
+const getEventQuery = () => {
+  return `
+         select ce.* 
+           from public.calendar_events ce
+          where ce.id = :eventId
+  `;
+};
+
+const getEventAssignmentsRelevantToUserQuery = () => {
+  return `
+           select cm.calendar_id, c.title,
+                      (select 1 
+                         from public.calendar_event_assignments cea 
+                        where cea.calendar_id = cm.calendar_id
+                          and cea.event_id = :eventId) as is_assigned,
+                      (select count(*)
+                         from public.calendar_members cm2
+                        where cm2.calendar_id = c.id) as member_count
+             from public.calendar_members cm 
+             join public.calendars c
+               on c.id = cm.calendar_id
+            where user_id = :userId
+  `;
+};
+
 module.exports = {
   getAllEventsForUserQuery,
   getAllEventsForUserThisWeekQuery,
+  getEventQuery,
+  getEventAssignmentsRelevantToUserQuery,
 };

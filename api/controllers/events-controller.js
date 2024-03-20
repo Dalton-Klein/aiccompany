@@ -7,6 +7,8 @@ const { saveNotification } = require("./notifications-controller");
 const {
   getAllEventsForUserQuery,
   getAllEventsForUserThisWeekQuery,
+  getEventQuery,
+  getEventAssignmentsRelevantToUserQuery,
 } = require("../services/events-queries");
 
 /*
@@ -27,6 +29,42 @@ const getAllEventsForUser = async (req, res) => {
     const result = {
       status: "success",
       data: eventsResult[0],
+    };
+    updateUserGenInfoField(userId, "last_seen", moment().format());
+    if (eventsResult) res.status(200).send(result);
+    else throw new Error("Failed to get events");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("POST ERROR");
+  }
+};
+
+const getDataForEvent = async (req, res) => {
+  try {
+    const { userId, eventId, token } = req.body;
+    //Top half of union selects events user has created, but not assigned to a calendar (personal events)
+    //Bottom half of union grabs all events from calendars that user is a member of
+    let query = getEventQuery();
+    const eventsResult = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        eventId,
+      },
+    });
+    query = getEventAssignmentsRelevantToUserQuery();
+    const assignmentsResult = await sequelize.query(query, {
+      type: Sequelize.QueryTypes.SELECT,
+      replacements: {
+        eventId,
+        userId,
+      },
+    });
+    const result = {
+      status: "success",
+      data: {
+        event: eventsResult[0],
+        calendarAssignments: assignmentsResult,
+      },
     };
     updateUserGenInfoField(userId, "last_seen", moment().format());
     if (eventsResult) res.status(200).send(result);
@@ -163,6 +201,7 @@ const createEventAssignments = async (req, res) => {
 
 module.exports = {
   getAllEventsForUser,
+  getDataForEvent,
   getAllEventsThisWeekForUser,
   createEvent,
   createTask,

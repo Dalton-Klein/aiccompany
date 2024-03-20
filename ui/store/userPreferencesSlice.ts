@@ -2,16 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Preferences } from "./interfaces";
 
 const initialState: Preferences = {
-  discoverFilters: {
-    sort: "",
-    age: [],
-    hours: [],
-    availability: [],
-    language: [],
-    region: [],
-    playlist: [],
-    rank: [],
-  },
+  lastTabPage: "dashboard",
   selectedCalendar: { id: 0 },
   refreshCalendar: false,
 };
@@ -28,20 +19,12 @@ const preferencesSlice = createSlice({
       state = { ...initialState };
       return state;
     },
-    resetFilterPreferences(state) {
-      state.discoverFilters = { ...initialState.discoverFilters };
-      return state;
-    },
     setPreferencesError(state, action: PayloadAction<string>) {
       return state;
     },
   },
 });
 
-export const {
-  setPreferences,
-  resetPreferences,
-  resetFilterPreferences,
-  setPreferencesError,
-} = preferencesSlice.actions;
+export const { setPreferences, resetPreferences, setPreferencesError } =
+  preferencesSlice.actions;
 export default preferencesSlice.reducer;

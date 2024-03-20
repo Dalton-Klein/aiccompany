@@ -28,6 +28,10 @@ const EventTile = (props) => {
     seteventEndTime(props.is_task ? "1 hour" : formattedDifference);
   };
 
+  const handleEventPressed = () => {
+    router.navigate(`/event-manager/${props.id}`);
+  };
+
   return (
     <TouchableOpacity
       style={
@@ -35,6 +39,7 @@ const EventTile = (props) => {
           ? [styles.eventTile, styles.taskColor]
           : [styles.eventTile, styles.eventColor]
       }
+      onPress={handleEventPressed}
     >
       <View>
         <Text style={styles.eventStartTime}>{eventStartTime}</Text>

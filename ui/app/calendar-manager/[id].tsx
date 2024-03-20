@@ -41,7 +41,6 @@ const CalendarManager = () => {
     const result = await getCalendarsData(id, "");
     settitle(result.data.title);
     setdescription(result.data.description);
-    console.log("what? ", result);
     if (result.memberResult && result.memberResult.length) {
       convertMembersToTiles(result.memberResult);
     }
@@ -55,7 +54,6 @@ const CalendarManager = () => {
     memberData.forEach((member) => {
       tiles.push(<MemberTile member={member} key={member.id}></MemberTile>);
     });
-    console.log("mems", memberData);
     setmemberTiles(tiles);
   };
 

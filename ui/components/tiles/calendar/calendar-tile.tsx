@@ -3,12 +3,13 @@ import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import * as THEME from "../../../constants/theme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 
-const CalendarTile = ({ handlePress, calendar }) => {
+const CalendarTile = ({ handlePress, calendar, isPreSelected = false }) => {
   const [memberFeed, setmemberFeed] = useState([]);
   const [isSelected, setisSelected] = useState(false);
 
   useEffect(() => {
     // generateMemberList();
+    setisSelected(isPreSelected);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

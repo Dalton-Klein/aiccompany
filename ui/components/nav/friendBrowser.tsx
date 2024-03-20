@@ -1,85 +1,49 @@
-import { View, TouchableOpacity, Text, StyleSheet, Modal } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+  Modal,
+  ScrollView,
+} from "react-native";
 import * as THEME from "../../constants/theme";
-import { getAllCalendarsForUser } from "../../app/services/rest";
-import CalendarTile from "../tiles/calendar/calendar-tile";
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import { setPreferences } from "../../store/userPreferencesSlice";
+import MemberTile from "../tiles/social/memberTile";
 
-const CalendarBrowser = ({
+const FriendBrowser = ({
+  friends,
   modalTitle,
   closeButtonText,
   isVisible,
-  isFilter,
-  handlePress,
   handleClose,
 }) => {
   const dispatch = useDispatch();
   const userState = useSelector((state: RootState) => state.user.user);
   const preferencesState = useSelector((state: RootState) => state.preferences);
-  const [calendarTiles, setcalendarTiles] = useState([]);
+  const [userTiles, setuserTiles] = useState([]);
 
   useEffect(() => {
-    refreshCalendars();
+    refreshFriends();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isVisible]);
+  }, [friends]);
 
-  const refreshCalendars = async () => {
-    const results = await getAllCalendarsForUser(userState.id, "");
-    if (
-      results &&
-      results.status &&
-      results.status === "success" &&
-      results.data.length
-    ) {
-      covertCalendarDataIntoTiles(results.data);
+  const refreshFriends = async () => {
+    if (friends && friends.length) {
+      covertCalendarDataIntoTiles(friends);
     } else {
       covertCalendarDataIntoTiles([]);
     }
   };
 
-  const handleCalendarPressed = (calendar: any) => {
-    handlePress(calendar);
-    if (isFilter) {
-      dispatch(
-        setPreferences({
-          ...preferencesState,
-          selectedCalendar: calendar,
-        })
-      );
-    }
-  };
-
-  const covertCalendarDataIntoTiles = async (calendars: any) => {
-    const memberCalendars = calendars.map((calendar: any) => (
-      <View key={calendar.id}>
-        <CalendarTile
-          calendar={calendar}
-          handlePress={handleCalendarPressed}
-        ></CalendarTile>
+  const covertCalendarDataIntoTiles = async (users: any) => {
+    const memberCalendars = users.map((member: any) => (
+      <View key={member.id}>
+        <MemberTile member={member}></MemberTile>
       </View>
     ));
-    const defaultCalendar = {
-      title: "Master",
-      member_count: 0,
-      id: 0,
-    };
-    const defaultCalendarTile = [
-      <View key={0}>
-        <CalendarTile
-          calendar={defaultCalendar}
-          handlePress={(calendar: any) => {
-            handleCalendarPressed(calendar);
-          }}
-        ></CalendarTile>
-      </View>,
-    ];
-    if (isFilter) {
-      setcalendarTiles(defaultCalendarTile.concat(memberCalendars));
-    } else {
-      setcalendarTiles(memberCalendars);
-    }
+    setuserTiles(memberCalendars);
   };
 
   return (
@@ -87,7 +51,9 @@ const CalendarBrowser = ({
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <Text style={styles.modalTitleText}>{modalTitle}</Text>
-          <View style={styles.modalGrid}>{calendarTiles}</View>
+          <View style={styles.modalGrid}>
+            <ScrollView style={styles.friendScrollBox}>{userTiles}</ScrollView>
+          </View>
           {/* Close Modal Button */}
           <TouchableOpacity
             style={styles.expandCalendarButton}
@@ -115,6 +81,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.COLORS.lighter,
     borderRadius: 20,
     width: "90%",
+    maxHeight: "80%",
     padding: 35,
     alignItems: "center",
     shadowColor: "#000",
@@ -128,10 +95,14 @@ const styles = StyleSheet.create({
   },
   modalGrid: {
     minWidth: "100%",
+    maxHeight: "80%",
     marginBottom: 15,
     flexDirection: "row",
     justifyContent: "space-around",
     flexWrap: "wrap",
+  },
+  friendScrollBox: {
+    maxHeight: "100%",
   },
   expandCalendarButton: {
     borderRadius: THEME.BORDERSIZES.large,
@@ -150,4 +121,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CalendarBrowser;
+export default FriendBrowser;
