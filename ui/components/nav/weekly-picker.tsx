@@ -79,6 +79,10 @@ const WeeklyPicker = (props) => {
               mode="calendar"
               selected={selectedDate}
               onDateChange={handleWeekChange}
+              options={{
+                mainColor: THEME.COLORS.primary,
+                borderColor: THEME.COLORS.primary,
+              }}
             />
             {/* Close Modal Button */}
             <TouchableOpacity

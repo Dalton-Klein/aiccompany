@@ -9,6 +9,7 @@ const EventTile = (props) => {
   const [eventStartTime, seteventStartTime] = useState("");
   const [eventEndTime, seteventEndTime] = useState("");
   const [isTask, setisTask] = useState(false);
+  const [isCancelled, setisCancelled] = useState(false);
 
   useEffect(() => {
     setTileData();
@@ -16,6 +17,7 @@ const EventTile = (props) => {
   }, []);
 
   const setTileData = () => {
+    setisCancelled(props.is_cancelled);
     setisTask(props.is_task);
     seteventStartTime(moment(props.start_time).format("h:mm A"));
     let formattedDifference = moment
@@ -46,14 +48,33 @@ const EventTile = (props) => {
         <Text style={styles.eventStartTime}>{eventEndTime}</Text>
       </View>
       <View style={styles.eventDetails}>
-        <Text style={styles.eventTitle}>{props.title}</Text>
-        <Text style={styles.eventNotes}>{props.notes}</Text>
+        <Text
+          style={
+            isCancelled
+              ? [styles.eventTitle, styles.strikeText]
+              : styles.eventTitle
+          }
+        >
+          {isCancelled ? `Cancelled: ${props.title}` : props.title}
+        </Text>
+        <Text
+          style={
+            isCancelled
+              ? [styles.eventNotes, styles.strikeText]
+              : styles.eventNotes
+          }
+        >
+          {props.notes}
+        </Text>
       </View>
     </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
+  strikeText: {
+    textDecorationLine: "line-through",
+  },
   eventTile: {
     marginTop: 10,
     paddingTop: 10,

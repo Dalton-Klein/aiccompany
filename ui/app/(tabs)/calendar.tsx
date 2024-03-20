@@ -10,8 +10,12 @@ import WeeklyPicker from "../../components/nav/weekly-picker";
 import TitleBar from "../../components/nav/tab-titlebar";
 import { useSelector } from "react-redux";
 import { RootState, persistor } from "../../store/store";
+import { useNavigationState } from "@react-navigation/native";
 
 const Calendar = () => {
+  const routeName = useNavigationState(
+    (state) => state.routes[state.index].name
+  );
   const userState = useSelector((state: RootState) => state.user.user);
   const preferencesState = useSelector((state: RootState) => state.preferences);
   //Refresh Page Variables
@@ -38,6 +42,13 @@ const Calendar = () => {
   const clearReduxPersistCache = async () => {
     await persistor.purge();
   };
+
+  useEffect(() => {
+    if (routeName === "calendar") {
+      generateMasterSchedule();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeName]);
 
   useEffect(() => {
     generateMasterSchedule();

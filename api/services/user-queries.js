@@ -27,9 +27,25 @@ const createUserQuery = () => {
        `;
 };
 
+const getUserCountQuery = () => {
+  return `
+       select count(*) as user_count 
+         from public.users
+       `;
+};
+
+const getEventCountQuery = () => {
+  return `
+       select count(*) as event_count 
+         from public.calendar_events
+       `;
+};
+
 module.exports = {
   getUserDataByEmailQuery,
   getUserDataByIdQuery,
   getUserByUsernameQuery,
   createUserQuery,
+  getUserCountQuery,
+  getEventCountQuery,
 };

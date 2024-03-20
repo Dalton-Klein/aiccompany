@@ -119,7 +119,6 @@ const updateDataForCalendar = async (req, res) => {
       `,
         field
       );
-      console.log("query? ", query);
       updateResult = await sequelize.query(query, {
         type: Sequelize.QueryTypes.UPDATE,
         replacements: {
@@ -133,7 +132,6 @@ const updateDataForCalendar = async (req, res) => {
       status: "success",
       data: updateResult,
     };
-    console.log("test? ", updateResult);
     if (updateResult) res.status(200).send(result);
     else throw new Error("Failed to update calendar data");
   } catch (err) {

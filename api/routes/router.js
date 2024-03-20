@@ -46,10 +46,15 @@ router.post("/accept-calendar-invite", calendarController.acceptCalendarInvite);
 router.post("/get-my-events", eventsController.getAllEventsForUser);
 router.post("/get-event-data", eventsController.getDataForEvent);
 router.post("/create-event", eventsController.createEvent);
+router.post("/update-event-data", eventsController.updateDataForEvent);
 router.post("/create-task", eventsController.createTask);
 router.post(
   "/create-event-assignments",
   eventsController.createEventAssignments
+);
+router.post(
+  "/remove-event-assignments",
+  eventsController.removeEventAssignments
 );
 
 // SOCIAL ROUTES

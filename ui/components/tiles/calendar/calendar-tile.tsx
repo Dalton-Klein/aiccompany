@@ -30,7 +30,7 @@ const CalendarTile = ({ handlePress, calendar, isPreSelected = false }) => {
 
   const handleCalendarSelected = () => {
     setisSelected(!isSelected);
-    handlePress(calendar);
+    handlePress(calendar, !isSelected);
   };
 
   return (

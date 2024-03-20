@@ -10,6 +10,7 @@ const {
   getEventQuery,
   getEventAssignmentsRelevantToUserQuery,
 } = require("../services/events-queries");
+const format = require("pg-format");
 
 /*
 get events logic
@@ -199,6 +200,74 @@ const createEventAssignments = async (req, res) => {
   }
 };
 
+const removeEventAssignments = async (req, res) => {
+  try {
+    const { userId, eventId, calendarIds, token } = req.body;
+    const query = `
+          delete from public.calendar_event_assignments
+                where event_id = :eventId
+                  and calendar_id = :id
+    `;
+    let eventInsertResult;
+    for (const id of calendarIds) {
+      if (id !== 0) {
+        eventInsertResult = await sequelize.query(query, {
+          type: Sequelize.QueryTypes.INSERT,
+          replacements: {
+            userId,
+            id,
+            eventId,
+          },
+        });
+      }
+    }
+    if (!eventInsertResult) {
+      res.status(200).send({ error: "failed to create event assignments" });
+    } else {
+      res.status(200).send({ status: "success", data: eventInsertResult });
+    }
+  } catch (error) {
+    console.log(error);
+    res.status(500).send("Create Event Assignments ERROR");
+  }
+};
+
+const updateDataForEvent = async (req, res) => {
+  try {
+    const { eventId, changes, token } = req.body;
+    let updateResult;
+    for (const change of changes) {
+      const field = change.field;
+      const query = format(
+        `
+        update public.calendar_events
+          set %I = :value,
+              updated_at = current_timestamp
+        where id = :eventId
+      `,
+        field
+      );
+      updateResult = await sequelize.query(query, {
+        type: Sequelize.QueryTypes.UPDATE,
+        replacements: {
+          eventId,
+          value: change.value,
+        },
+      });
+    }
+
+    const result = {
+      status: "success",
+      data: updateResult,
+    };
+    if (updateResult) res.status(200).send(result);
+    else throw new Error("Failed to update event data");
+  } catch (err) {
+    console.log(err);
+    res.status(500).send("POST ERROR");
+  }
+};
+
 module.exports = {
   getAllEventsForUser,
   getDataForEvent,
@@ -206,4 +275,6 @@ module.exports = {
   createEvent,
   createTask,
   createEventAssignments,
+  removeEventAssignments,
+  updateDataForEvent,
 };

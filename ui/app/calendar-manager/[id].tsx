@@ -87,7 +87,6 @@ const CalendarManager = () => {
       setisResultModalVisible(true);
     } else {
       const saveResult = await updateCalendarsData(id, unsavedChanges, "");
-      console.log("save result: ", saveResult);
       setresultText("Changes saved!");
       setisResultModalVisible(true);
     }

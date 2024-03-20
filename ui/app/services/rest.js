@@ -250,6 +250,27 @@ export const updateCalendarsData = async (calendarId, changes, token) => {
   }
 };
 
+export const updateEventsData = async (eventId, changes, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/update-event-data`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        eventId,
+        changes,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while fetching calendars for user`);
+  }
+};
+
 // CREATE ROUTES
 export const createCalendar = async (
   userId,
@@ -330,6 +351,33 @@ export const createEventAssignments = async (
 ) => {
   try {
     const httpResult = await fetch(`${endpointURL}/create-event-assignments`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        eventId,
+        calendarIds,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event assignments`);
+  }
+};
+
+export const removeEventAssignments = async (
+  userId,
+  eventId,
+  calendarIds,
+  token
+) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/remove-event-assignments`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

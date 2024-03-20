@@ -14,7 +14,12 @@ import * as THEME from "../../constants/theme";
 import BasicBtn from "../../components/tiles/buttons/basicButton";
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { getEventsData, updateCalendarsData } from "../services/rest";
+import {
+  createEventAssignments,
+  getEventsData,
+  removeEventAssignments,
+  updateEventsData,
+} from "../services/rest";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import CalendarTile from "../../components/tiles/calendar/calendar-tile";
@@ -25,6 +30,8 @@ const EventManager = () => {
   const { id } = useLocalSearchParams();
   const userState = useSelector((state: RootState) => state.user.user);
   const preferencesState = useSelector((state: RootState) => state.preferences);
+
+  const [isTask, setisTask] = useState(false);
 
   const [title, settitle] = useState("");
   const [notes, setnotes] = useState("");
@@ -42,12 +49,9 @@ const EventManager = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const handleRefresh = () => {
-    fetchData();
-  };
-
   const fetchData = async () => {
     const result = await getEventsData(userState.id, id, "");
+    setisTask(result.data.event.is_task);
     settitle(result.data.event.title);
     setnotes(result.data.event.notes);
     setisCancelled(result.data.event.is_cancelled);
@@ -95,15 +99,14 @@ const EventManager = () => {
     }
   };
 
-  const handleCalendarSelectedForAssignment = (cal: any) => {
-    //This either adds or removes a calendar from the array of selected calendars
-    if (calendarsSelected.some((calendar: any) => calendar.id === cal.id)) {
-      const updatedCalendars = calendarsSelected.filter(
-        (calendar) => calendar.id !== cal.id
-      );
-      setcalendarsSelected(updatedCalendars);
+  const handleCalendarSelectedForAssignment = async (
+    cal: any,
+    isSelected: boolean
+  ) => {
+    if (isSelected) {
+      await createEventAssignments(userState.id, id, [cal.calendar_id], "");
     } else {
-      setcalendarsSelected([...calendarsSelected, cal]);
+      await removeEventAssignments(userState.id, id, [cal.calendar_id], "");
     }
   };
 
@@ -112,8 +115,7 @@ const EventManager = () => {
       setresultText("No changes to title or notes detected!");
       setisResultModalVisible(true);
     } else {
-      const saveResult = await updateCalendarsData(id, unsavedChanges, "");
-      console.log("save result: ", saveResult);
+      const saveResult = await updateEventsData(id, unsavedChanges, "");
       setresultText("Changes saved!");
       setisResultModalVisible(true);
     }
@@ -130,7 +132,9 @@ const EventManager = () => {
           <TouchableOpacity style={styles.backBtn} onPress={navigateBack}>
             <Text>Back</Text>
           </TouchableOpacity>
-          <Text style={styles.titleText}>Manage Event</Text>
+          <Text style={styles.titleText}>
+            {isTask ? "Manage Task" : "Manage Event"}
+          </Text>
           <Text style={styles.backBtn}></Text>
         </View>
         <ScrollView keyboardShouldPersistTaps="always">
@@ -160,19 +164,29 @@ const EventManager = () => {
               }}
             ></TextInput>
           </View>
-          <Text style={styles.subTitle}>Start Time</Text>
+          <Text style={styles.subTitle}>
+            {isTask ? "Duration" : "Start Time"}
+          </Text>
           <View style={styles.fieldBox}>
             <Text style={styles.datePickedText}>
-              {moment(startTime).format("MMMM Do YYYY, h:mm a")}
+              {isTask
+                ? moment
+                    .duration(moment(endTime).diff(moment(startTime)))
+                    .humanize()
+                : moment(startTime).format("MMMM Do YYYY, h:mm a")}
             </Text>
           </View>
-          <Text style={styles.subTitle}>End Time</Text>
+          <Text style={styles.subTitle}>
+            {isTask ? "Deadline" : "End Time"}
+          </Text>
           <View style={styles.fieldBox}>
             <Text style={styles.datePickedText}>
               {moment(endTime).format("MMMM Do YYYY, h:mm a")}
             </Text>
           </View>
-          <Text style={styles.subTitle}>Is Event Cancelled</Text>
+          <Text style={styles.subTitle}>
+            {isTask ? "Is Task Cancelled" : "Is Event Cancelled"}
+          </Text>
           <View style={styles.fieldBox}>
             <Switch
               trackColor={{

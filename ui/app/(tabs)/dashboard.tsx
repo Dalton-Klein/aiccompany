@@ -38,6 +38,8 @@ const Dashboard = () => {
   const [friendInviteCount, setfriendInviteCount] = useState(0);
   const [calendarInviteCount, setcalendarInviteCount] = useState(0);
   const [calendarCount, setcalendarCount] = useState(0);
+  const [totalUserCount, settotalUserCount] = useState(0);
+  const [totalEventCount, settotalEventCount] = useState(0);
 
   const [isFriendRequestsOpen, setisFriendRequestsOpen] = useState(false);
   const [isCalendarRequestsOpen, setisCalendarRequestsOpen] = useState(false);
@@ -76,14 +78,16 @@ const Dashboard = () => {
         setmetricData(data.data);
         seteventCount(
           data.data.eventsThisWeek?.length
-            ? data.data.eventsThisWeek?.filter((event: any) => !event.is_task)
-                .length
+            ? data.data.eventsThisWeek?.filter(
+                (event: any) => !event.is_task && !event.is_cancelled
+              ).length
             : 0
         );
         setunsharedEventCount(
           data.data.eventsAll?.length
             ? data.data.eventsAll?.filter(
-                (event: any) => !event.is_task && !event.calendar_id
+                (event: any) =>
+                  !event.is_task && !event.calendar_id && !event.is_cancelled
               ).length
             : 0
         );
@@ -91,7 +95,9 @@ const Dashboard = () => {
           data.data.eventsAll?.length
             ? data.data.eventsAll?.filter(
                 (event: any) =>
-                  event.is_task && moment().isBefore(event.end_time)
+                  event.is_task &&
+                  moment().isBefore(event.end_time) &&
+                  !event.is_cancelled
               ).length
             : 0
         );
@@ -99,7 +105,9 @@ const Dashboard = () => {
           data.data.eventsAll?.length
             ? data.data.eventsAll?.filter(
                 (event: any) =>
-                  event.is_task && moment().isAfter(event.end_time)
+                  event.is_task &&
+                  moment().isAfter(event.end_time) &&
+                  !event.is_cancelled
               ).length
             : 0
         );
@@ -118,6 +126,12 @@ const Dashboard = () => {
         );
         setcalendarCount(
           data.data.calendars?.length ? data.data.calendars?.length : 0
+        );
+        settotalUserCount(
+          data.data.userCount ? data.data.userCount.user_count : 0
+        );
+        settotalEventCount(
+          data.data.eventCount ? data.data.eventCount.event_count : 0
         );
         resetIsRefreshing();
       }
@@ -236,6 +250,23 @@ const Dashboard = () => {
             handlePress={() => {
               setisCalendarPickerOpen(true);
             }}
+          ></MetricTile>
+        </View>
+        <Text style={styles.headingText}>Accompany Me Totals</Text>
+        <View style={styles.widgetContainer}>
+          <MetricTile
+            isTask={false}
+            isNeutral={true}
+            titleText={"Accompanists"}
+            amount={totalUserCount}
+            handlePress={() => {}}
+          ></MetricTile>
+          <MetricTile
+            isTask={false}
+            isNeutral={true}
+            titleText={"Events & Tasks"}
+            amount={totalEventCount}
+            handlePress={() => {}}
           ></MetricTile>
         </View>
       </ScrollView>

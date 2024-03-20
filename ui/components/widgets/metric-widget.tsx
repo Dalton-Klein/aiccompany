@@ -3,14 +3,20 @@ import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import { useEffect, useState } from "react";
 
-const MetricTile = ({ titleText, amount, handlePress, isTask }) => {
+const MetricTile = ({
+  titleText,
+  amount,
+  handlePress,
+  isTask,
+  isNeutral = false,
+}) => {
   return (
     <TouchableOpacity
-      style={
-        isTask
-          ? [styles.widgetContainer, styles.taskColor]
-          : [styles.widgetContainer, styles.eventColor]
-      }
+      style={[
+        styles.widgetContainer,
+        isTask ? styles.taskColor : styles.eventColor,
+        isNeutral ? styles.neutralColor : null,
+      ]}
       onPress={handlePress}
     >
       <View style={styles.titleBox}>
@@ -51,6 +57,9 @@ const styles = StyleSheet.create({
   },
   taskColor: {
     backgroundColor: THEME.COLORS.secondary,
+  },
+  neutralColor: {
+    backgroundColor: THEME.COLORS.neutral,
   },
   cancelButton: {
     backgroundColor: THEME.COLORS.lighter,

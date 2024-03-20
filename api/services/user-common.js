@@ -4,6 +4,8 @@ const format = require("pg-format");
 const {
   getUserDataByIdQuery,
   getUserByUsernameQuery,
+  getUserCountQuery,
+  getEventCountQuery,
 } = require("./user-queries");
 const {
   getFriendsForUserQuerySenders,
@@ -69,6 +71,14 @@ const getMetricDataForUser = async (userId) => {
       userId,
     },
   });
+  query = getUserCountQuery();
+  let totalUserCount = await sequelize.query(query, {
+    type: Sequelize.QueryTypes.SELECT,
+  });
+  query = getEventCountQuery();
+  let totalEventCount = await sequelize.query(query, {
+    type: Sequelize.QueryTypes.SELECT,
+  });
   return {
     friends: acceptorResult.concat(senderResult),
     friendRequests: friendRequestsResult,
@@ -76,6 +86,8 @@ const getMetricDataForUser = async (userId) => {
     calendars: calendarResult,
     eventsThisWeek: eventsResultWeek,
     eventsAll: eventsResultAll,
+    userCount: totalUserCount[0],
+    eventCount: totalEventCount[0],
   };
 };
 
