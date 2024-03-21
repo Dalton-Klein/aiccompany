@@ -87,7 +87,16 @@ const CalendarBrowser = ({
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <Text style={styles.modalTitleText}>{modalTitle}</Text>
-          <View style={styles.modalGrid}>{calendarTiles}</View>
+          <View style={styles.modalGrid}>
+            {calendarTiles.length ? (
+              calendarTiles
+            ) : (
+              <Text style={styles.noCalendarsText}>
+                You are not part of any group calendars yet. Create one to get
+                started!
+              </Text>
+            )}
+          </View>
           {/* Close Modal Button */}
           <TouchableOpacity
             style={styles.expandCalendarButton}
@@ -147,6 +156,13 @@ const styles = StyleSheet.create({
   buttonText: {
     padding: 10,
     color: THEME.COLORS.fontColor,
+  },
+  noCalendarsText: {
+    marginBottom: 10,
+    marginTop: 10,
+    fontSize: THEME.SIZES.medium,
+    fontWeight: "300",
+    textAlign: "center",
   },
 });
 
