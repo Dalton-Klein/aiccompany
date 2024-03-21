@@ -17,6 +17,7 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
   const [errorText, seterrorText] = useState("");
   const [title, settitle] = useState("");
   const [notes, setnotes] = useState("");
+  const [duration, setduration] = useState(0);
   const [isEndDatePickerVisible, setisEndDatePickerVisible] = useState(false);
   const [selectedEndDate, setSelectedEndDate] = useState(null);
 
@@ -40,6 +41,7 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
         title,
         notes,
         end_time: selectedEndDate,
+        task_duration: duration,
       });
       seterrorText("");
     }
@@ -64,7 +66,7 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
         <View style={styles.modalView}>
           <TextInput
             style={styles.textInput}
-            placeholder={"Task Name"}
+            placeholder={"Task Name..."}
             placeholderTextColor="grey"
             onChangeText={(value) => {
               settitle(value);
@@ -72,10 +74,19 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
           ></TextInput>
           <TextInput
             style={styles.textInput}
-            placeholder={"Task Notes"}
+            placeholder={"Task Notes..."}
             placeholderTextColor="grey"
             onChangeText={(value) => {
               setnotes(value);
+            }}
+          ></TextInput>
+          <TextInput
+            style={styles.textInput}
+            keyboardType="numeric"
+            placeholder={"Task Duration in minutes..."}
+            placeholderTextColor="grey"
+            onChangeText={(value) => {
+              setduration(parseInt(value.replace(/[^0-9]/g, "")));
             }}
           ></TextInput>
           <TouchableOpacity onPress={showEndPicker}>

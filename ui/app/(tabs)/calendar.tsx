@@ -105,18 +105,94 @@ const Calendar = () => {
         preferencesState.selectedCalendar &&
         preferencesState.selectedCalendar.id !== 0
       ) {
+        //Conditionally filter to a specific calendar
         events = events.filter((e: any) => {
           return e.calendar_id === preferencesState.selectedCalendar.id;
         });
       }
-      //Loop over date headings
+
+      const tasks = events.filter((event) => event.is_task);
+      //Loop over the date headings
       dateHeadings.forEach((dateHeading) => {
-        //Loop over events to pop events into day block
-        events.forEach((event) => {
-          if (dateHeading.date.isSame(moment(event.start_time), "day")) {
+        //Find events for this date heding
+        const eventsForDay = events.filter(
+          (event) =>
+            dateHeading.date.isSame(moment(event.start_time), "day") &&
+            !event.is_task
+        );
+        //Check if date heading is in future or past to be able to slot tasks in
+        if (
+          moment(dateHeading.date).isSameOrAfter(moment(currentTime), "day")
+        ) {
+          const openTimeSlots = calendarService.findOpenTimeSlots(eventsForDay);
+          // console.log(dateHeading.title, "   open time slots ", openTimeSlots);
+
+          // Slot in tasks by looping over them
+          let tasksThatWorkToday = [];
+          tasks.forEach((task) => {
+            // Check if the task has already been assigned
+            if (task.is_assigned) {
+              return;
+            }
+            const taskDurationMinutes = moment
+              .duration(task.task_duration, "minutes")
+              .asMilliseconds();
+
+            // Iterate over the open time slots until the task is assigned or no more slots are available
+            let assigned = false;
+            for (let i = 0; i < openTimeSlots.length; i++) {
+              const slot = openTimeSlots[i];
+              const breakDurationMilliseconds = moment(slot.break_end).diff(
+                moment(slot.break_start)
+              );
+              if (breakDurationMilliseconds >= taskDurationMinutes) {
+                // Assign the task to this time slot
+                const startTime = slot.break_start;
+                task.start_time = new Date(startTime);
+                task.end_time = new Date(startTime + taskDurationMinutes);
+
+                // Update the time slot if there is remaining time after the task
+                if (breakDurationMilliseconds > taskDurationMinutes) {
+                  const newBreakStart = moment(startTime)
+                    .add(taskDurationMinutes, "milliseconds")
+                    .toISOString();
+                  openTimeSlots[i] = {
+                    break_start: newBreakStart,
+                    break_end: slot.break_end,
+                  };
+                } else {
+                  // Remove the slot if it's fully used by the task
+                  openTimeSlots.splice(i, 1);
+                }
+
+                assigned = true;
+                task.is_assigned = true;
+                tasksThatWorkToday.push(task);
+                break;
+              }
+            }
+
+            // If the task couldn't be assigned to any open slot, break the loop
+            if (!assigned) {
+              return;
+            }
+          });
+
+          // Merge tasks with non-task events
+          const allEventsForDay = [...eventsForDay, ...tasksThatWorkToday];
+          // Resort events and tasks so they show in order
+          allEventsForDay.sort((a, b) => {
+            const startTimeA = moment(a.start_time).valueOf();
+            const startTimeB = moment(b.start_time).valueOf();
+            return startTimeA - startTimeB;
+          });
+          dateHeading.events.push(...allEventsForDay);
+        } else {
+          //Loop over events to pop events into day block
+          eventsForDay.forEach((event) => {
             dateHeading.events.push(event);
-          }
-        });
+          });
+        }
       });
       setdateHeaders(dateHeadings);
       generateDayTiles(dateHeadings);

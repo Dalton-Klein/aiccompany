@@ -140,8 +140,8 @@ const createTask = async (req, res) => {
   try {
     const { userId, task, token } = req.body;
     const query = `insert into public.calendar_events
-                               (user_id, title, start_time, end_time, "location", notes, is_task, created_at, updated_at)
-                         values(:userId, :title, now(), :end_time, '', :notes, true, now(), now())
+                               (user_id, title, start_time, end_time, "location", notes, is_task, task_duration, created_at, updated_at)
+                         values(:userId, :title, now(), :end_time, '', :notes, true, :duration, now(), now())
                      returning id;
   `;
     const taskInsertResult = await sequelize.query(query, {
@@ -151,6 +151,7 @@ const createTask = async (req, res) => {
         title: task.title,
         notes: task.notes,
         end_time: task.end_time,
+        duration: task.task_duration,
       },
       transaction,
     });

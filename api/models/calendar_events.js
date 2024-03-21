@@ -30,6 +30,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      is_cancelled: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+      },
       is_task: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
@@ -37,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
       is_completed: {
         type: DataTypes.BOOLEAN,
         defaultValue: false,
+      },
+      task_duration: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
       },
     },
     { schema: "public", freezeTableName: true }

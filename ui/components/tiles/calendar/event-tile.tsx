@@ -27,7 +27,9 @@ const EventTile = (props) => {
     if (formattedDifference.slice(0, 2) === "an") {
       formattedDifference = `1 ${formattedDifference.slice(2, 1000)}`;
     }
-    seteventEndTime(props.is_task ? "1 hour" : formattedDifference);
+    seteventEndTime(
+      props.is_task ? `${props.task_duration} minutes` : formattedDifference
+    );
   };
 
   const handleEventPressed = () => {

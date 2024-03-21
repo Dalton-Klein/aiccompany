@@ -6,6 +6,7 @@ const getAllEventsForUserQuery = () => {
             on cea.event_id = ce.id
          where ce.user_id = :userId
            and cea.event_id is null
+           and ce.is_completed = false
       union
         select cea.calendar_id, ce.*
           from public.calendar_events ce
@@ -14,6 +15,7 @@ const getAllEventsForUserQuery = () => {
           join public.calendar_members cm 
             on cm.calendar_id = cea.calendar_id 
          where cm.user_id = :userId
+           and ce.is_completed = false
       order by start_time asc;
   `;
 };

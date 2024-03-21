@@ -38,6 +38,7 @@ const EventManager = () => {
   const [title, settitle] = useState("");
   const [notes, setnotes] = useState("");
   const [startTime, setstartTime] = useState("");
+  const [taskDuration, settaskDuration] = useState(0);
   const [endTime, setendTime] = useState("");
   const [isCancelled, setisCancelled] = useState(false);
   const [calendarTiles, setcalendarTiles] = useState([]);
@@ -59,6 +60,7 @@ const EventManager = () => {
     setisCancelled(result.data.event.is_cancelled);
     setstartTime(result.data.event.start_time);
     setendTime(result.data.event.end_time);
+    settaskDuration(result.data.event.task_duration);
     if (
       result.data.calendarAssignments &&
       result.data.calendarAssignments.length
@@ -178,9 +180,7 @@ const EventManager = () => {
           <View style={styles.fieldBox}>
             <Text style={styles.datePickedText}>
               {isTask
-                ? moment
-                    .duration(moment(endTime).diff(moment(startTime)))
-                    .humanize()
+                ? `${taskDuration} minutes`
                 : moment(startTime).format("MMMM Do YYYY, h:mm a")}
             </Text>
           </View>
