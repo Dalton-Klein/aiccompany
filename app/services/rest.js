@@ -1,5 +1,5 @@
-// ***Coffee make http://192.168.1.4:3010 for local, ec2-35-169-9-79.compute-1.amazonaws.com for prod
-const endpointURL = "http://192.168.1.4:3010";
+// ***Coffee make http://192.168.1.4:3010 for local, https://accompany-me-api-911a354ccb4c.herokuapp.com for prod
+const endpointURL = "https://accompany-me-api-911a354ccb4c.herokuapp.com";
 
 const avatarCloud = `https://api.cloudinary.com/v1_1/kultured-dev/upload`;
 /*
