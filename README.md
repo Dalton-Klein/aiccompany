@@ -1,3 +1,13 @@
-# aiccompany
+# Expo Router Example
 
-Your AI-powered companion app designed to seamlessly organize and synchronize life's moments for families, couples, and friends. Manage calendars, appointments, and tasks through intuitive, plain-language commands, ensuring you're always connected and in harmony with your loved ones.
+Use [`expo-router`](https://docs.expo.dev/router/introduction/) to build native navigation using files in the `app/` directory.
+
+## 🚀 How to use
+
+```sh
+npx create-expo-app -e with-router
+```
+
+## 📝 Notes
+
+- [Expo Router: Docs](https://docs.expo.dev/router/introduction/)
