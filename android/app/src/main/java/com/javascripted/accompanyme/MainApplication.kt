@@ -1,4 +1,4 @@
-package com.javascripted.accompanyme
+package com.javascripted.Accompany-Me
 
 import android.app.Application
 import android.content.res.Configuration

@@ -1,4 +1,4 @@
-rootProject.name = 'Accompanyme'
+rootProject.name = 'Accompany-Me'
 
 dependencyResolutionManagement {
   versionCatalogs {

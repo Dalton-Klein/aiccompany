@@ -83,9 +83,9 @@ android {
     buildToolsVersion rootProject.ext.buildToolsVersion
     compileSdk rootProject.ext.compileSdkVersion
 
-    namespace "com.accompanyme"
+    namespace "com.Accompany-Me"
     defaultConfig {
-        applicationId 'com.javascripted.accompanyme'
+        applicationId 'com.javascripted.Accompany-Me'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
         versionCode 1

@@ -1,4 +1,4 @@
-package com.javascripted.accompanyme
+package com.javascripted.Accompany-Me
 
 import android.os.Build
 import android.os.Bundle

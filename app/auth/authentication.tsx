@@ -106,7 +106,6 @@ const AuthenticationForm = () => {
   const handleAppleSignUp = async () => {
     if (signupError === "") {
       const result = await createUser({ username, email, appleId });
-      console.log("create result1?? ", result);
       if (!result.error) {
         const verifyResult = await verifyUser(
           email,

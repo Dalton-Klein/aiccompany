@@ -4,27 +4,35 @@
     "web": {
       "bundler": "metro"
     },
-    "name": "Accompanyme",
-    "slug": "Accompanyme",
+    "name": "Accompany-Me",
+    "slug": "Accompany-Me",
+    "version": "1.0.1",
+    "splash": {
+      "image": "./assets/icons/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#FFFFFF"
+    },
+    "icon": "./assets/icons/icon.png",
     "plugins": [
       "expo-router",
       "@react-native-google-signin/google-signin",
       "expo-apple-authentication"
     ],
     "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.javascripted.accompanyme",
-      "useAppleSignIn": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.javascripted.Accompany-Me",
+      "useAppleSignIn": true,
+      "buildNumber": "3"
     },
     "android": {
-      "package": "com.javascripted.accompanyme"
+      "package": "com.javascripted.Accompany-Me"
     },
     "extra": {
       "router": {
         "origin": false
       },
       "eas": {
-        "projectId": "761b1d18-0c74-40a9-b7df-087a6ce2539b"
+        "projectId": "d522e45b-646f-4f0f-9586-2c539eb85887"
       }
     }
   }
