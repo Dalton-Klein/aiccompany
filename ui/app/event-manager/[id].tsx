@@ -221,7 +221,7 @@ const EventManager = () => {
         <BasicBtn
           iconUrl={<></>}
           handlePress={handleSaveChanges}
-          buttonText={"Save Event"}
+          buttonText={"Save"}
           isCancel={false}
         />
       </View>
