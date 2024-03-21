@@ -22,10 +22,13 @@ import {
 } from "react-native-gesture-handler";
 import { router } from "expo-router";
 import { useNavigationState } from "@react-navigation/native";
+import { useDispatch } from "react-redux";
+import { setUser } from "../../store/userSlice";
 
 WebBrowser.maybeCompleteAuthSession();
 
 const AuthenticationForm = () => {
+  const dispatch = useDispatch();
   const routeName = useNavigationState(
     (state) => state.routes[state.index].name
   );
@@ -44,7 +47,8 @@ const AuthenticationForm = () => {
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [appleId, setappleId] = useState("");
-  const [isUsernameFocused, setIsUsernameFocused] = useState(false);
+  const [isUsernameFocused, setisUsernameFocused] = useState(false);
+  const [isEmailFocused, setisEmailFocused] = useState(false);
   const [currentMenu, setcurrentMenu] = useState("signin");
 
   useEffect(() => {
@@ -102,17 +106,20 @@ const AuthenticationForm = () => {
   const handleAppleSignUp = async () => {
     if (signupError === "") {
       const result = await createUser({ username, email, appleId });
+      console.log("create result1?? ", result);
       if (!result.error) {
-        const createResult = await verifyUser(
+        const verifyResult = await verifyUser(
           email,
           "apple",
           username,
           "apple",
           appleId
         );
-        if (createResult.error) {
-          setsignupError(createResult.error);
+        if (verifyResult.error) {
+          setsignupError(verifyResult.error);
         } else {
+          dispatch(setUser(verifyResult.data));
+          await new Promise((resolve) => setTimeout(resolve, 1000));
           router.navigate("dashboard");
         }
       }
@@ -221,13 +228,13 @@ const AuthenticationForm = () => {
                     setusername(value);
                     validateAppleSignUpCredentials(true);
                   }}
-                  onFocus={() => setIsUsernameFocused(true)}
-                  onBlur={() => setIsUsernameFocused(false)}
+                  onFocus={() => setisUsernameFocused(true)}
+                  onBlur={() => setisUsernameFocused(false)}
                 ></TextInput>
                 <TextInput
                   style={[
                     styles.textInput,
-                    isUsernameFocused && styles.focusedInput,
+                    isEmailFocused && styles.focusedInput,
                   ]}
                   placeholder={"Email"}
                   placeholderTextColor="grey"
@@ -235,8 +242,8 @@ const AuthenticationForm = () => {
                     setemail(value);
                     validateAppleSignUpCredentials(false);
                   }}
-                  onFocus={() => setIsUsernameFocused(true)}
-                  onBlur={() => setIsUsernameFocused(false)}
+                  onFocus={() => setisEmailFocused(true)}
+                  onBlur={() => setisEmailFocused(false)}
                 ></TextInput>
                 <Text>{signupError !== "" ? signupError : ""}</Text>
                 <View style={styles.modalConfirmContainer}>
@@ -256,6 +263,7 @@ const AuthenticationForm = () => {
               </View>
             </View>
           </Modal>
+          {/* email signup */}
           <Modal
             animationType="slide"
             transparent={true}
@@ -272,20 +280,20 @@ const AuthenticationForm = () => {
                   onChangeText={(value) => {
                     setusername(value);
                   }}
-                  onFocus={() => setIsUsernameFocused(true)}
-                  onBlur={() => setIsUsernameFocused(false)}
+                  onFocus={() => setisUsernameFocused(true)}
+                  onBlur={() => setisUsernameFocused(false)}
                 ></TextInput>
                 <TextInput
                   style={[
                     styles.textInput,
-                    isUsernameFocused && styles.focusedInput,
+                    isEmailFocused && styles.focusedInput,
                   ]}
                   placeholder={"Email"}
                   onChangeText={(value) => {
                     setusername(value);
                   }}
-                  onFocus={() => setIsUsernameFocused(true)}
-                  onBlur={() => setIsUsernameFocused(false)}
+                  onFocus={() => setisEmailFocused(true)}
+                  onBlur={() => setisEmailFocused(false)}
                 ></TextInput>
                 <TextInput
                   style={styles.textInput}
@@ -332,7 +340,7 @@ const AuthenticationForm = () => {
 
 const styles = StyleSheet.create({
   masterContainer: {
-    marginTop: 125,
+    marginTop: 75,
     alignItems: "center",
   },
   logoImage: {
@@ -419,6 +427,7 @@ const styles = StyleSheet.create({
   modalConfirmContainer: {
     minWidth: "100%",
     alignItems: "center",
+    minHeight: 150,
     justifyContent: "space-evenly",
     paddingTop: 15,
   },

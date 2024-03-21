@@ -24,7 +24,10 @@ const MemberTile = ({ member }) => {
     <View style={styles.requestContainer}>
       <View style={styles.userInfoContainer}>
         {member.avatar_url && member.avatar_url.length > 0 ? (
-          <Image source={member.avatar_url} style={styles.prolfileImg} />
+          <Image
+            source={{ uri: member.avatar_url }}
+            style={styles.prolfileImg}
+          />
         ) : (
           <View style={styles.dynamicAvatarBg}>
             <Text style={styles.dynamicAvatarText}>

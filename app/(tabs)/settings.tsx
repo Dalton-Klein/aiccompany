@@ -25,7 +25,9 @@ const Settings = () => {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   useEffect(() => {
-    // clearReduxPersistCache();
+    if (!userState.id || userState.id < 1) {
+      router.navigate("auth/authentication");
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -40,8 +42,11 @@ const Settings = () => {
       <ScrollView contentContainerStyle={styles.scrollBox}>
         <View style={styles.userFieldBox}>
           <Text style={styles.userFieldText}>Profile Photo</Text>
-          {userState.avatar_url.length > 0 ? (
-            <Image source={userState.avatar_url} style={styles.prolfileImg} />
+          {userState.avatar_url?.length > 0 ? (
+            <Image
+              source={{ uri: userState.avatar_url }}
+              style={styles.prolfileImg}
+            />
           ) : (
             <TouchableOpacity style={styles.dynamicAvatarBg}>
               <Text style={styles.dynamicAvatarText}>

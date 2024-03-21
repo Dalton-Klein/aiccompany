@@ -1,4 +1,4 @@
-// ***ELECTRON MAKE "" BLANK STRING IF NOT ELECTRON, "https://www.gangs.gg" IF ELECTRON PROD, "http://localhost:3010" if ELECTRON Serve
+// ***Coffee make http://192.168.1.4:3010 for local, ec2-35-169-9-79.compute-1.amazonaws.com for prod
 const endpointURL = "http://192.168.1.4:3010";
 
 const avatarCloud = `https://api.cloudinary.com/v1_1/kultured-dev/upload`;

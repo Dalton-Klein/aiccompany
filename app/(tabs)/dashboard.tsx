@@ -50,6 +50,13 @@ const Dashboard = () => {
     useState(false);
 
   useEffect(() => {
+    if (!userState.id || userState.id < 1) {
+      router.navigate("auth/authentication");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
     refreshMetricTiles();
     if (
       routeName === "dashboard" ||

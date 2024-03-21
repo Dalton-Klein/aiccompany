@@ -43,7 +43,10 @@ const RequestTile = ({ request, handleAccept, isFriendRequest }) => {
       <View style={styles.userInfoContainer}>
         {isFriendRequest ? (
           request.avatar_url && request.avatar_url.length > 0 ? (
-            <Image source={request.avatar_url} style={styles.prolfileImg} />
+            <Image
+              source={{ uri: request.avatar_url }}
+              style={styles.prolfileImg}
+            />
           ) : (
             <View style={styles.dynamicAvatarBg}>
               <Text style={styles.dynamicAvatarText}>
