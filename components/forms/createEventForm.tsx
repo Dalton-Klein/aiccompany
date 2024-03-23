@@ -1,13 +1,4 @@
-import {
-  Text,
-  Image,
-  TouchableOpacity,
-  View,
-  Modal,
-  TextInput,
-  Switch,
-  ScrollView,
-} from "react-native";
+import { Text, View, Modal, TextInput, Switch, ScrollView } from "react-native";
 import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
@@ -32,9 +23,11 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
   const [selectedEndDate, setselectedEndDate] = useState(new Date());
 
   useEffect(() => {
-    setselectedStartDate(new Date());
-    setselectedEndDate(new Date());
-    setselectedSeriesEndDate(new Date());
+    const remainder = 15 - (moment().minute() % 15);
+    const dateTime = moment().add(remainder, "minutes");
+    setselectedStartDate(dateTime.toDate());
+    setselectedEndDate(dateTime.add(1, "hour").toDate());
+    setselectedSeriesEndDate(dateTime.add(1, "hour").toDate());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -50,6 +43,15 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     }
     if (!selectedEndDate) {
       seterrorText("Must choose Event End Time!");
+      hasError = true;
+    }
+    // Check if selected end time is before selected start time
+    if (
+      selectedEndDate &&
+      selectedStartDate &&
+      moment(selectedEndDate).isSameOrBefore(moment(selectedStartDate))
+    ) {
+      seterrorText("End Time must be after Start Time!");
       hasError = true;
     }
     if (isSeries) {
@@ -123,12 +125,14 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
             mode={"datetime"}
             onChange={handleConfirmStartTime}
             accentColor={THEME.COLORS.primary}
+            minuteInterval={15}
           />
           <Text style={styles.datePickerText}>Select Event End Time</Text>
           <DateTimePicker
             value={selectedEndDate}
             mode={"datetime"}
             onChange={handleConfirmEndTime}
+            minuteInterval={15}
           />
           <View style={styles.seriesBox}>
             <Text style={styles.datePickedText}>Is this a series?</Text>
@@ -184,6 +188,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
                 value={selectedSeriesEndDate}
                 mode={"datetime"}
                 onChange={handleConfirmEndTime}
+                minuteInterval={15}
               />
             </View>
           ) : (
@@ -203,7 +208,10 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
             />
             <BasicBtn
               iconUrl={<></>}
-              handlePress={handleCancel}
+              handlePress={() => {
+                seterrorText("");
+                handleCancel();
+              }}
               buttonText={"Cancel"}
               isCancel={true}
             />
@@ -283,7 +291,7 @@ const styles = StyleSheet.create({
     minWidth: "100%",
     alignItems: "center",
     justifyContent: "space-evenly",
-    minHeight: 150,
+    minHeight: 175,
     marginTop: 20,
   },
   datePickerText: {
@@ -315,6 +323,7 @@ const styles = StyleSheet.create({
   errorText: {
     marginTop: 15,
     color: "red",
+    marginBottom: 10,
   },
 });
 

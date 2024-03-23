@@ -21,7 +21,9 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
   const [selectedEndDate, setSelectedEndDate] = useState(new Date());
 
   useEffect(() => {
-    setSelectedEndDate(new Date());
+    const remainder = 15 - (moment().minute() % 15);
+    const dateTime = moment().add(remainder, "minutes");
+    setSelectedEndDate(dateTime.add(1, "hour").toDate());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -85,6 +87,7 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
             mode={"datetime"}
             onChange={handleConfirmEndTime}
             accentColor={THEME.COLORS.primary}
+            minuteInterval={15}
           />
           <View style={styles.modalConfirmContainer}>
             {errorText !== "" ? (
