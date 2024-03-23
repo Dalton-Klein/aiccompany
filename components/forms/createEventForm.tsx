@@ -13,6 +13,7 @@ import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
 import { useEffect, useState } from "react";
 import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import SelectDropdown from "react-native-select-dropdown";
 
@@ -25,19 +26,16 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
   const [seriesReccurenceNumber, setseriesReccurenceNumber] = useState(1);
   const [seriesReccurenceFrequency, setseriesReccurenceFrequency] =
     useState("");
-  const [selectedSeriesEndDate, setSelectedSeriesEndDate] = useState(null);
-  const [isSeriesEndDatePickerVisible, setisSeriesEndDatePickerVisible] =
-    useState(false);
-  const [isStartDatePickerVisible, setisStartDatePickerVisible] =
-    useState(false);
-  const [isEndDatePickerVisible, setisEndDatePickerVisible] = useState(false);
-  const [selectedStartDate, setSelectedStartDate] = useState(null);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [selectedSeriesEndDate, setselectedSeriesEndDate] = useState(
+    new Date()
+  );
+  const [selectedStartDate, setselectedStartDate] = useState(new Date());
+  const [selectedEndDate, setselectedEndDate] = useState(new Date());
 
   useEffect(() => {
-    setSelectedStartDate(null);
-    setSelectedEndDate(null);
-    setSelectedSeriesEndDate(null);
+    setselectedStartDate(new Date());
+    setselectedEndDate(new Date());
+    setselectedSeriesEndDate(new Date());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -84,41 +82,20 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     }
   };
 
-  const showStartPicker = () => {
-    setisStartDatePickerVisible(true);
+  const handleConfirmStartTime = (e, date: any) => {
+    setselectedStartDate(date);
   };
 
-  const showEndPicker = () => {
-    setisEndDatePickerVisible(true);
-  };
-
-  const showSeriesEndPicker = () => {
-    setisSeriesEndDatePickerVisible(true);
-  };
-
-  const hideAllDatePickers = () => {
-    setisStartDatePickerVisible(false);
-    setisEndDatePickerVisible(false);
-    setisSeriesEndDatePickerVisible(false);
-  };
-
-  const handleConfirmStartTime = (date: any) => {
-    setSelectedStartDate(date);
-    hideAllDatePickers();
-  };
-
-  const handleConfirmEndTime = (date: any) => {
-    setSelectedEndDate(date);
-    hideAllDatePickers();
+  const handleConfirmEndTime = (e, date: any) => {
+    setselectedEndDate(date);
   };
 
   const toggleSeriesSwitch = () => {
     setisSeries(!isSeries);
   };
 
-  const handleConfirmSeriesEndTime = (date: any) => {
-    setSelectedSeriesEndDate(date);
-    hideAllDatePickers();
+  const handleConfirmSeriesEndTime = (e, date: any) => {
+    setselectedSeriesEndDate(date);
   };
 
   return (
@@ -141,39 +118,18 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               setnotes(value);
             }}
           ></TextInput>
-          <TouchableOpacity onPress={showStartPicker}>
-            <Text style={styles.datePickerText}>Select Event Start Time</Text>
-          </TouchableOpacity>
-          {selectedStartDate ? (
-            <Text style={styles.datePickedText}>
-              {moment(selectedStartDate).format("MMMM Do YYYY, h:mm a")}
-            </Text>
-          ) : (
-            <></>
-          )}
-
-          <DateTimePickerModal
-            isVisible={isStartDatePickerVisible}
-            mode="datetime"
-            onConfirm={handleConfirmStartTime}
-            onCancel={hideAllDatePickers}
+          <Text style={styles.datePickerText}>Select Event Start Time</Text>
+          <DateTimePicker
+            value={selectedStartDate}
+            mode={"datetime"}
+            onChange={handleConfirmStartTime}
+            accentColor={THEME.COLORS.primary}
           />
-          <TouchableOpacity onPress={showEndPicker}>
-            <Text style={styles.datePickerText}>Select Event End Time</Text>
-          </TouchableOpacity>
-          {selectedEndDate ? (
-            <Text style={styles.datePickedText}>
-              {moment(selectedEndDate).format("MMMM Do YYYY, h:mm a")}
-            </Text>
-          ) : (
-            <></>
-          )}
-
-          <DateTimePickerModal
-            isVisible={isEndDatePickerVisible}
-            mode="datetime"
-            onConfirm={handleConfirmEndTime}
-            onCancel={hideAllDatePickers}
+          <Text style={styles.datePickerText}>Select Event End Time</Text>
+          <DateTimePicker
+            value={selectedEndDate}
+            mode={"datetime"}
+            onChange={handleConfirmEndTime}
           />
           <View style={styles.seriesBox}>
             <Text style={styles.datePickedText}>Is this a series?</Text>
@@ -222,24 +178,13 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
                 }}
                 buttonStyle={{ marginBottom: 5, marginTop: 5 }}
               />
-              <TouchableOpacity onPress={showSeriesEndPicker}>
-                <Text style={styles.datePickerText}>
-                  Select Series End Date
-                </Text>
-              </TouchableOpacity>
-              {selectedSeriesEndDate ? (
-                <Text style={styles.datePickedText}>
-                  {moment(selectedSeriesEndDate).format("MMMM Do YYYY, h:mm a")}
-                </Text>
-              ) : (
-                <></>
-              )}
 
-              <DateTimePickerModal
-                isVisible={isSeriesEndDatePickerVisible}
-                mode="datetime"
-                onConfirm={handleConfirmSeriesEndTime}
-                onCancel={hideAllDatePickers}
+              <Text style={styles.datePickerText}>Select Series End Date</Text>
+
+              <DateTimePicker
+                value={selectedSeriesEndDate}
+                mode={"datetime"}
+                onChange={handleConfirmEndTime}
               />
             </View>
           ) : (
@@ -340,11 +285,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-evenly",
     minHeight: 150,
+    marginTop: 20,
   },
   datePickerText: {
     marginBottom: 10,
     marginTop: 10,
-    color: THEME.COLORS.primary,
+    color: THEME.COLORS.darker,
     fontSize: THEME.SIZES.medium,
   },
   datePickedText: {
@@ -357,6 +303,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     minWidth: "100%",
+    marginTop: 20,
   },
   seriesSwitch: {
     marginBottom: 10,
