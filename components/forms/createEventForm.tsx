@@ -12,7 +12,6 @@ import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
 import { useEffect, useState } from "react";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import SelectDropdown from "react-native-select-dropdown";

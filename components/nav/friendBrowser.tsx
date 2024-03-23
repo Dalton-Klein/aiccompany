@@ -54,7 +54,7 @@ const FriendBrowser = ({
           <View style={styles.modalGrid}>
             <ScrollView style={styles.friendScrollBox}>
               {userTiles.length ? (
-                userTiles.length
+                userTiles
               ) : (
                 <Text style={styles.noFriendsText}>No friends yet!</Text>
               )}

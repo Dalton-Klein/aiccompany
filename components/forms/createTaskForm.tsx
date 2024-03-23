@@ -10,7 +10,7 @@ import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
 import { useEffect, useState } from "react";
-import DateTimePickerModal from "react-native-modal-datetime-picker";
+import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 
 const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
@@ -18,11 +18,10 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
   const [title, settitle] = useState("");
   const [notes, setnotes] = useState("");
   const [duration, setduration] = useState(0);
-  const [isEndDatePickerVisible, setisEndDatePickerVisible] = useState(false);
-  const [selectedEndDate, setSelectedEndDate] = useState(null);
+  const [selectedEndDate, setSelectedEndDate] = useState(new Date());
 
   useEffect(() => {
-    setSelectedEndDate(null);
+    setSelectedEndDate(new Date());
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -47,17 +46,8 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     }
   };
 
-  const showEndPicker = () => {
-    setisEndDatePickerVisible(true);
-  };
-
-  const hideAllDatePickers = () => {
-    setisEndDatePickerVisible(false);
-  };
-
-  const handleConfirmEndTime = (date: any) => {
+  const handleConfirmEndTime = (e, date: any) => {
     setSelectedEndDate(date);
-    hideAllDatePickers();
   };
 
   return (
@@ -89,22 +79,12 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               setduration(parseInt(value.replace(/[^0-9]/g, "")));
             }}
           ></TextInput>
-          <TouchableOpacity onPress={showEndPicker}>
-            <Text style={styles.datePickerText}>Select Task Deadline</Text>
-          </TouchableOpacity>
-          {selectedEndDate ? (
-            <Text style={styles.datePickedText}>
-              {moment(selectedEndDate).format("MMMM Do YYYY, h:mm a")}
-            </Text>
-          ) : (
-            <></>
-          )}
-
-          <DateTimePickerModal
-            isVisible={isEndDatePickerVisible}
-            mode="datetime"
-            onConfirm={handleConfirmEndTime}
-            onCancel={hideAllDatePickers}
+          <Text style={styles.datePickerText}>Select Task Deadline</Text>
+          <DateTimePicker
+            value={selectedEndDate}
+            mode={"datetime"}
+            onChange={handleConfirmEndTime}
+            accentColor={THEME.COLORS.primary}
           />
           <View style={styles.modalConfirmContainer}>
             {errorText !== "" ? (
@@ -201,11 +181,12 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-evenly",
     minHeight: 150,
+    marginTop: 20,
   },
   datePickerText: {
     marginBottom: 10,
     marginTop: 10,
-    color: THEME.COLORS.primary,
+    color: THEME.COLORS.darker,
     fontSize: THEME.SIZES.medium,
   },
   datePickedText: {

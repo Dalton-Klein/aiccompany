@@ -81,7 +81,9 @@ const RequestTile = ({ request, handleAccept, isFriendRequest }) => {
           <></>
         )}
         <Text style={styles.usernameText}>
-          {request.title.substring(0, 16)}
+          {isFriendRequest
+            ? request.username.substring(0, 16)
+            : request.title.substring(0, 16)}
         </Text>
       </View>
       <TouchableOpacity
