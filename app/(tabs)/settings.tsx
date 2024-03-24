@@ -8,6 +8,7 @@ import {
   TextInput,
   Image,
   TouchableOpacity,
+  Switch,
 } from "react-native";
 import { useRouter } from "expo-router";
 import * as THEME from "../../constants/theme";
@@ -15,7 +16,8 @@ import TitleBar from "../../components/nav/tab-titlebar";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import BasicBtn from "../../components/tiles/buttons/basicButton";
-import { logoutUser } from "../../store/userSlice";
+import { logoutUser, updateUserThunk } from "../../store/userSlice";
+import { updateUserField } from "../services/rest";
 
 const Settings = () => {
   const router = useRouter();
@@ -34,6 +36,11 @@ const Settings = () => {
   const handleLogout = () => {
     dispatch(logoutUser(userState.id));
     router.navigate("auth/authentication");
+  };
+
+  const toggleShowTasksSwitch = async (value: boolean) => {
+    await updateUserField(userState.id, "show_tasks", value);
+    dispatch(updateUserThunk(userState.id));
   };
 
   return (
@@ -67,6 +74,26 @@ const Settings = () => {
           <Text style={styles.userFieldText}>Username</Text>
           <Text style={styles.userFieldText}>{userState.username}</Text>
         </View>
+        <View style={styles.userFieldBoxSwitch}>
+          <Text style={styles.userFieldText}>Show tasks in calendar view</Text>
+          <Switch
+            trackColor={{
+              false: THEME.COLORS.dark,
+              true: THEME.COLORS.neutral,
+            }}
+            thumbColor={
+              userState.show_tasks ? THEME.COLORS.primary : THEME.COLORS.lighter
+            }
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={toggleShowTasksSwitch}
+            value={userState.show_tasks}
+            style={styles.switch}
+          />
+        </View>
+        <Text style={styles.infoText}>
+          If enabled, we automatically slot tasks into your calendar as your
+          schedule allows.
+        </Text>
         <View style={styles.buttonBox}>
           <BasicBtn
             iconUrl={<></>}
@@ -122,9 +149,29 @@ const styles = StyleSheet.create({
     alignItems: "center",
     minWidth: "95%",
   },
+  userFieldBoxSwitch: {
+    marginTop: 25,
+    marginBottom: 5,
+    paddingLeft: 15,
+    paddingRight: 15,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    minWidth: "95%",
+  },
   userFieldText: {
     color: THEME.COLORS.fontColor,
     fontSize: THEME.SIZES.medium,
+  },
+  infoText: {
+    color: THEME.COLORS.fontColor,
+    fontSize: THEME.SIZES.medium,
+    fontStyle: "italic",
+    fontWeight: "300",
+    marginBottom: 25,
+  },
+  switch: {
+    marginBottom: 10,
   },
   buttonBox: {
     maxWidth: 150,

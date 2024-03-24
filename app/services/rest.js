@@ -1,5 +1,5 @@
 // ***Coffee make http://192.168.1.4:3010 for local, https://accompany-me-api-911a354ccb4c.herokuapp.com for prod
-const endpointURL = "https://accompany-me-api-911a354ccb4c.herokuapp.com";
+const endpointURL = "http://192.168.1.4:3010";
 
 const avatarCloud = `https://api.cloudinary.com/v1_1/kultured-dev/upload`;
 /*
@@ -145,6 +145,21 @@ export const fetchUserData = async (userId) => {
     .then((data) => data)
     .catch((err) => console.log("FETCH USER DATA ERROR", err));
   return result;
+};
+
+export const updateUserField = async (id, field, value) => {
+  await fetch(`${endpointURL}/updateUserInfoField`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      userId: id,
+      field,
+      value,
+    }),
+  })
+    .then((res) => res.json())
+    .catch((err) => console.log("Fetch Error (avatar)", err));
+  return;
 };
 
 // EVENT RELATED REQUESTS

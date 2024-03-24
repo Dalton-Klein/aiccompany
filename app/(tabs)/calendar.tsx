@@ -46,6 +46,13 @@ const Calendar = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (routeName === "calendar") {
+      generateMasterSchedule(true);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [routeName]);
+
   //This function will clear a bad cache of state
   const clearReduxPersistCache = async () => {
     await persistor.purge();
@@ -120,9 +127,18 @@ const Calendar = () => {
         });
       }
 
-      const tasks = events.filter((event) => event.is_task);
+      let tasks = events.filter((event) => event.is_task);
       //Loop over the date headings
       dateHeadings.forEach((dateHeading) => {
+        // Do no add any tasks if the user has selected to not show them in calendar view
+        if (!userState.show_tasks) {
+          tasks = [];
+        }
+        // Do no add any tasks if user is looking in a future week, we only slot them into current week
+        const startDateOfCurrentWeek = moment().startOf("week");
+        if (dateHeading.date.isAfter(startDateOfCurrentWeek, "day")) {
+          tasks = [];
+        }
         //Find events for this date heding
         const eventsForDay = events.filter(
           (event) =>

@@ -9,6 +9,7 @@ export interface User {
   connection_count_sender: number;
   connection_count_acceptor: number;
   connections: any;
+  show_tasks: boolean;
   input_device_id: string;
   output_device_id: string;
   created_at?: Date;

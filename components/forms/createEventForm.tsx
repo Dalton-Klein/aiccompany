@@ -71,7 +71,9 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
         title,
         notes,
         start_time: selectedStartDate,
-        end_time: moment(selectedStartDate).add(duration, "minutes").toDate(),
+        end_time: moment(selectedStartDate)
+          .add(parseInt(duration), "minutes")
+          .toDate(),
         is_series: isSeries,
         series_reccurence_number: seriesReccurenceNumber,
         series_reccurence_frequency: seriesReccurenceFrequency,
