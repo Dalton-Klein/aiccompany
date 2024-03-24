@@ -20,7 +20,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     new Date()
   );
   const [selectedStartDate, setselectedStartDate] = useState(new Date());
-  const [selectedEndDate, setselectedEndDate] = useState(new Date());
+  const [duration, setduration] = useState("60");
 
   useEffect(() => {
     setInitialFormValues();
@@ -31,7 +31,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     const remainder = 15 - (moment().minute() % 15);
     const dateTime = moment().add(remainder, "minutes");
     setselectedStartDate(dateTime.toDate());
-    setselectedEndDate(dateTime.add(1, "hour").toDate());
+    setduration("60");
     setselectedSeriesEndDate(dateTime.add(1, "hour").toDate());
     setseriesReccurenceNumber(1);
     setseriesReccurenceFrequency("");
@@ -48,17 +48,8 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
       seterrorText("Must choose Event Start Time!");
       hasError = true;
     }
-    if (!selectedEndDate) {
-      seterrorText("Must choose Event End Time!");
-      hasError = true;
-    }
-    // Check if selected end time is before selected start time
-    if (
-      selectedEndDate &&
-      selectedStartDate &&
-      moment(selectedEndDate).isSameOrBefore(moment(selectedStartDate))
-    ) {
-      seterrorText("End Time must be after Start Time!");
+    if (!duration) {
+      seterrorText("Must choose Event Duration!");
       hasError = true;
     }
     if (isSeries) {
@@ -80,7 +71,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
         title,
         notes,
         start_time: selectedStartDate,
-        end_time: selectedEndDate,
+        end_time: moment(selectedStartDate).add(duration, "minutes").toDate(),
         is_series: isSeries,
         series_reccurence_number: seriesReccurenceNumber,
         series_reccurence_frequency: seriesReccurenceFrequency,
@@ -95,10 +86,6 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     setselectedStartDate(date);
   };
 
-  const handleConfirmEndTime = (e, date: any) => {
-    setselectedEndDate(date);
-  };
-
   const toggleSeriesSwitch = () => {
     setisSeries(!isSeries);
   };
@@ -111,6 +98,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     <Modal animationType="slide" transparent={true} visible={isModalVisible}>
       <ScrollView contentContainerStyle={styles.centeredView}>
         <View style={styles.modalView}>
+          <Text style={styles.datePickerText}>*Event Name</Text>
           <TextInput
             style={styles.textInput}
             placeholder={"Event Name"}
@@ -119,6 +107,29 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               settitle(value);
             }}
           ></TextInput>
+          <Text style={styles.datePickerText}>*Select Event Start Time</Text>
+          <DateTimePicker
+            value={selectedStartDate}
+            mode={"datetime"}
+            onChange={handleConfirmStartTime}
+            accentColor={THEME.COLORS.primary}
+            minuteInterval={15}
+            style={styles.datePicker}
+          />
+          <Text
+            style={styles.datePickerText}
+          >{`Event Duration (Minutes)`}</Text>
+          <TextInput
+            style={styles.textInput}
+            keyboardType="numeric"
+            placeholder={"Event Duration in minutes..."}
+            placeholderTextColor="grey"
+            value={duration}
+            onChangeText={(value) => {
+              setduration(value);
+            }}
+          ></TextInput>
+          <Text style={styles.datePickerText}>Event Notes</Text>
           <TextInput
             style={styles.textInput}
             placeholder={"Event Notes"}
@@ -127,21 +138,6 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               setnotes(value);
             }}
           ></TextInput>
-          <Text style={styles.datePickerText}>Select Event Start Time</Text>
-          <DateTimePicker
-            value={selectedStartDate}
-            mode={"datetime"}
-            onChange={handleConfirmStartTime}
-            accentColor={THEME.COLORS.primary}
-            minuteInterval={15}
-          />
-          <Text style={styles.datePickerText}>Select Event End Time</Text>
-          <DateTimePicker
-            value={selectedEndDate}
-            mode={"datetime"}
-            onChange={handleConfirmEndTime}
-            minuteInterval={15}
-          />
           <View style={styles.seriesBox}>
             <Text style={styles.datePickedText}>Is this a series?</Text>
             <Switch
@@ -307,6 +303,9 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: THEME.COLORS.darker,
     fontSize: THEME.SIZES.medium,
+  },
+  datePicker: {
+    marginBottom: 15,
   },
   datePickedText: {
     marginBottom: 15,

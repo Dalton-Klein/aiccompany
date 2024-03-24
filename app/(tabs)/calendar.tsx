@@ -1,5 +1,12 @@
 import { useState, useEffect } from "react";
-import { ScrollView, SafeAreaView, StyleSheet } from "react-native";
+import {
+  ScrollView,
+  SafeAreaView,
+  StyleSheet,
+  View,
+  TouchableOpacity,
+  Text,
+} from "react-native";
 import { router } from "expo-router";
 import { getAllEventsForUser } from "../services/rest";
 import * as calendarService from "../services/date-logic/calendar-logic";
@@ -11,6 +18,7 @@ import TitleBar from "../../components/nav/tab-titlebar";
 import { useSelector } from "react-redux";
 import { RootState, persistor } from "../../store/store";
 import { useNavigationState } from "@react-navigation/native";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const Calendar = () => {
   const routeName = useNavigationState(
@@ -44,7 +52,7 @@ const Calendar = () => {
   };
 
   useEffect(() => {
-    generateMasterSchedule();
+    generateMasterSchedule(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
 
@@ -85,11 +93,12 @@ const Calendar = () => {
   };
 
   // Creates master data array of days with events nested
-  const generateMasterSchedule = async () => {
+  const generateMasterSchedule = async (isForceRefresh = false) => {
     const currentTime = new Date().getTime();
     if (
-      !isRefreshing &&
-      (!lastRefreshTime || currentTime - lastRefreshTime > 1000)
+      isForceRefresh ||
+      (!isRefreshing &&
+        (!lastRefreshTime || currentTime - lastRefreshTime > 1000))
     ) {
       setlastRefreshTime(currentTime);
       setisRefreshing(true);
@@ -219,6 +228,7 @@ const Calendar = () => {
       <WeeklyPicker
         updateCalendarFeed={refreshSchedule}
         dateHeaders={dateHeaders}
+        parentSelectedDate={selectedDate}
       ></WeeklyPicker>
       <ScrollView
         onScroll={handleScroll}
@@ -226,6 +236,53 @@ const Calendar = () => {
         keyboardShouldPersistTaps="always"
       >
         {calendarFeed}
+        {calendarFeed.length ? (
+          <View style={styles.weeklyQuickNavBox}>
+            <TouchableOpacity
+              style={styles.weeklyQuickNavButton}
+              onPress={() => {
+                console.log(
+                  selectedDate,
+                  "   test ",
+                  moment(selectedDate, "YYYY/MM/DD")
+                );
+                setselectedDate(
+                  moment(selectedDate, "YYYY/MM/DD")
+                    .subtract(1, "weeks")
+                    .format("YYYY/MM/DD")
+                );
+              }}
+            >
+              <FontAwesome
+                size={28}
+                name="angle-left"
+                color={THEME.COLORS.lighter}
+                style={styles.weeklyQuickNavIcon}
+              />
+              <Text style={styles.weeklyQuickNavText}>Back One Week</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.weeklyQuickNavButton}
+              onPress={() => {
+                setselectedDate(
+                  moment(selectedDate, "YYYY/MM/DD")
+                    .add(1, "weeks")
+                    .format("YYYY/MM/DD")
+                );
+              }}
+            >
+              <Text style={styles.weeklyQuickNavText}>Forward One Week</Text>
+              <FontAwesome
+                size={28}
+                name="angle-right"
+                color={THEME.COLORS.lighter}
+                style={styles.weeklyQuickNavIcon}
+              />
+            </TouchableOpacity>
+          </View>
+        ) : (
+          <></>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -236,6 +293,31 @@ const styles = StyleSheet.create({
     paddingTop: 5,
     flex: 1,
     backgroundColor: THEME.COLORS.lighter,
+  },
+  weeklyQuickNavBox: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    marginTop: 20,
+    marginBottom: 25,
+  },
+  weeklyQuickNavButton: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    padding: 10,
+    paddingLeft: 20,
+    paddingRight: 20,
+    backgroundColor: THEME.COLORS.secondary,
+    borderRadius: THEME.BORDERSIZES.large,
+  },
+  weeklyQuickNavIcon: {
+    marginLeft: 10,
+    marginRight: 10,
+  },
+  weeklyQuickNavText: {
+    color: THEME.COLORS.lighter,
+    fontWeight: "400",
   },
 });
 

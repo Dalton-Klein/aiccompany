@@ -5,7 +5,7 @@ import moment from "moment";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DatePicker from "react-native-modern-datepicker";
 
-const WeeklyPicker = (props) => {
+const WeeklyPicker = (props: any) => {
   const [sliderTiles, setsliderTiles] = useState([]);
   const [isDatePickerOpen, setisDatePickerOpen] = useState(false);
   const [selectedDate, setselectedDate] = useState(
@@ -22,6 +22,12 @@ const WeeklyPicker = (props) => {
     props.updateCalendarFeed(selectedDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
+
+  useEffect(() => {
+    createSliderTiles();
+    setselectedDate(props.parentSelectedDate);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.parentSelectedDate]);
 
   const createSliderTiles = () => {
     let tempTiles = [];
