@@ -40,6 +40,7 @@ const EventManager = () => {
   const [startTime, setstartTime] = useState("");
   const [taskDuration, settaskDuration] = useState(0);
   const [endTime, setendTime] = useState("");
+  const [isSeries, setisSeries] = useState(false);
   const [isCancelled, setisCancelled] = useState(false);
   const [calendarTiles, setcalendarTiles] = useState([]);
   const [calendarsSelected, setcalendarsSelected] = useState([]);
@@ -57,6 +58,7 @@ const EventManager = () => {
     setisTask(result.data.event.is_task);
     settitle(result.data.event.title);
     setnotes(result.data.event.notes);
+    setisSeries(result.data.event.series_id ? true : false);
     setisCancelled(result.data.event.is_cancelled);
     setstartTime(result.data.event.start_time);
     setendTime(result.data.event.end_time);
@@ -116,18 +118,25 @@ const EventManager = () => {
 
   const handleSaveChanges = async () => {
     if (!unsavedChanges.length) {
-      setresultText("No changes to title or notes detected!");
+      setresultText("Changes saved!");
       setisResultModalVisible(true);
     } else {
       const saveResult = await updateEventsData(id, unsavedChanges, "");
-      setresultText("Changes saved!");
-      setisResultModalVisible(true);
-      dispatch(
-        setPreferences({
-          ...preferencesState,
-          refreshCalendar: !preferencesState.refreshCalendar,
-        })
-      );
+      if (saveResult) {
+        setresultText("Changes saved!");
+        setisResultModalVisible(true);
+        dispatch(
+          setPreferences({
+            ...preferencesState,
+            refreshCalendar: !preferencesState.refreshCalendar,
+          })
+        );
+      } else {
+        setresultText(
+          "There was a problem saving changes. Try again or contact support."
+        );
+        setisResultModalVisible(true);
+      }
     }
   };
 
@@ -213,6 +222,12 @@ const EventManager = () => {
               style={styles.seriesSwitch}
             />
           </View>
+          {isSeries && (
+            <Text style={styles.seriesNotifText}>
+              *Calendar assignments will be applied to all events in this
+              series*
+            </Text>
+          )}
           <Text style={styles.subTitle}>Calendar Assignments</Text>
           <View style={styles.calendarTileBox}>{calendarTiles}</View>
         </ScrollView>
@@ -318,6 +333,14 @@ const styles = StyleSheet.create({
     marginLeft: 25,
     marginBottom: 20,
     fontSize: THEME.SIZES.large,
+  },
+  seriesNotifText: {
+    color: THEME.COLORS.dark,
+    textAlign: "center",
+    marginLeft: 25,
+    marginRight: 25,
+    marginBottom: 10,
+    fontSize: THEME.SIZES.medium,
   },
   confirmContainer: {
     minWidth: "80%",

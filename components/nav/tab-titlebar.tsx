@@ -112,7 +112,6 @@ const TitleBar = (props: any) => {
 
   const handleSubmitCreateEvent = async (event: any) => {
     const eventResult = await createEvent(userState.id, event, "");
-    console.log("event result: ", eventResult);
     dispatch(
       setPreferences({
         ...preferencesState,

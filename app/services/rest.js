@@ -342,7 +342,6 @@ export const createTask = async (userId, task, token) => {
     console.log(`${error} while creating event`);
   }
 };
-
 export const createEventAssignments = async (
   userId,
   eventId,

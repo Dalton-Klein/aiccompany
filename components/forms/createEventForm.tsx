@@ -23,13 +23,20 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
   const [selectedEndDate, setselectedEndDate] = useState(new Date());
 
   useEffect(() => {
+    setInitialFormValues();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const setInitialFormValues = () => {
     const remainder = 15 - (moment().minute() % 15);
     const dateTime = moment().add(remainder, "minutes");
     setselectedStartDate(dateTime.toDate());
     setselectedEndDate(dateTime.add(1, "hour").toDate());
     setselectedSeriesEndDate(dateTime.add(1, "hour").toDate());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    setseriesReccurenceNumber(1);
+    setseriesReccurenceFrequency("");
+    setisSeries(false);
+  };
 
   const handleSubmitForm = () => {
     let hasError = false;
@@ -79,6 +86,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
         series_reccurence_frequency: seriesReccurenceFrequency,
         series_end_time: selectedSeriesEndDate,
       });
+      setInitialFormValues();
       seterrorText("");
     }
   };
@@ -187,7 +195,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               <DateTimePicker
                 value={selectedSeriesEndDate}
                 mode={"datetime"}
-                onChange={handleConfirmEndTime}
+                onChange={handleConfirmSeriesEndTime}
                 minuteInterval={15}
               />
             </View>
