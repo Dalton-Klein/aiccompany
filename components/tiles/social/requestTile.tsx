@@ -1,21 +1,13 @@
-import {
-  Text,
-  Image,
-  TouchableOpacity,
-  View,
-  Modal,
-  TextInput,
-} from "react-native";
+import { Text, Image, TouchableOpacity, View } from "react-native";
 import { StyleSheet } from "react-native";
 import * as THEME from "../../../constants/theme";
-import BasicBtn from "../../tiles/buttons/basicButton";
-import { useEffect, useState } from "react";
 import {
   acceptCalendarInvite,
   acceptFriendRequest,
 } from "../../../app/services/rest";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
+import React from "react";
 
 const RequestTile = ({ request, handleAccept, isFriendRequest }) => {
   const userState = useSelector((state: RootState) => state.user.user);

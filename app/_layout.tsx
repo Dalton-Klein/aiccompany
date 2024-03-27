@@ -3,6 +3,7 @@ import { Provider } from "react-redux";
 import store from "../store/store";
 import { useNavigationState } from "@react-navigation/native";
 import { useEffect } from "react";
+import React from "react";
 
 const Layout = () => {
   return (

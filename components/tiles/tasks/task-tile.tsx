@@ -5,7 +5,7 @@ import moment from "moment";
 import * as THEME from "../../../constants/theme";
 import React from "react";
 
-const EventTile = (props) => {
+const TaskTile = (props) => {
   const router = useRouter();
   const [eventStartTime, seteventStartTime] = useState("");
   const [eventEndTime, seteventEndTime] = useState("");
@@ -123,4 +123,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default EventTile;
+export default TaskTile;

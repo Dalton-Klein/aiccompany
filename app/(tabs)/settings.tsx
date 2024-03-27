@@ -18,6 +18,7 @@ import { RootState } from "../../store/store";
 import BasicBtn from "../../components/tiles/buttons/basicButton";
 import { logoutUser, updateUserThunk } from "../../store/userSlice";
 import { updateUserField } from "../services/rest";
+import React from "react";
 
 const Settings = () => {
   const router = useRouter();

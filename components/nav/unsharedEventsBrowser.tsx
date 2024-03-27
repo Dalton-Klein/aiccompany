@@ -14,6 +14,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { setPreferences } from "../../store/userPreferencesSlice";
 import moment from "moment";
+import React from "react";
 
 const UnsharedEventsBrowser = ({
   events,

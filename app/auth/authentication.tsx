@@ -24,6 +24,7 @@ import { router } from "expo-router";
 import { useNavigationState } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/userSlice";
+import React from "react";
 
 WebBrowser.maybeCompleteAuthSession();
 

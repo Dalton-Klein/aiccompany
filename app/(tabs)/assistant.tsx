@@ -5,6 +5,7 @@ import * as THEME from "../../constants/theme";
 import TitleBar from "../../components/nav/tab-titlebar";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import React from "react";
 
 const Assistant = () => {
   const router = useRouter();

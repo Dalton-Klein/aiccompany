@@ -16,6 +16,7 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import CalendarInviteForm from "../../components/forms/calendarInviteForm";
 import { getCalendarsData, updateCalendarsData } from "../services/rest";
 import MemberTile from "../../components/tiles/social/memberTile";
+import React from "react";
 
 const CalendarManager = () => {
   const router = useRouter();
@@ -27,6 +28,7 @@ const CalendarManager = () => {
   const [unsavedChanges, setunsavedChanges] = useState([]);
   const [isResultModalVisible, setisResultModalVisible] = useState(false);
   const [resultText, setresultText] = useState("");
+  const [isLeaveModalVisible, setisLeaveModalVisible] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -83,17 +85,22 @@ const CalendarManager = () => {
 
   const handleSaveChanges = async () => {
     if (!unsavedChanges.length) {
-      setresultText("No changes to title or description detected!");
+      setresultText("Changes saved!");
       setisResultModalVisible(true);
     } else {
       const saveResult = await updateCalendarsData(id, unsavedChanges, "");
       setresultText("Changes saved!");
       setisResultModalVisible(true);
+      setunsavedChanges([]);
     }
   };
 
   const navigateBack = () => {
-    router.navigate(`/dashboard`);
+    if (unsavedChanges.length) {
+      setisLeaveModalVisible(true);
+    } else {
+      router.navigate(`/dashboard`);
+    }
   };
 
   return (
@@ -178,6 +185,36 @@ const CalendarManager = () => {
           </View>
         </View>
       </Modal>
+      {/* Confirm Leave Page Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isLeaveModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text
+              style={styles.modalText}
+            >{`You have unsaved changes, are you sure you want to leave?`}</Text>
+            <TouchableOpacity
+              style={styles.stayBtnContainer}
+              onPress={() => {
+                setisLeaveModalVisible(false);
+              }}
+            >
+              <Text style={styles.stayBtnText}>Stay</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnContainer}
+              onPress={() => {
+                router.navigate(`/dashboard`);
+              }}
+            >
+              <Text style={styles.btnText}>Leave</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -219,6 +256,16 @@ const styles = StyleSheet.create({
     minWidth: "100%",
     marginBottom: 15,
   },
+  stayBtnContainer: {
+    backgroundColor: THEME.COLORS.lighter,
+    borderRadius: THEME.SIZES.small / 1.25,
+    borderWidth: 2,
+    borderColor: THEME.COLORS.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+    minWidth: "100%",
+    marginBottom: 15,
+  },
   textInput: {
     marginBottom: 15,
     padding: 5,
@@ -238,6 +285,13 @@ const styles = StyleSheet.create({
   },
   btnText: {
     color: THEME.COLORS.lighter,
+    marginLeft: 10,
+    fontSize: THEME.SIZES.large,
+    paddingBottom: 10,
+    paddingTop: 10,
+  },
+  stayBtnText: {
+    color: THEME.COLORS.secondary,
     marginLeft: 10,
     fontSize: THEME.SIZES.large,
     paddingBottom: 10,
@@ -284,6 +338,7 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 20,
     fontSize: THEME.SIZES.medium,
+    textAlign: "center",
   },
 });
 

@@ -19,6 +19,7 @@ import { useSelector } from "react-redux";
 import { RootState, persistor } from "../../store/store";
 import { useNavigationState } from "@react-navigation/native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import React from "react";
 
 const Calendar = () => {
   const routeName = useNavigationState(
@@ -130,14 +131,19 @@ const Calendar = () => {
       let tasks = events.filter((event) => event.is_task);
       //Loop over the date headings
       dateHeadings.forEach((dateHeading) => {
+        let tasksWithPotentialToday = [...tasks];
         // Do no add any tasks if the user has selected to not show them in calendar view
         if (!userState.show_tasks) {
-          tasks = [];
+          tasksWithPotentialToday = [];
         }
         // Do no add any tasks if user is looking in a future week, we only slot them into current week
         const startDateOfCurrentWeek = moment().startOf("week");
-        if (dateHeading.date.isAfter(startDateOfCurrentWeek, "day")) {
-          tasks = [];
+        if (
+          moment(dateHeading.date)
+            .startOf("week")
+            .isAfter(startDateOfCurrentWeek, "day")
+        ) {
+          tasksWithPotentialToday = [];
         }
         //Find events for this date heding
         const eventsForDay = events.filter(
@@ -153,8 +159,9 @@ const Calendar = () => {
           // console.log(dateHeading.title, "   open time slots ", openTimeSlots);
 
           // Slot in tasks by looping over them
-          let tasksThatWorkToday = [];
-          tasks.forEach((task) => {
+          let tasksThatWeveFoundOpenTimeForToday = [];
+          console.log("anythign? ", tasksWithPotentialToday);
+          tasksWithPotentialToday.forEach((task) => {
             // Check if the task has already been assigned
             if (task.is_assigned) {
               return;
@@ -192,7 +199,7 @@ const Calendar = () => {
 
                 assigned = true;
                 task.is_assigned = true;
-                tasksThatWorkToday.push(task);
+                tasksThatWeveFoundOpenTimeForToday.push(task);
                 break;
               }
             }
@@ -204,7 +211,10 @@ const Calendar = () => {
           });
 
           // Merge tasks with non-task events
-          const allEventsForDay = [...eventsForDay, ...tasksThatWorkToday];
+          const allEventsForDay = [
+            ...eventsForDay,
+            ...tasksThatWeveFoundOpenTimeForToday,
+          ];
           // Resort events and tasks so they show in order
           allEventsForDay.sort((a, b) => {
             const startTimeA = moment(a.start_time).valueOf();

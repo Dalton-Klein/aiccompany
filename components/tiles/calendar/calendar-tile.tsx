@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
 import * as THEME from "../../../constants/theme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
+import React from "react";
 
 const CalendarTile = ({ handlePress, calendar, isPreSelected = false }) => {
   const [memberFeed, setmemberFeed] = useState([]);

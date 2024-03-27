@@ -16,6 +16,8 @@ import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import {
   createEventAssignments,
+  deleteEvent,
+  deleteSeries,
   getEventsData,
   removeEventAssignments,
   updateEventsData,
@@ -25,6 +27,7 @@ import { RootState } from "../../store/store";
 import CalendarTile from "../../components/tiles/calendar/calendar-tile";
 import moment from "moment";
 import { setPreferences } from "../../store/userPreferencesSlice";
+import React from "react";
 
 const EventManager = () => {
   const dispatch = useDispatch();
@@ -41,12 +44,17 @@ const EventManager = () => {
   const [taskDuration, settaskDuration] = useState(0);
   const [endTime, setendTime] = useState("");
   const [isSeries, setisSeries] = useState(false);
+  const [seriesId, setseriesId] = useState(0);
   const [isCancelled, setisCancelled] = useState(false);
   const [calendarTiles, setcalendarTiles] = useState([]);
   const [calendarsSelected, setcalendarsSelected] = useState([]);
   const [unsavedChanges, setunsavedChanges] = useState([]);
   const [isResultModalVisible, setisResultModalVisible] = useState(false);
   const [resultText, setresultText] = useState("");
+  const [isLeaveModalVisible, setisLeaveModalVisible] = useState(false);
+  const [isDeleteModalVisible, setisDeleteModalVisible] = useState(false);
+  const [isDeleteSeriesModalVisible, setisDeleteSeriesModalVisible] =
+    useState(false);
 
   useEffect(() => {
     fetchData();
@@ -59,6 +67,7 @@ const EventManager = () => {
     settitle(result.data.event.title);
     setnotes(result.data.event.notes);
     setisSeries(result.data.event.series_id ? true : false);
+    setseriesId(result.data.event.series_id);
     setisCancelled(result.data.event.is_cancelled);
     setstartTime(result.data.event.start_time);
     setendTime(result.data.event.end_time);
@@ -131,6 +140,7 @@ const EventManager = () => {
             refreshCalendar: !preferencesState.refreshCalendar,
           })
         );
+        setunsavedChanges([]);
       } else {
         setresultText(
           "There was a problem saving changes. Try again or contact support."
@@ -141,7 +151,11 @@ const EventManager = () => {
   };
 
   const navigateBack = () => {
-    router.navigate(`/${preferencesState.lastTabPage}`);
+    if (unsavedChanges.length) {
+      setisLeaveModalVisible(true);
+    } else {
+      router.navigate(`/${preferencesState.lastTabPage}`);
+    }
   };
 
   return (
@@ -230,6 +244,28 @@ const EventManager = () => {
           )}
           <Text style={styles.subTitle}>Calendar Assignments</Text>
           <View style={styles.calendarTileBox}>{calendarTiles}</View>
+          <TouchableOpacity
+            style={styles.deleteBtnContainer}
+            onPress={() => {
+              setisDeleteModalVisible(true);
+            }}
+          >
+            <Text style={styles.stayBtnText}>
+              {isTask ? "Delete Task" : "Detete Event"}
+            </Text>
+          </TouchableOpacity>
+          {isSeries ? (
+            <TouchableOpacity
+              style={styles.deleteBtnContainer}
+              onPress={() => {
+                setisDeleteSeriesModalVisible(true);
+              }}
+            >
+              <Text style={styles.stayBtnText}>Delete Series</Text>
+            </TouchableOpacity>
+          ) : (
+            <></>
+          )}
         </ScrollView>
       </View>
       <View style={styles.confirmContainer}>
@@ -256,6 +292,110 @@ const EventManager = () => {
               }}
             >
               <Text style={styles.btnText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* Confirm Leave Page Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isLeaveModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text
+              style={styles.modalText}
+            >{`You have unsaved changes, are you sure you want to leave?`}</Text>
+            <TouchableOpacity
+              style={styles.stayBtnContainer}
+              onPress={() => {
+                setisLeaveModalVisible(false);
+              }}
+            >
+              <Text style={styles.stayBtnText}>Stay</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnContainer}
+              onPress={() => {
+                router.navigate(`/${preferencesState.lastTabPage}`);
+              }}
+            >
+              <Text style={styles.btnText}>Leave</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* Confirm Delete Event Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDeleteModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text
+              style={styles.modalText}
+            >{`This event will be removed from all calendars. Are you sure you want to delete this event?`}</Text>
+            <TouchableOpacity
+              style={styles.stayBtnContainer}
+              onPress={() => {
+                setisDeleteModalVisible(false);
+              }}
+            >
+              <Text style={styles.stayBtnText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnContainer}
+              onPress={async () => {
+                await deleteEvent(userState.id, id, "");
+                dispatch(
+                  setPreferences({
+                    ...preferencesState,
+                    refreshCalendar: !preferencesState.refreshCalendar,
+                  })
+                );
+                router.navigate(`/${preferencesState.lastTabPage}`);
+              }}
+            >
+              <Text style={styles.btnText}>Delete</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* Confirm Delete SERIES Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDeleteSeriesModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text
+              style={styles.modalText}
+            >{`All events in this series will be removed from all calendars. \n\nAre you sure you want to delete every event in this series?`}</Text>
+            <TouchableOpacity
+              style={styles.stayBtnContainer}
+              onPress={() => {
+                setisDeleteSeriesModalVisible(false);
+              }}
+            >
+              <Text style={styles.stayBtnText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnContainer}
+              onPress={async () => {
+                await deleteSeries(userState.id, id, seriesId, "");
+                dispatch(
+                  setPreferences({
+                    ...preferencesState,
+                    refreshCalendar: !preferencesState.refreshCalendar,
+                  })
+                );
+                router.navigate(`/${preferencesState.lastTabPage}`);
+              }}
+            >
+              <Text style={styles.btnText}>Delete</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -304,6 +444,29 @@ const styles = StyleSheet.create({
     minWidth: "100%",
     marginBottom: 15,
   },
+  stayBtnContainer: {
+    backgroundColor: THEME.COLORS.lighter,
+    borderRadius: THEME.SIZES.small / 1.25,
+    borderWidth: 2,
+    borderColor: THEME.COLORS.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+    minWidth: "100%",
+    marginBottom: 15,
+  },
+  deleteBtnContainer: {
+    backgroundColor: THEME.COLORS.lighter,
+    borderRadius: THEME.SIZES.small / 1.25,
+    borderWidth: 2,
+    borderColor: THEME.COLORS.secondary,
+    justifyContent: "center",
+    alignItems: "center",
+    minWidth: "80%",
+    marginTop: 25,
+    marginBottom: 5,
+    marginLeft: 20,
+    marginRight: 20,
+  },
   textInput: {
     marginBottom: 15,
     padding: 5,
@@ -323,6 +486,13 @@ const styles = StyleSheet.create({
   },
   btnText: {
     color: THEME.COLORS.lighter,
+    marginLeft: 10,
+    fontSize: THEME.SIZES.large,
+    paddingBottom: 10,
+    paddingTop: 10,
+  },
+  stayBtnText: {
+    color: THEME.COLORS.secondary,
     marginLeft: 10,
     fontSize: THEME.SIZES.large,
     paddingBottom: 10,
@@ -377,6 +547,7 @@ const styles = StyleSheet.create({
   modalText: {
     marginBottom: 20,
     fontSize: THEME.SIZES.medium,
+    textAlign: "center",
   },
   seriesSwitch: {
     marginBottom: 10,

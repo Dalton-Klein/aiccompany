@@ -1,6 +1,7 @@
 import { Tabs } from "expo-router";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import * as THEME from "../../constants/theme";
+import React from "react";
 
 const Layout = () => {
   return (

@@ -16,6 +16,7 @@ import {
 } from "../../../app/services/rest";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store/store";
+import React from "react";
 
 const MemberTile = ({ member }) => {
   const userState = useSelector((state: RootState) => state.user.user);

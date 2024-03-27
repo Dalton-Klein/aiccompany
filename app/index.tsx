@@ -4,6 +4,7 @@ import * as SplashScreen from "expo-splash-screen";
 import Entypo from "@expo/vector-icons/Entypo";
 import { useCallback, useEffect, useState } from "react";
 import { View } from "react-native";
+import React from "react";
 
 SplashScreen.preventAutoHideAsync();
 

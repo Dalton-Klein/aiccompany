@@ -1,5 +1,5 @@
 // ***Coffee make http://192.168.1.4:3010 for local, https://accompany-me-api-911a354ccb4c.herokuapp.com for prod
-const endpointURL = "http://192.168.1.4:3010";
+const endpointURL = "https://accompany-me-api-911a354ccb4c.herokuapp.com";
 
 const avatarCloud = `https://api.cloudinary.com/v1_1/kultured-dev/upload`;
 /*
@@ -381,6 +381,49 @@ export const createEventAssignments = async (
     return jsonify;
   } catch (error) {
     console.log(`${error} while creating event assignments`);
+  }
+};
+
+export const deleteEvent = async (userId, eventId, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/delete-event`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        eventId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
+  }
+};
+
+export const deleteSeries = async (userId, eventId, seriesId, token) => {
+  try {
+    const httpResult = await fetch(`${endpointURL}/delete-series`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        eventId,
+        seriesId,
+        token,
+      }),
+    });
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating event`);
   }
 };
 
