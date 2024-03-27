@@ -15,6 +15,8 @@ import CalendarBrowser from "../../components/nav/calendarBrowser";
 import FriendBrowser from "../../components/nav/friendBrowser";
 import { setPreferences } from "../../store/userPreferencesSlice";
 import UnsharedEventsBrowser from "../../components/nav/unsharedEventsBrowser";
+import MetricTileTriple from "../../components/widgets/metric-widget-triple";
+import React from "react";
 
 const Dashboard = () => {
   const routeName = useNavigationState(
@@ -31,7 +33,9 @@ const Dashboard = () => {
   const [isRefreshing, setisRefreshing] = useState<any>(null);
 
   const [metricData, setmetricData] = useState<any>({});
-  const [eventCount, seteventCount] = useState(0);
+  const [eventCountToday, seteventCountToday] = useState(0);
+  const [eventCountTomorrow, seteventCountTomorrow] = useState(0);
+  const [eventCountTwoDaysFromNow, seteventCountTwoDaysFromNow] = useState(0);
   const [unsharedEventCount, setunsharedEventCount] = useState(0);
   const [taskCount, settaskCount] = useState(0);
   const [overdueTaskCount, setoverdueTaskCount] = useState(0);
@@ -85,11 +89,41 @@ const Dashboard = () => {
       setisRefreshing(true);
       const data = await getMetricData(userState.id, userState.token);
       if (data && data.status && data.status === "success" && data.data) {
+        const currentDate = moment().startOf("day");
         setmetricData(data.data);
-        seteventCount(
+        seteventCountToday(
           data.data.eventsThisWeek?.length
             ? data.data.eventsThisWeek?.filter(
-                (event: any) => !event.is_task && !event.is_cancelled
+                (event: any) =>
+                  !event.is_task &&
+                  !event.is_cancelled &&
+                  moment(event.start_time).isSame(currentDate, "day")
+              ).length
+            : 0
+        );
+        seteventCountTomorrow(
+          data.data.eventsThisWeek?.length
+            ? data.data.eventsThisWeek?.filter(
+                (event: any) =>
+                  !event.is_task &&
+                  !event.is_cancelled &&
+                  moment(event.start_time).isSame(
+                    currentDate.add(1, "days"),
+                    "day"
+                  )
+              ).length
+            : 0
+        );
+        seteventCountTwoDaysFromNow(
+          data.data.eventsThisWeek?.length
+            ? data.data.eventsThisWeek?.filter(
+                (event: any) =>
+                  !event.is_task &&
+                  !event.is_cancelled &&
+                  moment(event.start_time).isSame(
+                    currentDate.add(2, "days"),
+                    "day"
+                  )
               ).length
             : 0
         );
@@ -191,10 +225,14 @@ const Dashboard = () => {
       >
         <Text style={styles.headingText}>Events</Text>
         <View style={styles.widgetContainer}>
-          <MetricTile
+          <MetricTileTriple
             isTask={false}
-            titleText={"Events this week"}
-            amount={eventCount}
+            title1Text={"Today"}
+            amount1={eventCountToday}
+            title2Text={"Tomorrow"}
+            amount2={eventCountTomorrow}
+            title3Text={moment().add(2, "days").format("ddd")}
+            amount3={eventCountTwoDaysFromNow}
             handlePress={() => {
               dispatch(
                 setPreferences({
@@ -204,7 +242,7 @@ const Dashboard = () => {
               );
               router.navigate(`/calendar`);
             }}
-          ></MetricTile>
+          ></MetricTileTriple>
           <MetricTile
             isTask={false}
             titleText={"Unshared Events"}
@@ -220,13 +258,17 @@ const Dashboard = () => {
             isTask={true}
             titleText={"Active Tasks"}
             amount={taskCount}
-            handlePress={() => {}}
+            handlePress={() => {
+              router.navigate(`/task-viewer/0`);
+            }}
           ></MetricTile>
           <MetricTile
             isTask={true}
             titleText={"Overdue Tasks"}
             amount={overdueTaskCount}
-            handlePress={() => {}}
+            handlePress={() => {
+              router.navigate(`/task-viewer/0`);
+            }}
           ></MetricTile>
         </View>
         <Text style={styles.headingText}>Social</Text>
@@ -382,7 +424,6 @@ const styles = StyleSheet.create({
     // textAlign: "center",
   },
   widgetContainer: {
-    marginTop: 15,
     flexDirection: "row",
     flexWrap: "wrap",
     justifyContent: "space-evenly",

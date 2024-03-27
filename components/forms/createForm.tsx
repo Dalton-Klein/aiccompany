@@ -10,6 +10,7 @@ import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
 import { useState } from "react";
+import React from "react";
 
 const CreateForm = ({
   isModalVisible,

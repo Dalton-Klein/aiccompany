@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { setPreferences } from "../../store/userPreferencesSlice";
+import React from "react";
 
 const CalendarBrowser = ({
   modalTitle,

@@ -3,9 +3,13 @@ import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import React from "react";
 
-const MetricTile = ({
-  titleText,
-  amount,
+const MetricTileTriple = ({
+  title1Text,
+  title2Text,
+  title3Text,
+  amount1,
+  amount2,
+  amount3,
   handlePress,
   isTask,
   isNeutral = false,
@@ -20,10 +24,16 @@ const MetricTile = ({
       onPress={handlePress}
     >
       <View style={styles.titleBox}>
-        <Text style={styles.amountText}>{amount}</Text>
+        <Text style={styles.amountText}>{amount1}</Text>
+        <Text style={styles.titleText}>{title1Text}</Text>
       </View>
       <View style={styles.titleBox}>
-        <Text style={styles.titleText}>{titleText}</Text>
+        <Text style={styles.amountText}>{amount2}</Text>
+        <Text style={styles.titleText}>{title2Text}</Text>
+      </View>
+      <View style={styles.titleBox}>
+        <Text style={styles.amountText}>{amount3}</Text>
+        <Text style={styles.titleText}>{title3Text}</Text>
       </View>
     </TouchableOpacity>
   );
@@ -78,7 +88,7 @@ const styles = StyleSheet.create({
   titleBox: {
     display: "flex",
     flexDirection: "row",
-    justifyContent: "center",
+    justifyContent: "space-between",
     alignItems: "center",
     minWidth: "100%",
     paddingTop: 10,
@@ -99,9 +109,9 @@ const styles = StyleSheet.create({
   amountText: {
     fontWeight: "900",
     color: THEME.COLORS.lighter,
-    fontSize: THEME.SIZES.xLarge,
+    fontSize: THEME.SIZES.large,
     textAlign: "center",
   },
 });
 
-export default MetricTile;
+export default MetricTileTriple;

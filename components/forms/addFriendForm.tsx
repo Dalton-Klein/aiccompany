@@ -18,6 +18,7 @@ import {
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import Autocomplete from "react-native-autocomplete-input";
+import React from "react";
 
 const AddFriendForm = ({ handleTextInputFocus }) => {
   const userState = useSelector((state: RootState) => state.user.user);

@@ -11,6 +11,7 @@ import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
 import { useEffect, useState } from "react";
 import RequestTile from "../tiles/social/requestTile";
+import React from "react";
 
 const RequestsForm = ({
   isModalVisible,

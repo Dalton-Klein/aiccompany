@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import SelectDropdown from "react-native-select-dropdown";
+import React from "react";
 
 const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
   const recurrenceOptions = ["Day(s)", "Week(s)", "Month(s)"];

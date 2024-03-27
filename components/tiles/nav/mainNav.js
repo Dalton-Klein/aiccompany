@@ -5,6 +5,8 @@ import { Settings } from "../../../app/(tabs)/settings";
 import { Calendar } from "../../../app/(tabs)/calendar";
 import { Assistant } from "../../../app/(tabs)/assistant";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
+import React from "react";
+
 const Tab = createBottomTabNavigator();
 
 import { COLORS, icons, images, SIZEZ } from "../../../constants/theme";

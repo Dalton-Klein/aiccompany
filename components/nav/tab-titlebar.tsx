@@ -27,6 +27,7 @@ import CreateForm from "../forms/createForm";
 import { setPreferences } from "../../store/userPreferencesSlice";
 import CreateTaskForm from "../forms/createTaskForm";
 import CalendarBrowser from "./calendarBrowser";
+import React from "react";
 
 const TitleBar = (props: any) => {
   const dispatch = useDispatch();

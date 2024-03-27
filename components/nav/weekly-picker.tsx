@@ -4,6 +4,7 @@ import * as THEME from "../../constants/theme";
 import moment from "moment";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DatePicker from "react-native-modern-datepicker";
+import React from "react";
 
 const WeeklyPicker = (props: any) => {
   const [sliderTiles, setsliderTiles] = useState([]);

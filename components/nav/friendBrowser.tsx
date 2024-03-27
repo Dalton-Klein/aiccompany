@@ -11,6 +11,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import MemberTile from "../tiles/social/memberTile";
+import React from "react";
 
 const FriendBrowser = ({
   friends,

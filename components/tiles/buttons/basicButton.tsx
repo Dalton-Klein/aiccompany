@@ -2,6 +2,7 @@ import { Text, Image, TouchableOpacity, View } from "react-native";
 import { StyleSheet } from "react-native";
 import * as THEME from "../../../constants/theme";
 import { useEffect, useState } from "react";
+import React from "react";
 
 const BasicBtn = ({ iconUrl, buttonText, handlePress, isCancel }) => {
   return (

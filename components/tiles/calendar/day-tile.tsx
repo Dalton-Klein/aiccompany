@@ -3,6 +3,7 @@ import { View, StyleSheet, Text } from "react-native";
 import { useRouter } from "expo-router";
 import EventTile from "./event-tile";
 import * as THEME from "../../../constants/theme";
+import React from "react";
 
 const DayTile = (props) => {
   const router = useRouter();

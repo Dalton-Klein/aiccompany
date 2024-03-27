@@ -5,6 +5,7 @@ import { signInUserThunk } from "../../store/userSlice";
 import { router } from "expo-router";
 import { useEffect } from "react";
 import { RootState } from "../../store/store";
+import React from "react";
 
 export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
   const dispatch = useDispatch();
