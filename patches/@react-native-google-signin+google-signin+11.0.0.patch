@@ -1,0 +1,13 @@
+diff --git a/node_modules/@react-native-google-signin/google-signin/expo/ios/ExpoAdapterGoogleSignIn.podspec b/node_modules/@react-native-google-signin/google-signin/expo/ios/ExpoAdapterGoogleSignIn.podspec
+index dbd46f6..38a16d9 100644
+--- a/node_modules/@react-native-google-signin/google-signin/expo/ios/ExpoAdapterGoogleSignIn.podspec
++++ b/node_modules/@react-native-google-signin/google-signin/expo/ios/ExpoAdapterGoogleSignIn.podspec
+@@ -17,7 +17,7 @@ Pod::Spec.new do |s|
+ 
+   s.dependency 'ExpoModulesCore'
+   s.dependency 'React-Core'
+-  s.dependency "GoogleSignIn", "~> 7.0"
++  s.dependency "GoogleSignIn", "~> 7.0.0"
+ 
+   # Swift/Objective-C compatibility
+   s.pod_target_xcconfig = {
