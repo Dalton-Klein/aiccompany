@@ -1,13 +1,28 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
+import { useDispatch, useSelector } from "react-redux";
+import { setPreferences } from "../../store/userPreferencesSlice";
+import { RootState } from "../../store/store";
 
-const TaskViewerNav = ({ updateView }) => {
+const TaskViewerNav = () => {
+  const preferencesState = useSelector((state: RootState) => state.preferences);
+  const dispatch = useDispatch();
   const [selectedOption, setSelectedOption] = useState("Active");
 
-  const handleOptionSelect = (option) => {
+  useEffect(() => {
+    setSelectedOption(preferencesState.taskView);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferencesState.taskView]);
+
+  const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
-    updateView();
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        taskView: option,
+      })
+    );
   };
 
   return (
@@ -79,6 +94,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 10,
     borderRadius: 5,
+    minWidth: "30%",
   },
   selectedOption: {
     backgroundColor: THEME.COLORS.primary, // Change color based on your preference
@@ -86,10 +102,12 @@ const styles = StyleSheet.create({
   optionText: {
     color: THEME.COLORS.darker, // Change color based on your preference
     fontWeight: "500",
+    textAlign: "center",
   },
   optionSelectedText: {
     color: THEME.COLORS.lighter, // Change color based on your preference
     fontWeight: "500",
+    textAlign: "center",
   },
 });
 

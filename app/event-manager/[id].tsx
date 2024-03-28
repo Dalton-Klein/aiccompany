@@ -46,6 +46,7 @@ const EventManager = () => {
   const [isSeries, setisSeries] = useState(false);
   const [seriesId, setseriesId] = useState(0);
   const [isCancelled, setisCancelled] = useState(false);
+  const [isCompleted, setisCompleted] = useState(false);
   const [calendarTiles, setcalendarTiles] = useState([]);
   const [calendarsSelected, setcalendarsSelected] = useState([]);
   const [unsavedChanges, setunsavedChanges] = useState([]);
@@ -69,6 +70,7 @@ const EventManager = () => {
     setisSeries(result.data.event.series_id ? true : false);
     setseriesId(result.data.event.series_id);
     setisCancelled(result.data.event.is_cancelled);
+    setisCompleted(result.data.event.is_completed);
     setstartTime(result.data.event.start_time);
     setendTime(result.data.event.end_time);
     settaskDuration(result.data.event.task_duration);
@@ -236,6 +238,34 @@ const EventManager = () => {
               style={styles.seriesSwitch}
             />
           </View>
+          {isTask ? (
+            <Text style={styles.subTitle}>Is Task Completed</Text>
+          ) : (
+            <></>
+          )}
+          {isTask ? (
+            <View style={styles.fieldBox}>
+              <Switch
+                trackColor={{
+                  false: THEME.COLORS.dark,
+                  true: THEME.COLORS.neutral,
+                }}
+                thumbColor={
+                  isCompleted ? THEME.COLORS.primary : THEME.COLORS.lighter
+                }
+                ios_backgroundColor="#3e3e3e"
+                onValueChange={() => {
+                  setisCompleted(!isCompleted);
+                  addUnsavedChange("is_completed", !isCompleted);
+                }}
+                value={isCompleted}
+                style={styles.seriesSwitch}
+              />
+            </View>
+          ) : (
+            <></>
+          )}
+
           {isSeries && (
             <Text style={styles.seriesNotifText}>
               *Calendar assignments will be applied to all events in this

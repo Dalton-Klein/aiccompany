@@ -6,6 +6,8 @@ const initialState: Preferences = {
   selectedCalendar: { id: 0 },
   selectedDate: "",
   refreshCalendar: false,
+  taskView: "Active",
+  refreshTaskView: false,
 };
 
 const preferencesSlice = createSlice({

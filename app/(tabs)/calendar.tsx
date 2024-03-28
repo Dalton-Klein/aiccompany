@@ -160,7 +160,6 @@ const Calendar = () => {
 
           // Slot in tasks by looping over them
           let tasksThatWeveFoundOpenTimeForToday = [];
-          console.log("anythign? ", tasksWithPotentialToday);
           tasksWithPotentialToday.forEach((task) => {
             // Check if the task has already been assigned
             if (task.is_assigned) {

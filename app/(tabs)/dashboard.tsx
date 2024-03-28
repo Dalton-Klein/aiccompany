@@ -90,6 +90,8 @@ const Dashboard = () => {
       const data = await getMetricData(userState.id, userState.token);
       if (data && data.status && data.status === "success" && data.data) {
         const currentDate = moment().startOf("day");
+        const tomorrowDate = moment().add(1, "days");
+        const twodaysFromNowDate = moment().add(2, "days");
         setmetricData(data.data);
         seteventCountToday(
           data.data.eventsThisWeek?.length
@@ -101,18 +103,17 @@ const Dashboard = () => {
               ).length
             : 0
         );
+        let eventsTomorrow = data.data.eventsThisWeek?.filter((event: any) => {
+          if (
+            !event.is_task &&
+            !event.is_cancelled &&
+            moment(event.start_time).isSame(tomorrowDate, "day")
+          ) {
+            return true;
+          } else return false;
+        });
         seteventCountTomorrow(
-          data.data.eventsThisWeek?.length
-            ? data.data.eventsThisWeek?.filter(
-                (event: any) =>
-                  !event.is_task &&
-                  !event.is_cancelled &&
-                  moment(event.start_time).isSame(
-                    currentDate.add(1, "days"),
-                    "day"
-                  )
-              ).length
-            : 0
+          data.data.eventsThisWeek?.length ? eventsTomorrow.length : 0
         );
         seteventCountTwoDaysFromNow(
           data.data.eventsThisWeek?.length
@@ -120,10 +121,7 @@ const Dashboard = () => {
                 (event: any) =>
                   !event.is_task &&
                   !event.is_cancelled &&
-                  moment(event.start_time).isSame(
-                    currentDate.add(2, "days"),
-                    "day"
-                  )
+                  moment(event.start_time).isSame(twodaysFromNowDate, "day")
               ).length
             : 0
         );
@@ -259,6 +257,12 @@ const Dashboard = () => {
             titleText={"Active Tasks"}
             amount={taskCount}
             handlePress={() => {
+              dispatch(
+                setPreferences({
+                  ...preferencesState,
+                  taskView: "Active",
+                })
+              );
               router.navigate(`/task-viewer/0`);
             }}
           ></MetricTile>
@@ -267,6 +271,12 @@ const Dashboard = () => {
             titleText={"Overdue Tasks"}
             amount={overdueTaskCount}
             handlePress={() => {
+              dispatch(
+                setPreferences({
+                  ...preferencesState,
+                  taskView: "Overdue",
+                })
+              );
               router.navigate(`/task-viewer/0`);
             }}
           ></MetricTile>

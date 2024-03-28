@@ -14,7 +14,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "expo-router";
 import MemberTile from "../../components/tiles/social/memberTile";
 import TaskViewerNav from "../../components/nav/taskViwerNav";
-import { getAllEventsForUser } from "../services/rest";
+import { getAllTasksForUser } from "../services/rest";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import moment from "moment";
@@ -24,9 +24,10 @@ import React from "react";
 const TaskViewer = () => {
   const router = useRouter();
   const userState = useSelector((state: RootState) => state.user.user);
+  const preferencesState = useSelector((state: RootState) => state.preferences);
 
   const [unsavedChanges, setunsavedChanges] = useState([]);
-  const [selectedView, setselectedView] = useState("Active");
+  const [selectedView, setselectedView] = useState(preferencesState.taskView);
   const [taskTiles, settaskTiles] = useState([]);
 
   useEffect(() => {
@@ -34,23 +35,38 @@ const TaskViewer = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    fetchData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedView, preferencesState.refreshTaskView]);
+
+  useEffect(() => {
+    setselectedView(preferencesState.taskView);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preferencesState.taskView]);
+
   const fetchData = async () => {
-    const result = await getAllEventsForUser(userState.id, "");
+    const result = await getAllTasksForUser(userState.id, "");
     if (result.data) {
       turnTasksIntoTiles(result.data.filter((t: any) => t.is_task));
     }
   };
 
   const turnTasksIntoTiles = (tasks: any) => {
+    let filteredTasks = [];
     if (selectedView === "Active") {
-      tasks.filter((t) => moment(t.end_time).isAfter(moment()));
+      filteredTasks = tasks.filter(
+        (t: any) => moment(t.end_time).isAfter(moment()) && !t.is_completed
+      );
     } else if (selectedView === "Overdue") {
-      tasks.filter((t) => moment(t.end_time).isBefore(moment()));
+      filteredTasks = tasks.filter(
+        (t: any) => moment(t.end_time).isBefore(moment()) && !t.is_completed
+      );
     } else {
-      tasks.filter((t) => t.is_completed);
+      filteredTasks = tasks.filter((t: any) => t.is_completed);
     }
     let tempTaskTiles = [];
-    tasks.forEach((task) => {
+    filteredTasks.forEach((task) => {
       tempTaskTiles.push(
         <View key={task.id}>
           <TaskTile task={task}></TaskTile>
@@ -73,8 +89,14 @@ const TaskViewer = () => {
         <Text style={styles.titleText}>Tasks</Text>
         <Text style={styles.backBtn}></Text>
       </View>
-      <TaskViewerNav updateView={() => {}}></TaskViewerNav>
-      <ScrollView keyboardShouldPersistTaps="always">{taskTiles}</ScrollView>
+      <TaskViewerNav></TaskViewerNav>
+      <ScrollView keyboardShouldPersistTaps="always">
+        {taskTiles.length ? (
+          taskTiles
+        ) : (
+          <Text style={styles.noTasksText}> No {selectedView} tasks!</Text>
+        )}
+      </ScrollView>
     </SafeAreaView>
   );
 };
@@ -93,6 +115,14 @@ const styles = StyleSheet.create({
     fontWeight: "600",
     fontSize: THEME.SIZES.large,
     minWidth: "50%",
+  },
+  noTasksText: {
+    color: THEME.COLORS.fontColor,
+    textAlign: "center",
+    fontWeight: "600",
+    fontSize: THEME.SIZES.large,
+    minWidth: "50%",
+    marginTop: 50,
   },
   backBtn: {
     marginTop: 5,

@@ -1,12 +1,5 @@
 import { useState, useEffect } from "react";
-import {
-  View,
-  TouchableOpacity,
-  Text,
-  StyleSheet,
-  Modal,
-  Image,
-} from "react-native";
+import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useNavigationState } from "@react-navigation/native";
@@ -15,10 +8,8 @@ import {
   createEvent,
   createEventAssignments,
   createTask,
-  getAllCalendarsForUser,
 } from "../../app/services/rest";
-import CalendarTile from "../tiles/calendar/calendar-tile";
-import BasicBtn from "../tiles/buttons/basicButton";
+
 import CreateCalendarForm from "../forms/createCalendarForm";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";

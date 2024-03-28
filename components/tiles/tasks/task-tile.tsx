@@ -4,13 +4,21 @@ import { useRouter } from "expo-router";
 import moment from "moment";
 import * as THEME from "../../../constants/theme";
 import React from "react";
+import { Entypo, FontAwesome6 } from "@expo/vector-icons";
+import { updateEventsData } from "../../../app/services/rest";
+import { useDispatch, useSelector } from "react-redux";
+import { setPreferences } from "../../../store/userPreferencesSlice";
+import { RootState } from "../../../store/store";
 
-const TaskTile = (props) => {
+const TaskTile = (props: any) => {
   const router = useRouter();
-  const [eventStartTime, seteventStartTime] = useState("");
-  const [eventEndTime, seteventEndTime] = useState("");
-  const [isTask, setisTask] = useState(false);
+  const dispatch = useDispatch();
+  const preferencesState = useSelector((state: RootState) => state.preferences);
+
+  const [taskDuration, settaskDuration] = useState("");
+  const [taskEndTime, settaskEndTime] = useState("");
   const [isCancelled, setisCancelled] = useState(false);
+  const [isCompleted, setisCompleted] = useState(false);
 
   useEffect(() => {
     setTileData();
@@ -18,57 +26,74 @@ const TaskTile = (props) => {
   }, []);
 
   const setTileData = () => {
-    setisCancelled(props.is_cancelled);
-    setisTask(props.is_task);
-    seteventStartTime(moment(props.start_time).format("h:mm A"));
-    let formattedDifference = moment
-      .duration(moment(props.end_time).diff(moment(props.start_time)))
-      .humanize();
-    //Instead of "an hour" conver to "1 hour"
-    if (formattedDifference.slice(0, 2) === "an") {
-      formattedDifference = `1 ${formattedDifference.slice(2, 1000)}`;
-    }
-    seteventEndTime(
-      props.is_task ? `${props.task_duration} minutes` : formattedDifference
-    );
+    setisCancelled(props.task.is_cancelled);
+    setisCompleted(props.task.is_completed);
+    settaskDuration(props.task.task_duration);
+    settaskEndTime(moment(props.task.end_time).format("MMMM Do YYYY, h:mm a"));
   };
 
   const handleEventPressed = () => {
-    router.navigate(`/event-manager/${props.id}`);
+    router.navigate(`/event-manager/${props.task.id}`);
+  };
+
+  const handleToggleTaskCompleted = async () => {
+    await updateEventsData(
+      props.task.id,
+      [{ field: "is_completed", value: !isCompleted }],
+      ""
+    );
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        refreshTaskView: !preferencesState.refreshTaskView,
+      })
+    );
   };
 
   return (
     <TouchableOpacity
-      style={
-        isTask
-          ? [styles.eventTile, styles.taskColor]
-          : [styles.eventTile, styles.eventColor]
-      }
+      style={[styles.eventTile, styles.taskColor]}
       onPress={handleEventPressed}
     >
-      <View>
-        <Text style={styles.eventStartTime}>{eventStartTime}</Text>
-        <Text style={styles.eventStartTime}>{eventEndTime}</Text>
-      </View>
-      <View style={styles.eventDetails}>
-        <Text
-          style={
-            isCancelled
-              ? [styles.eventTitle, styles.strikeText]
-              : styles.eventTitle
-          }
+      <View style={styles.taskBox}>
+        <View style={styles.eventDetails}>
+          <Text
+            style={
+              isCancelled
+                ? [styles.eventTitle, styles.strikeText]
+                : styles.eventTitle
+            }
+          >
+            {isCancelled ? `Cancelled: ${props.task.title}` : props.task.title}
+          </Text>
+          <Text
+            style={
+              isCancelled
+                ? [styles.eventNotes, styles.strikeText]
+                : styles.eventNotes
+            }
+          >
+            {props.task.notes}
+          </Text>
+          <Text style={styles.eventStartTime}>
+            Duration: {taskDuration} minutes
+          </Text>
+          <Text style={styles.eventStartTime}>Deadline: {taskEndTime}</Text>
+        </View>
+        <TouchableOpacity
+          style={styles.taskCompletionBtn}
+          onPress={handleToggleTaskCompleted}
         >
-          {isCancelled ? `Cancelled: ${props.title}` : props.title}
-        </Text>
-        <Text
-          style={
-            isCancelled
-              ? [styles.eventNotes, styles.strikeText]
-              : styles.eventNotes
-          }
-        >
-          {props.notes}
-        </Text>
+          {isCompleted ? (
+            <FontAwesome6
+              name="circle-check"
+              size={28}
+              color={THEME.COLORS.lighter}
+            />
+          ) : (
+            <Entypo name="circle" size={28} color={THEME.COLORS.lighter} />
+          )}
+        </TouchableOpacity>
       </View>
     </TouchableOpacity>
   );
@@ -79,11 +104,12 @@ const styles = StyleSheet.create({
     textDecorationLine: "line-through",
   },
   eventTile: {
-    marginTop: 10,
+    marginTop: 15,
+    marginRight: 10,
+    marginLeft: 10,
     paddingTop: 10,
     paddingBottom: 10,
-    paddingLeft: 25,
-    marginRight: 10,
+    paddingLeft: 5,
     display: "flex",
     flexDirection: "row",
     justifyContent: "flex-start",
@@ -97,6 +123,12 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.4,
     shadowRadius: 4,
     elevation: 2,
+  },
+  taskBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    minWidth: "85%",
   },
   eventColor: {
     backgroundColor: THEME.COLORS.primary,
@@ -120,6 +152,9 @@ const styles = StyleSheet.create({
   eventStartTime: {
     fontSize: THEME.SIZES.medium,
     color: THEME.COLORS.lighter,
+  },
+  taskCompletionBtn: {
+    marginBottom: 10,
   },
 });
 

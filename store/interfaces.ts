@@ -22,6 +22,8 @@ export interface Preferences {
   selectedCalendar: any;
   selectedDate: string;
   refreshCalendar: boolean;
+  taskView: string;
+  refreshTaskView: boolean;
 }
 
 export interface SignIn {
