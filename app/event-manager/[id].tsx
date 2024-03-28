@@ -217,27 +217,6 @@ const EventManager = () => {
               {moment(endTime).format("MMMM Do YYYY, h:mm a")}
             </Text>
           </View>
-          <Text style={styles.subTitle}>
-            {isTask ? "Is Task Cancelled" : "Is Event Cancelled"}
-          </Text>
-          <View style={styles.fieldBox}>
-            <Switch
-              trackColor={{
-                false: THEME.COLORS.dark,
-                true: THEME.COLORS.neutral,
-              }}
-              thumbColor={
-                isCancelled ? THEME.COLORS.primary : THEME.COLORS.lighter
-              }
-              ios_backgroundColor="#3e3e3e"
-              onValueChange={() => {
-                setisCancelled(!isCancelled);
-                addUnsavedChange("is_cancelled", !isCancelled);
-              }}
-              value={isCancelled}
-              style={styles.seriesSwitch}
-            />
-          </View>
           {isTask ? (
             <Text style={styles.subTitle}>Is Task Completed</Text>
           ) : (
@@ -265,7 +244,27 @@ const EventManager = () => {
           ) : (
             <></>
           )}
-
+          <Text style={styles.subTitle}>
+            {isTask ? "Is Task Cancelled" : "Is Event Cancelled"}
+          </Text>
+          <View style={styles.fieldBox}>
+            <Switch
+              trackColor={{
+                false: THEME.COLORS.dark,
+                true: THEME.COLORS.neutral,
+              }}
+              thumbColor={
+                isCancelled ? THEME.COLORS.primary : THEME.COLORS.lighter
+              }
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() => {
+                setisCancelled(!isCancelled);
+                addUnsavedChange("is_cancelled", !isCancelled);
+              }}
+              value={isCancelled}
+              style={styles.seriesSwitch}
+            />
+          </View>
           {isSeries && (
             <Text style={styles.seriesNotifText}>
               *Calendar assignments will be applied to all events in this

@@ -5,8 +5,14 @@ import moment from "moment";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import DatePicker from "react-native-modern-datepicker";
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { setPreferences } from "../../store/userPreferencesSlice";
+import { RootState } from "../../store/store";
 
 const WeeklyPicker = (props: any) => {
+  const dispatch = useDispatch();
+  const preferencesState = useSelector((state: RootState) => state.preferences);
+
   const [sliderTiles, setsliderTiles] = useState([]);
   const [isDatePickerOpen, setisDatePickerOpen] = useState(false);
   const [selectedDate, setselectedDate] = useState(
@@ -17,10 +23,8 @@ const WeeklyPicker = (props: any) => {
     createSliderTiles();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
   useEffect(() => {
     createSliderTiles();
-    props.updateCalendarFeed(selectedDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedDate]);
 
@@ -28,7 +32,7 @@ const WeeklyPicker = (props: any) => {
     createSliderTiles();
     setselectedDate(props.parentSelectedDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [props.parentSelectedDate]);
+  }, [preferencesState.selectedDate]);
 
   const createSliderTiles = () => {
     let tempTiles = [];
@@ -57,6 +61,12 @@ const WeeklyPicker = (props: any) => {
 
   const handleWeekChange = (date) => {
     setselectedDate(date);
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        selectedDate: date,
+      })
+    );
     handleOpenExpandedPicker();
   };
 

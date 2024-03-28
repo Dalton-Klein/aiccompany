@@ -17,8 +17,9 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import BasicBtn from "../../components/tiles/buttons/basicButton";
 import { logoutUser, updateUserThunk } from "../../store/userSlice";
-import { updateUserField } from "../services/rest";
+import { updateUserField, uploadAvatarCloud } from "../services/rest";
 import React from "react";
+import * as ImagePicker from "expo-image-picker";
 
 const Settings = () => {
   const router = useRouter();
@@ -31,6 +32,7 @@ const Settings = () => {
     if (!userState.id || userState.id < 1) {
       router.navigate("auth/authentication");
     }
+    console.log("avatar: ", userState.avatar_url);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -44,6 +46,34 @@ const Settings = () => {
     dispatch(updateUserThunk(userState.id));
   };
 
+  const handlePickAvatar = async () => {
+    // Requesting permission to access the camera roll
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+      return;
+    }
+
+    // Launching the image picker
+    let result: any = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1], // Optional: You can force the crop aspect ratio to be square
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      const uploadResult = await uploadAvatarCloud(result.assets[0].uri);
+      // // Assuming you have a function to handle the upload of the image URL to your server or backend
+      const rez = await updateUserField(
+        userState.id,
+        "avatar_url",
+        uploadResult
+      );
+      dispatch(updateUserThunk(userState.id));
+    }
+  };
+
   return (
     <SafeAreaView style={styles.masterContainer}>
       <TitleBar title="Settings"></TitleBar>
@@ -51,12 +81,17 @@ const Settings = () => {
         <View style={styles.userFieldBox}>
           <Text style={styles.userFieldText}>Profile Photo</Text>
           {userState.avatar_url?.length > 0 ? (
-            <Image
-              source={{ uri: userState.avatar_url }}
-              style={styles.prolfileImg}
-            />
+            <TouchableOpacity
+              style={styles.avatarBg}
+              onPress={handlePickAvatar}
+            >
+              <Image src={userState.avatar_url} style={styles.profileImg} />
+            </TouchableOpacity>
           ) : (
-            <TouchableOpacity style={styles.dynamicAvatarBg}>
+            <TouchableOpacity
+              style={styles.dynamicAvatarBg}
+              onPress={handlePickAvatar}
+            >
               <Text style={styles.dynamicAvatarText}>
                 {userState.username
                   ? userState.username
@@ -120,12 +155,20 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  prolfileImg: {
+  profileImg: {
     maxWidth: 75,
     maxHeight: 75,
     minWidth: 75,
     minHeight: 75,
     borderRadius: 75 / 2,
+  },
+  avatarBg: {
+    minWidth: 75,
+    minHeight: 75,
+    borderRadius: 75 / 2,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
   },
   dynamicAvatarBg: {
     backgroundColor: THEME.COLORS.neutral,

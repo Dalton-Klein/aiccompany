@@ -1,11 +1,18 @@
 // ***Coffee make http://192.168.1.4:3010 for local, https://accompany-me-api-911a354ccb4c.herokuapp.com for prod
-const endpointURL = "https://accompany-me-api-911a354ccb4c.herokuapp.com";
+const endpointURL = "http://192.168.1.4:3010";
 
 const avatarCloud = `https://api.cloudinary.com/v1_1/kultured-dev/upload`;
 /*
 	Auth Calls
 */
-export const verifyUser = async (email, vKey, name, password, appleId) => {
+export const verifyUser = async (
+  email,
+  vKey,
+  name,
+  password,
+  appleId,
+  avatarUrl
+) => {
   let result = await fetch(`${endpointURL}/verify`, {
     method: "POST",
     headers: {
@@ -17,6 +24,7 @@ export const verifyUser = async (email, vKey, name, password, appleId) => {
       email,
       appleId,
       password,
+      avatarUrl,
     }),
   })
     .then((res) => res.json())
@@ -160,6 +168,31 @@ export const updateUserField = async (id, field, value) => {
     .then((res) => res.json())
     .catch((err) => console.log("Fetch Error (avatar)", err));
   return;
+};
+
+export const uploadAvatarCloud = async (uri) => {
+  const uriParts = uri.split(".");
+  const fileType = uriParts[uriParts.length - 1];
+
+  const formData = new FormData();
+  formData.append("upload_preset", "ribyujnm");
+  formData.append("file", {
+    uri,
+    name: `photo.${fileType}`,
+    type: `image/${fileType}`,
+  });
+  let response;
+  await fetch(avatarCloud, {
+    method: "POST",
+    body: formData,
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => (response = data.url))
+    .catch((err) => console.log("Fetch error (CLOUDINARY)", err));
+  return response;
 };
 
 // EVENT RELATED REQUESTS

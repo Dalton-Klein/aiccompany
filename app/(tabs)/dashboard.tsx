@@ -248,6 +248,7 @@ const Dashboard = () => {
             handlePress={() => {
               setisUnsharedEventViewerOpen(true);
             }}
+            iconName="calendar-minus"
           ></MetricTile>
         </View>
         <Text style={styles.headingText}>Tasks</Text>
@@ -265,6 +266,7 @@ const Dashboard = () => {
               );
               router.navigate(`/task-viewer/0`);
             }}
+            iconName="tasks"
           ></MetricTile>
           <MetricTile
             isTask={true}
@@ -279,6 +281,7 @@ const Dashboard = () => {
               );
               router.navigate(`/task-viewer/0`);
             }}
+            iconName="tasks"
           ></MetricTile>
         </View>
         <Text style={styles.headingText}>Social</Text>
@@ -295,6 +298,7 @@ const Dashboard = () => {
             handlePress={() => {
               handleOpenFriendRequests();
             }}
+            iconName="user-plus"
           ></MetricTile>
           <MetricTile
             isTask={false}
@@ -303,6 +307,7 @@ const Dashboard = () => {
             handlePress={() => {
               setisFriendViewerOpen(true);
             }}
+            iconName="user-friends"
           ></MetricTile>
         </View>
         <Text style={styles.headingText}>Calendars</Text>
@@ -314,6 +319,7 @@ const Dashboard = () => {
             handlePress={() => {
               handleOpenCalendarRequests();
             }}
+            iconName="calendar-plus"
           ></MetricTile>
           <MetricTile
             isTask={false}
@@ -322,6 +328,7 @@ const Dashboard = () => {
             handlePress={() => {
               setisCalendarPickerOpen(true);
             }}
+            iconName="calendar-alt"
           ></MetricTile>
         </View>
         <Text style={styles.headingText}>Accompany Me Totals</Text>
@@ -332,6 +339,7 @@ const Dashboard = () => {
             titleText={"Accompanists (Users)"}
             amount={totalUserCount}
             handlePress={() => {}}
+            iconName="user-check"
           ></MetricTile>
           <MetricTile
             isTask={false}
@@ -339,6 +347,7 @@ const Dashboard = () => {
             titleText={"Events & Tasks Created"}
             amount={totalEventCount}
             handlePress={() => {}}
+            iconName="calendar-check"
           ></MetricTile>
         </View>
       </ScrollView>

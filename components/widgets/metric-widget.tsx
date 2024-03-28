@@ -2,6 +2,7 @@ import { Text, Image, TouchableOpacity, View } from "react-native";
 import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import React from "react";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const MetricTile = ({
   titleText,
@@ -9,6 +10,7 @@ const MetricTile = ({
   handlePress,
   isTask,
   isNeutral = false,
+  iconName = "",
 }) => {
   return (
     <TouchableOpacity
@@ -19,6 +21,7 @@ const MetricTile = ({
       ]}
       onPress={handlePress}
     >
+      <FontAwesome5 name={iconName} style={styles.backgroundIcon} solid />
       <View style={styles.titleBox}>
         <Text style={styles.amountText}>{amount}</Text>
       </View>
@@ -61,6 +64,15 @@ const styles = StyleSheet.create({
   neutralColor: {
     backgroundColor: THEME.COLORS.neutral,
   },
+  backgroundIcon: {
+    position: "absolute", // Position it absolutely to cover the background
+    fontSize: 24, // Adjust size as needed
+    color: THEME.COLORS.darker, // Icon color
+    opacity: 0.1, // Reduce opacity for background effect
+    zIndex: 1, // Ensure it's below the text content
+    top: 13,
+    left: 15,
+  },
   cancelButton: {
     backgroundColor: THEME.COLORS.lighter,
     flex: 1,
@@ -76,6 +88,7 @@ const styles = StyleSheet.create({
     maxHeight: 50,
   },
   titleBox: {
+    zIndex: 2,
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",

@@ -15,7 +15,7 @@ import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 import { Auth } from "./auth.native";
 import { validateEmail, validateUsername } from "../services/auth-services";
-import { createUser, verifyUser } from "../services/rest";
+import { createUser, uploadAvatarCloud, verifyUser } from "../services/rest";
 import {
   GestureHandlerRootView,
   TouchableWithoutFeedback,
@@ -25,6 +25,8 @@ import { useNavigationState } from "@react-navigation/native";
 import { useDispatch } from "react-redux";
 import { setUser } from "../../store/userSlice";
 import React from "react";
+import { FontAwesome } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 WebBrowser.maybeCompleteAuthSession();
 
@@ -44,6 +46,7 @@ const AuthenticationForm = () => {
     androidClientId:
       "1053731323112-0hf213cjgsusebp007pn4f6iu7bak0jc.apps.googleusercontent.com",
   });
+  const [profileImage, setprofileImage] = useState(null);
   const [username, setusername] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
@@ -113,7 +116,8 @@ const AuthenticationForm = () => {
           "apple",
           username,
           "apple",
-          appleId
+          appleId,
+          profileImage ? profileImage : ""
         );
         if (verifyResult.error) {
           setsignupError(verifyResult.error);
@@ -131,14 +135,37 @@ const AuthenticationForm = () => {
     router.navigate("dashboard");
   };
 
+  const handlePickAvatar = async () => {
+    // Requesting permission to access the camera roll
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+      return;
+    }
+
+    // Launching the image picker
+    let result: any = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1], // Optional: You can force the crop aspect ratio to be square
+      quality: 1,
+    });
+
+    if (!result.cancelled) {
+      const uploadResult = await uploadAvatarCloud(result.assets[0].uri);
+      // // Assuming you have a function to handle the upload of the image URL to your server or backend
+      setprofileImage(uploadResult);
+    }
+  };
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.masterContainer}>
           <Image
-            source={{
-              uri: "https://res.cloudinary.com/kultured-dev/image/upload/v1710353434/AccompanyMeLogov1-Large_tdejjd.png",
-            }}
+            src={
+              "https://res.cloudinary.com/kultured-dev/image/upload/v1711642224/AccompanyMeLogov1-Large-color_jdcz0n.png"
+            }
             style={styles.logoImage}
             resizeMode="contain"
           />
@@ -217,6 +244,28 @@ const AuthenticationForm = () => {
           >
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
+                <View style={styles.imagePickerBox}>
+                  <Text style={styles.imagePickerText}>Profile Photo</Text>
+                  {profileImage ? (
+                    <TouchableOpacity
+                      style={styles.avatarBg}
+                      onPress={handlePickAvatar}
+                    >
+                      <Image src={profileImage} style={styles.profileImg} />
+                    </TouchableOpacity>
+                  ) : (
+                    <TouchableOpacity
+                      style={styles.dynamicAvatarBg}
+                      onPress={handlePickAvatar}
+                    >
+                      <FontAwesome
+                        name="user-o"
+                        size={36}
+                        color={THEME.COLORS.lighter}
+                      />
+                    </TouchableOpacity>
+                  )}
+                </View>
                 <TextInput
                   style={[
                     styles.textInput,
@@ -360,6 +409,7 @@ const styles = StyleSheet.create({
   },
   modalView: {
     margin: 20,
+    marginTop: 150,
     backgroundColor: THEME.COLORS.lighter,
     borderRadius: 20,
     width: "90%",
@@ -388,6 +438,48 @@ const styles = StyleSheet.create({
     alignItems: "center",
     minWidth: "100%",
     marginBottom: 15,
+  },
+  imagePickerBox: {
+    flexDirection: "row",
+    minWidth: "80%",
+    justifyContent: "space-around",
+    alignItems: "center",
+  },
+  imagePickerText: {
+    color: "grey",
+    fontWeight: "300",
+    fontSize: THEME.SIZES.medium,
+    paddingBottom: 15,
+  },
+  profileImg: {
+    maxWidth: 75,
+    maxHeight: 75,
+    minWidth: 75,
+    minHeight: 75,
+    borderRadius: 75 / 2,
+    marginBottom: 15,
+  },
+  avatarBg: {
+    minWidth: 75,
+    minHeight: 75,
+    borderRadius: 75 / 2,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  dynamicAvatarBg: {
+    backgroundColor: THEME.COLORS.neutral,
+    minWidth: 75,
+    minHeight: 75,
+    borderRadius: 75 / 2,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+  },
+  dynamicAvatarText: {
+    fontSize: THEME.SIZES.large,
+    color: THEME.COLORS.fontColor,
   },
   textInput: {
     marginBottom: 15,

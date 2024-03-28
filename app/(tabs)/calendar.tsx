@@ -15,13 +15,15 @@ import moment from "moment";
 import * as THEME from "../../constants/theme";
 import WeeklyPicker from "../../components/nav/weekly-picker";
 import TitleBar from "../../components/nav/tab-titlebar";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { RootState, persistor } from "../../store/store";
 import { useNavigationState } from "@react-navigation/native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import React from "react";
+import { updateUserThunk } from "../../store/userSlice";
 
 const Calendar = () => {
+  const dispatch = useDispatch();
   const routeName = useNavigationState(
     (state) => state.routes[state.index].name
   );
@@ -51,6 +53,7 @@ const Calendar = () => {
     if (routeName === "calendar") {
       generateMasterSchedule(true);
     }
+    dispatch(updateUserThunk(userState.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName]);
 
@@ -251,7 +254,6 @@ const Calendar = () => {
     <SafeAreaView style={styles.calendarContainer}>
       <TitleBar title="Calendar"></TitleBar>
       <WeeklyPicker
-        updateCalendarFeed={refreshSchedule}
         dateHeaders={dateHeaders}
         parentSelectedDate={selectedDate}
       ></WeeklyPicker>
