@@ -4,6 +4,7 @@ import { useRouter } from "expo-router";
 import moment from "moment";
 import * as THEME from "../../../constants/theme";
 import React from "react";
+import { FontAwesome5 } from "@expo/vector-icons";
 
 const EventTile = (props) => {
   const router = useRouter();
@@ -46,7 +47,7 @@ const EventTile = (props) => {
       }
       onPress={handleEventPressed}
     >
-      <View>
+      <View style={styles.timeBox}>
         <Text style={styles.eventStartTime}>{eventStartTime}</Text>
         <Text style={styles.eventStartTime}>{eventEndTime}</Text>
       </View>
@@ -70,6 +71,11 @@ const EventTile = (props) => {
           {props.notes}
         </Text>
       </View>
+      <FontAwesome5
+        name={isTask ? "tasks" : "calendar"}
+        style={styles.backgroundIcon}
+        solid
+      />
     </TouchableOpacity>
   );
 };
@@ -82,7 +88,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     paddingTop: 10,
     paddingBottom: 10,
-    paddingLeft: 25,
+    paddingLeft: 17,
     marginRight: 10,
     display: "flex",
     flexDirection: "row",
@@ -104,8 +110,12 @@ const styles = StyleSheet.create({
   taskColor: {
     backgroundColor: THEME.COLORS.secondary,
   },
+  timeBox: {
+    minWidth: "23%",
+    maxWidth: "23%",
+  },
   eventDetails: {
-    marginLeft: 35,
+    marginLeft: 25,
   },
   eventTitle: {
     fontSize: THEME.SIZES.large,
@@ -120,6 +130,15 @@ const styles = StyleSheet.create({
   eventStartTime: {
     fontSize: THEME.SIZES.medium,
     color: THEME.COLORS.lighter,
+  },
+  backgroundIcon: {
+    position: "absolute", // Position it absolutely to cover the background
+    fontSize: 24, // Adjust size as needed
+    color: THEME.COLORS.darker, // Icon color
+    opacity: 0.1, // Reduce opacity for background effect
+    zIndex: 1, // Ensure it's below the text content
+    top: 17,
+    right: 15,
   },
 });
 

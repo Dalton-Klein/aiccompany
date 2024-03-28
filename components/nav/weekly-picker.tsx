@@ -44,7 +44,12 @@ const WeeklyPicker = (props: any) => {
           <Text style={styles.daySliderDayTitleText}>
             {dateData.format("dd")}
           </Text>
-          <TouchableOpacity style={styles.dayButton}>
+          <TouchableOpacity
+            style={styles.dayButton}
+            onPress={() => {
+              sliderTilePressed(dateData.format("YYYY-DD-MM"));
+            }}
+          >
             <Text style={styles.dayOfMonthText}>
               {moment(dateData).format("DD")}
             </Text>
@@ -53,6 +58,10 @@ const WeeklyPicker = (props: any) => {
       );
     }
     setsliderTiles(tempTiles);
+  };
+
+  const sliderTilePressed = (dateYYYYDDMM: string) => {
+    props.scrollToDay(dateYYYYDDMM);
   };
 
   const handleOpenExpandedPicker = () => {

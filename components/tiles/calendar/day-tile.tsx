@@ -27,7 +27,12 @@ const DayTile = (props) => {
   };
 
   return (
-    <View style={styles.dayTile}>
+    <View
+      style={styles.dayTile}
+      onLayout={(e) => {
+        props.onLayout(e);
+      }}
+    >
       <Text style={styles.dayTitle}>{props.title}</Text>
       {eventFeed}
     </View>

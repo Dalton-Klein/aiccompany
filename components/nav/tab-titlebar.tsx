@@ -140,7 +140,14 @@ const TitleBar = (props: any) => {
   };
 
   const handleSubmitCreateCalendar = async (form: any) => {
-    await createCalendar(userState.id, form.title, form.description, [], "");
+    await createCalendar(
+      userState.id,
+      form.title,
+      form.description,
+      form.calendar_url,
+      [],
+      ""
+    );
     closeAllModals();
   };
 

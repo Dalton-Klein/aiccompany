@@ -19,7 +19,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState, persistor } from "../../store/store";
 import { useNavigationState } from "@react-navigation/native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
-import React from "react";
+import React, { useRef } from "react";
 import { updateUserThunk } from "../../store/userSlice";
 
 const Calendar = () => {
@@ -29,6 +29,9 @@ const Calendar = () => {
   );
   const userState = useSelector((state: RootState) => state.user.user);
   const preferencesState = useSelector((state: RootState) => state.preferences);
+  const scrollViewRef = useRef(null);
+  const dayTilePositionsRef = useRef({});
+
   //Refresh Page Variables
   const [lastRefreshTime, setlastRefreshTime] = useState<any>(null);
   const [isRefreshing, setisRefreshing] = useState<any>(null);
@@ -159,8 +162,6 @@ const Calendar = () => {
           moment(dateHeading.date).isSameOrAfter(moment(currentTime), "day")
         ) {
           const openTimeSlots = calendarService.findOpenTimeSlots(eventsForDay);
-          // console.log(dateHeading.title, "   open time slots ", openTimeSlots);
-
           // Slot in tasks by looping over them
           let tasksThatWeveFoundOpenTimeForToday = [];
           tasksWithPotentialToday.forEach((task) => {
@@ -231,7 +232,6 @@ const Calendar = () => {
           });
         }
       });
-      setdateHeaders(dateHeadings);
       generateDayTiles(dateHeadings);
       resetIsRefreshing();
     }
@@ -242,12 +242,35 @@ const Calendar = () => {
     return result;
   };
 
-  const generateDayTiles = (dateHeadings) => {
+  const generateDayTiles = (dateHeadings: any) => {
     setcalendarFeed(
-      dateHeadings.map((dateHeading) => (
-        <DayTile {...dateHeading} key={dateHeading.title}></DayTile>
+      dateHeadings.map((dateHeading: any, index: any) => (
+        <DayTile
+          {...dateHeading}
+          key={dateHeading.title}
+          onLayout={(event: any) => {
+            const layout = event.nativeEvent.layout;
+            dayTilePositionsRef.current[dateHeading.title] = layout.y;
+          }}
+        ></DayTile>
       ))
     );
+    setdateHeaders(dateHeadings);
+  };
+
+  const scrollToDayTile = (desiredDate: any) => {
+    if (desiredDate) {
+      const formattedDesiredDate = moment(desiredDate, "YYYY-DD-MM").format(
+        "MMM D dddd"
+      );
+      const yPosition = dayTilePositionsRef.current[formattedDesiredDate];
+      if (yPosition !== undefined) {
+        scrollViewRef.current.scrollTo({
+          y: yPosition,
+          animated: true,
+        });
+      }
+    }
   };
 
   return (
@@ -256,11 +279,13 @@ const Calendar = () => {
       <WeeklyPicker
         dateHeaders={dateHeaders}
         parentSelectedDate={selectedDate}
+        scrollToDay={scrollToDayTile}
       ></WeeklyPicker>
       <ScrollView
         onScroll={handleScroll}
         scrollEventThrottle={16}
         keyboardShouldPersistTaps="always"
+        ref={scrollViewRef}
       >
         {calendarFeed}
         {calendarFeed.length ? (
@@ -268,11 +293,6 @@ const Calendar = () => {
             <TouchableOpacity
               style={styles.weeklyQuickNavButton}
               onPress={() => {
-                console.log(
-                  selectedDate,
-                  "   test ",
-                  moment(selectedDate, "YYYY/MM/DD")
-                );
                 setselectedDate(
                   moment(selectedDate, "YYYY/MM/DD")
                     .subtract(1, "weeks")
@@ -335,7 +355,7 @@ const styles = StyleSheet.create({
     padding: 10,
     paddingLeft: 20,
     paddingRight: 20,
-    backgroundColor: THEME.COLORS.secondary,
+    backgroundColor: THEME.COLORS.neutral,
     borderRadius: THEME.BORDERSIZES.large,
   },
   weeklyQuickNavIcon: {

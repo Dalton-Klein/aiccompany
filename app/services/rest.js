@@ -1,5 +1,5 @@
 // ***Coffee make http://192.168.1.4:3010 for local, https://accompany-me-api-911a354ccb4c.herokuapp.com for prod
-const endpointURL = "http://192.168.1.4:3010";
+const endpointURL = "https://accompany-me-api-911a354ccb4c.herokuapp.com";
 
 const avatarCloud = `https://api.cloudinary.com/v1_1/kultured-dev/upload`;
 /*
@@ -344,6 +344,7 @@ export const createCalendar = async (
   userId,
   title,
   description,
+  calendar_url,
   inviteUserIds,
   token
 ) => {
@@ -357,6 +358,7 @@ export const createCalendar = async (
         userId,
         title,
         description,
+        calendar_url,
         inviteUserIds,
         token,
       }),

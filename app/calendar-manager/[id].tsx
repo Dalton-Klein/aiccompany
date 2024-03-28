@@ -14,13 +14,20 @@ import BasicBtn from "../../components/tiles/buttons/basicButton";
 import { useEffect, useState } from "react";
 import { useLocalSearchParams, useRouter } from "expo-router";
 import CalendarInviteForm from "../../components/forms/calendarInviteForm";
-import { getCalendarsData, updateCalendarsData } from "../services/rest";
+import {
+  getCalendarsData,
+  updateCalendarsData,
+  uploadAvatarCloud,
+} from "../services/rest";
 import MemberTile from "../../components/tiles/social/memberTile";
 import React from "react";
+import { FontAwesome5 } from "@expo/vector-icons";
+import * as ImagePicker from "expo-image-picker";
 
 const CalendarManager = () => {
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const [calendarBanner, setcalendarBanner] = useState("");
   const [title, settitle] = useState("");
   const [description, setdescription] = useState("");
   const [memberTiles, setmemberTiles] = useState([]);
@@ -41,6 +48,7 @@ const CalendarManager = () => {
 
   const fetchData = async () => {
     const result = await getCalendarsData(id, "");
+    setcalendarBanner(result.data.calendar_url);
     settitle(result.data.title);
     setdescription(result.data.description);
     if (result.memberResult && result.memberResult.length) {
@@ -103,6 +111,30 @@ const CalendarManager = () => {
     }
   };
 
+  const handlePickAvatar = async () => {
+    // Requesting permission to access the camera roll
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== "granted") {
+      alert("Sorry, we need camera roll permissions to make this work!");
+      return;
+    }
+
+    // Launching the image picker
+    let result: any = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      allowsEditing: true,
+      aspect: [1, 1], // Optional: You can force the crop aspect ratio to be square
+      quality: 1,
+    });
+
+    if (result && !result.cancelled) {
+      const uploadResult = await uploadAvatarCloud(result.assets[0].uri);
+      // // Assuming you have a function to handle the upload of the image URL to your server or backend
+      addUnsavedChange("calendar_url", uploadResult);
+      setcalendarBanner(uploadResult);
+    }
+  };
+
   return (
     <SafeAreaView>
       <View style={styles.titleRow}>
@@ -112,7 +144,29 @@ const CalendarManager = () => {
         <Text style={styles.titleText}>Manage Calendar</Text>
         <Text style={styles.backBtn}></Text>
       </View>
-      <ScrollView keyboardShouldPersistTaps="always">
+      <ScrollView keyboardShouldPersistTaps="always" style={styles.scrollBox}>
+        <View style={styles.photoBox}>
+          <Text style={styles.subTitle}>Photo</Text>
+          {calendarBanner ? (
+            <TouchableOpacity
+              style={styles.avatarBg}
+              onPress={handlePickAvatar}
+            >
+              <Image src={calendarBanner} style={styles.profileImg} />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity
+              style={styles.dynamicAvatarBg}
+              onPress={handlePickAvatar}
+            >
+              <FontAwesome5
+                name="calendar"
+                size={50}
+                color={THEME.COLORS.lighter}
+              />
+            </TouchableOpacity>
+          )}
+        </View>
         <Text style={styles.subTitle}>Title</Text>
         <View style={styles.fieldBox}>
           <TextInput
@@ -220,6 +274,45 @@ const CalendarManager = () => {
 };
 
 const styles = StyleSheet.create({
+  scrollBox: {
+    maxHeight: "80%",
+  },
+  photoBox: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  profileImg: {
+    maxWidth: 100,
+    maxHeight: 100,
+    minWidth: 100,
+    minHeight: 100,
+    borderRadius: 100 / 2,
+    marginBottom: 15,
+  },
+  avatarBg: {
+    minWidth: 100,
+    minHeight: 100,
+    borderRadius: 100 / 2,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 20,
+  },
+  dynamicAvatarBg: {
+    backgroundColor: THEME.COLORS.neutral,
+    minWidth: 100,
+    minHeight: 100,
+    borderRadius: 100 / 2,
+    flexDirection: "row",
+    justifyContent: "center",
+    alignItems: "center",
+    marginRight: 20,
+  },
+  dynamicAvatarText: {
+    fontSize: THEME.SIZES.large,
+    color: THEME.COLORS.fontColor,
+  },
   titleRow: {
     flexDirection: "row",
     justifyContent: "space-between",

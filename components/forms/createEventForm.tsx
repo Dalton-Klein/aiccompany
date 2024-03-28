@@ -85,7 +85,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     }
   };
 
-  const handleConfirmStartTime = (e, date: any) => {
+  const handleConfirmStartTime = (e: any, date: any) => {
     setselectedStartDate(date);
   };
 
@@ -93,7 +93,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     setisSeries(!isSeries);
   };
 
-  const handleConfirmSeriesEndTime = (e, date: any) => {
+  const handleConfirmSeriesEndTime = (e: any, date: any) => {
     setselectedSeriesEndDate(date);
   };
 
