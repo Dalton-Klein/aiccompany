@@ -59,7 +59,13 @@ const EventTile = (props) => {
               : styles.eventTitle
           }
         >
-          {isCancelled ? `Cancelled: ${props.title}` : props.title}
+          {isCancelled
+            ? props.title.length > 8
+              ? `Cancelled: ${props.title.substring(0, 8)}...`
+              : `Cancelled: ${props.title}`
+            : props.title.length > 17
+            ? `${props.title.substring(0, 17)}...`
+            : `${props.title}`}
         </Text>
         <Text
           style={
@@ -68,7 +74,9 @@ const EventTile = (props) => {
               : styles.eventNotes
           }
         >
-          {props.notes}
+          {props.notes.length > 28
+            ? `${props.notes.substring(0, 28)}...`
+            : props.notes}
         </Text>
       </View>
       <FontAwesome5

@@ -104,6 +104,9 @@ const EventManager = () => {
   };
 
   const addUnsavedChange = (field: string, value: any) => {
+    if (field === "task_duration" && !value) {
+      value = 0;
+    }
     const existingIndex = unsavedChanges.findIndex(
       (item) => item.field === field
     );
@@ -218,7 +221,9 @@ const EventManager = () => {
                   keyboardType="numeric"
                   placeholder={"Task Duration in minutes..."}
                   placeholderTextColor="grey"
-                  value={`${taskDuration}`}
+                  value={
+                    taskDuration && taskDuration > 0 ? `${taskDuration}` : ""
+                  }
                   onChangeText={(value) => {
                     const safeValue = parseInt(value.replace(/[^0-9]/g, ""));
                     addUnsavedChange("task_duration", safeValue);

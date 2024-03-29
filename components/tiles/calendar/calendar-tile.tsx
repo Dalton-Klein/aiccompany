@@ -57,7 +57,7 @@ const CalendarTile = ({ handlePress, calendar, isPreSelected = false }) => {
       ) : (
         <></>
       )}
-      {calendarBanner ? (
+      {calendarBanner && calendarBanner !== "" ? (
         <View style={styles.avatarBg}>
           <Image src={calendarBanner} style={styles.profileImg} />
         </View>
