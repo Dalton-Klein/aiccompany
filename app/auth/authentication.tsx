@@ -78,8 +78,17 @@ const AuthenticationForm = () => {
   //   console.log("google result: ", useInfo);
   // };
 
-  const openAppleSignUp = (appleUserId: string) => {
+  const openAppleSignUp = (
+    appleUserId: string,
+    appleEmail: string,
+    givenName: string,
+    familyName: string
+  ) => {
     setappleId(appleUserId);
+    setemail(appleEmail);
+    if (givenName && givenName.length && familyName && familyName.length) {
+      setusername(`${givenName} ${familyName}`);
+    }
     setcurrentMenu("apple-signup");
   };
 
@@ -273,6 +282,7 @@ const AuthenticationForm = () => {
                   ]}
                   placeholder={"Username"}
                   placeholderTextColor="grey"
+                  value={username}
                   onChangeText={(value) => {
                     setusername(value);
                     validateAppleSignUpCredentials(true);
@@ -286,6 +296,7 @@ const AuthenticationForm = () => {
                     isEmailFocused && styles.focusedInput,
                   ]}
                   placeholder={"Email"}
+                  value={email}
                   placeholderTextColor="grey"
                   onChangeText={(value) => {
                     setemail(value);

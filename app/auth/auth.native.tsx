@@ -2,15 +2,14 @@ import { Platform } from "react-native";
 import * as AppleAuthentication from "expo-apple-authentication";
 import { useDispatch, useSelector } from "react-redux";
 import { signInUserThunk } from "../../store/userSlice";
-import { router } from "expo-router";
 import { useEffect } from "react";
 import { RootState } from "../../store/store";
 import React from "react";
 
 export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
   const dispatch = useDispatch();
-
   const userState = useSelector((state: RootState) => state.user.user);
+
   useEffect(() => {
     if (userState.id && userState.id > 0) {
     }
@@ -33,7 +32,12 @@ export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
         if (result && result.status && result.status === "success") {
           handleSuccess(result);
         } else {
-          handleCreateAccount(credential.user);
+          handleCreateAccount(
+            credential.user,
+            credential.email,
+            credential.fullName.givenName,
+            credential.fullName.familyName
+          );
         }
       } else {
         throw new Error("No identityToken.");
