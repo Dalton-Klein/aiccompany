@@ -36,7 +36,7 @@ const Layout = () => {
           ),
         }}
       ></Tabs.Screen>
-      <Tabs.Screen
+      {/* <Tabs.Screen
         name="assistant"
         options={{
           headerShown: false,
@@ -45,7 +45,7 @@ const Layout = () => {
             <FontAwesome size={28} name="user" color={color} />
           ),
         }}
-      ></Tabs.Screen>
+      ></Tabs.Screen> */}
       <Tabs.Screen
         name="settings"
         options={{
