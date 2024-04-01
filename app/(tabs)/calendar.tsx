@@ -27,14 +27,20 @@ const Calendar = () => {
   const routeName = useNavigationState(
     (state) => state.routes[state.index].name
   );
-  const userState = useSelector((state: RootState) => state.user.user);
-  const preferencesState = useSelector((state: RootState) => state.preferences);
+  const userState = useSelector(
+    (state: RootState) => state.user.user
+  );
+  const preferencesState = useSelector(
+    (state: RootState) => state.preferences
+  );
   const scrollViewRef = useRef(null);
   const dayTilePositionsRef = useRef({});
 
   //Refresh Page Variables
-  const [lastRefreshTime, setlastRefreshTime] = useState<any>(null);
-  const [isRefreshing, setisRefreshing] = useState<any>(null);
+  const [lastRefreshTime, setlastRefreshTime] =
+    useState<any>(null);
+  const [isRefreshing, setisRefreshing] =
+    useState<any>(null);
 
   const [selectedDate, setselectedDate] = useState(
     moment().format("YYYY/MM/DD")
@@ -71,11 +77,17 @@ const Calendar = () => {
   }, [selectedDate]);
 
   useEffect(() => {
-    if (preferencesState && preferencesState.selectedCalendar) {
+    if (
+      preferencesState &&
+      preferencesState.selectedCalendar
+    ) {
       generateMasterSchedule();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferencesState.selectedCalendar, preferencesState.refreshCalendar]);
+  }, [
+    preferencesState.selectedCalendar,
+    preferencesState.refreshCalendar,
+  ]);
 
   useEffect(() => {
     if (
@@ -107,18 +119,22 @@ const Calendar = () => {
   };
 
   // Creates master data array of days with events nested
-  const generateMasterSchedule = async (isForceRefresh = false) => {
+  const generateMasterSchedule = async (
+    isForceRefresh = false
+  ) => {
     const currentTime = new Date().getTime();
     if (
       isForceRefresh ||
       (!isRefreshing &&
-        (!lastRefreshTime || currentTime - lastRefreshTime > 1000))
+        (!lastRefreshTime ||
+          currentTime - lastRefreshTime > 1000))
     ) {
       setlastRefreshTime(currentTime);
       setisRefreshing(true);
       setdateHeaders([]);
       setcalendarFeed([]);
-      const dateHeadings = calendarService.generateDateHeadings(selectedDate);
+      const dateHeadings =
+        calendarService.generateDateHeadings(selectedDate);
       const eventResult = await grabEvents();
       let events = [];
       if (eventResult?.data.length) {
@@ -130,11 +146,16 @@ const Calendar = () => {
       ) {
         //Conditionally filter to a specific calendar
         events = events.filter((e: any) => {
-          return e.calendar_id === preferencesState.selectedCalendar.id;
+          return (
+            e.calendar_id ===
+            preferencesState.selectedCalendar.id
+          );
         });
       }
 
-      let tasks = events.filter((event) => event.is_task);
+      let tasks = events.filter(
+        (event) => event.is_task && !event.is_completed
+      );
       //Loop over the date headings
       dateHeadings.forEach((dateHeading) => {
         let tasksWithPotentialToday = [...tasks];
@@ -143,7 +164,8 @@ const Calendar = () => {
           tasksWithPotentialToday = [];
         }
         // Do no add any tasks if user is looking in a future week, we only slot them into current week
-        const startDateOfCurrentWeek = moment().startOf("week");
+        const startDateOfCurrentWeek =
+          moment().startOf("week");
         if (
           moment(dateHeading.date)
             .startOf("week")
@@ -154,14 +176,20 @@ const Calendar = () => {
         //Find events for this date heding
         const eventsForDay = events.filter(
           (event) =>
-            dateHeading.date.isSame(moment(event.start_time), "day") &&
-            !event.is_task
+            dateHeading.date.isSame(
+              moment(event.start_time),
+              "day"
+            ) && !event.is_task
         );
         //Check if date heading is in future or past to be able to slot tasks in
         if (
-          moment(dateHeading.date).isSameOrAfter(moment(currentTime), "day")
+          moment(dateHeading.date).isSameOrAfter(
+            moment(currentTime),
+            "day"
+          )
         ) {
-          const openTimeSlots = calendarService.findOpenTimeSlots(eventsForDay);
+          const openTimeSlots =
+            calendarService.findOpenTimeSlots(eventsForDay);
           // Slot in tasks by looping over them
           let tasksThatWeveFoundOpenTimeForToday = [];
           tasksWithPotentialToday.forEach((task) => {
@@ -177,19 +205,30 @@ const Calendar = () => {
             let assigned = false;
             for (let i = 0; i < openTimeSlots.length; i++) {
               const slot = openTimeSlots[i];
-              const breakDurationMilliseconds = moment(slot.break_end).diff(
-                moment(slot.break_start)
-              );
-              if (breakDurationMilliseconds >= taskDurationMinutes) {
+              const breakDurationMilliseconds = moment(
+                slot.break_end
+              ).diff(moment(slot.break_start));
+              if (
+                breakDurationMilliseconds >=
+                taskDurationMinutes
+              ) {
                 // Assign the task to this time slot
                 const startTime = slot.break_start;
                 task.start_time = new Date(startTime);
-                task.end_time = new Date(startTime + taskDurationMinutes);
+                task.end_time = new Date(
+                  startTime + taskDurationMinutes
+                );
 
                 // Update the time slot if there is remaining time after the task
-                if (breakDurationMilliseconds > taskDurationMinutes) {
+                if (
+                  breakDurationMilliseconds >
+                  taskDurationMinutes
+                ) {
                   const newBreakStart = moment(startTime)
-                    .add(taskDurationMinutes, "milliseconds")
+                    .add(
+                      taskDurationMinutes,
+                      "milliseconds"
+                    )
                     .toISOString();
                   openTimeSlots[i] = {
                     break_start: newBreakStart,
@@ -202,7 +241,9 @@ const Calendar = () => {
 
                 assigned = true;
                 task.is_assigned = true;
-                tasksThatWeveFoundOpenTimeForToday.push(task);
+                tasksThatWeveFoundOpenTimeForToday.push(
+                  task
+                );
                 break;
               }
             }
@@ -220,8 +261,12 @@ const Calendar = () => {
           ];
           // Resort events and tasks so they show in order
           allEventsForDay.sort((a, b) => {
-            const startTimeA = moment(a.start_time).valueOf();
-            const startTimeB = moment(b.start_time).valueOf();
+            const startTimeA = moment(
+              a.start_time
+            ).valueOf();
+            const startTimeB = moment(
+              b.start_time
+            ).valueOf();
             return startTimeA - startTimeB;
           });
           dateHeading.events.push(...allEventsForDay);
@@ -238,7 +283,10 @@ const Calendar = () => {
   };
 
   const grabEvents = async () => {
-    const result = await getAllEventsForUser(userState.id, "");
+    const result = await getAllEventsForUser(
+      userState.id,
+      ""
+    );
     return result;
   };
 
@@ -250,7 +298,8 @@ const Calendar = () => {
           key={dateHeading.title}
           onLayout={(event: any) => {
             const layout = event.nativeEvent.layout;
-            dayTilePositionsRef.current[dateHeading.title] = layout.y;
+            dayTilePositionsRef.current[dateHeading.title] =
+              layout.y;
           }}
         ></DayTile>
       ))
@@ -260,10 +309,12 @@ const Calendar = () => {
 
   const scrollToDayTile = (desiredDate: any) => {
     if (desiredDate) {
-      const formattedDesiredDate = moment(desiredDate, "YYYY-DD-MM").format(
-        "MMM D dddd"
-      );
-      const yPosition = dayTilePositionsRef.current[formattedDesiredDate];
+      const formattedDesiredDate = moment(
+        desiredDate,
+        "YYYY-DD-MM"
+      ).format("MMM D dddd");
+      const yPosition =
+        dayTilePositionsRef.current[formattedDesiredDate];
       if (yPosition !== undefined) {
         scrollViewRef.current.scrollTo({
           y: yPosition,
@@ -306,7 +357,9 @@ const Calendar = () => {
                 color={THEME.COLORS.lighter}
                 style={styles.weeklyQuickNavIcon}
               />
-              <Text style={styles.weeklyQuickNavText}>Back One Week</Text>
+              <Text style={styles.weeklyQuickNavText}>
+                Back One Week
+              </Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.weeklyQuickNavButton}
@@ -318,7 +371,9 @@ const Calendar = () => {
                 );
               }}
             >
-              <Text style={styles.weeklyQuickNavText}>Forward One Week</Text>
+              <Text style={styles.weeklyQuickNavText}>
+                Forward One Week
+              </Text>
               <FontAwesome
                 size={28}
                 name="angle-right"

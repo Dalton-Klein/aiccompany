@@ -1,5 +1,11 @@
 import { useEffect, useRef, useState } from "react";
-import { View, SafeAreaView, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  SafeAreaView,
+  Text,
+  StyleSheet,
+  ScrollView,
+} from "react-native";
 import { useRouter } from "expo-router";
 import * as THEME from "../../constants/theme";
 import TitleBar from "../../components/nav/tab-titlebar";
@@ -7,7 +13,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import MetricTile from "../../components/widgets/metric-widget";
 import { useNavigationState } from "@react-navigation/native";
-import { getMetricData } from "../services/rest";
+import {
+  getMetricData,
+  updateUserField,
+} from "../services/rest";
 import AddFriendForm from "../../components/forms/addFriendForm";
 import moment from "moment";
 import RequestsForm from "../../components/forms/requestsForm";
@@ -17,41 +26,68 @@ import { setPreferences } from "../../store/userPreferencesSlice";
 import UnsharedEventsBrowser from "../../components/nav/unsharedEventsBrowser";
 import MetricTileTriple from "../../components/widgets/metric-widget-triple";
 import React from "react";
+import { usePushNotifications } from "../auth/usePushNotifications";
 
 const Dashboard = () => {
+  const { expoPushToken, notification } =
+    usePushNotifications();
+
+  const data = JSON.stringify(notification, undefined, 2);
   const routeName = useNavigationState(
     (state) => state.routes[state.index].name
   );
   const dispatch = useDispatch();
-  const userState = useSelector((state: RootState) => state.user.user);
-  const preferencesState = useSelector((state: RootState) => state.preferences);
+  const userState = useSelector(
+    (state: RootState) => state.user.user
+  );
+  const preferencesState = useSelector(
+    (state: RootState) => state.preferences
+  );
   const router = useRouter();
   const scrollViewRef = useRef(null);
 
   //Refresh Page Variables
-  const [lastRefreshTime, setlastRefreshTime] = useState<any>(null);
-  const [isRefreshing, setisRefreshing] = useState<any>(null);
+  const [lastRefreshTime, setlastRefreshTime] =
+    useState<any>(null);
+  const [isRefreshing, setisRefreshing] =
+    useState<any>(null);
 
   const [metricData, setmetricData] = useState<any>({});
   const [eventCountToday, seteventCountToday] = useState(0);
-  const [eventCountTomorrow, seteventCountTomorrow] = useState(0);
-  const [eventCountTwoDaysFromNow, seteventCountTwoDaysFromNow] = useState(0);
-  const [unsharedEventCount, setunsharedEventCount] = useState(0);
+  const [eventCountTomorrow, seteventCountTomorrow] =
+    useState(0);
+  const [
+    eventCountTwoDaysFromNow,
+    seteventCountTwoDaysFromNow,
+  ] = useState(0);
+  const [unsharedEventCount, setunsharedEventCount] =
+    useState(0);
   const [taskCount, settaskCount] = useState(0);
-  const [overdueTaskCount, setoverdueTaskCount] = useState(0);
+  const [overdueTaskCount, setoverdueTaskCount] =
+    useState(0);
   const [friendCount, setfriendCount] = useState(0);
-  const [friendInviteCount, setfriendInviteCount] = useState(0);
-  const [calendarInviteCount, setcalendarInviteCount] = useState(0);
+  const [friendInviteCount, setfriendInviteCount] =
+    useState(0);
+  const [calendarInviteCount, setcalendarInviteCount] =
+    useState(0);
   const [calendarCount, setcalendarCount] = useState(0);
   const [totalUserCount, settotalUserCount] = useState(0);
   const [totalEventCount, settotalEventCount] = useState(0);
 
-  const [isFriendRequestsOpen, setisFriendRequestsOpen] = useState(false);
-  const [isCalendarRequestsOpen, setisCalendarRequestsOpen] = useState(false);
-  const [isCalendarPickerOpen, setisCalendarPickerOpen] = useState(false);
-  const [isFriendViewerOpen, setisFriendViewerOpen] = useState(false);
-  const [isUnsharedEventViewerOpen, setisUnsharedEventViewerOpen] =
+  const [isFriendRequestsOpen, setisFriendRequestsOpen] =
     useState(false);
+  const [
+    isCalendarRequestsOpen,
+    setisCalendarRequestsOpen,
+  ] = useState(false);
+  const [isCalendarPickerOpen, setisCalendarPickerOpen] =
+    useState(false);
+  const [isFriendViewerOpen, setisFriendViewerOpen] =
+    useState(false);
+  const [
+    isUnsharedEventViewerOpen,
+    setisUnsharedEventViewerOpen,
+  ] = useState(false);
 
   useEffect(() => {
     if (!userState.id || userState.id < 1) {
@@ -59,6 +95,15 @@ const Dashboard = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (
+      expoPushToken?.data.startsWith("ExponentPushToken")
+    ) {
+      handleUpdatePushToken(expoPushToken?.data);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expoPushToken?.data]);
 
   useEffect(() => {
     refreshMetricTiles();
@@ -78,17 +123,36 @@ const Dashboard = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName]);
 
-  const refreshMetricTiles = async (forceRefresh = false) => {
+  const handleUpdatePushToken = async (token: string) => {
+    await updateUserField(
+      userState.id,
+      "push_notification_token",
+      token
+    );
+  };
+
+  const refreshMetricTiles = async (
+    forceRefresh = false
+  ) => {
     const currentTime = new Date().getTime();
     if (
       forceRefresh ||
       (!isRefreshing &&
-        (!lastRefreshTime || currentTime - lastRefreshTime > 3000))
+        (!lastRefreshTime ||
+          currentTime - lastRefreshTime > 3000))
     ) {
       setlastRefreshTime(currentTime);
       setisRefreshing(true);
-      const data = await getMetricData(userState.id, userState.token);
-      if (data && data.status && data.status === "success" && data.data) {
+      const data = await getMetricData(
+        userState.id,
+        userState.token
+      );
+      if (
+        data &&
+        data.status &&
+        data.status === "success" &&
+        data.data
+      ) {
         const currentDate = moment().startOf("day");
         const tomorrowDate = moment().add(1, "days");
         const twodaysFromNowDate = moment().add(2, "days");
@@ -98,30 +162,45 @@ const Dashboard = () => {
             ? data.data.eventsThisWeek?.filter(
                 (event: any) =>
                   !event.is_task &&
+                  !event.is_completed &&
                   !event.is_cancelled &&
-                  moment(event.start_time).isSame(currentDate, "day")
+                  moment(event.start_time).isSame(
+                    currentDate,
+                    "day"
+                  )
               ).length
             : 0
         );
-        let eventsTomorrow = data.data.eventsThisWeek?.filter((event: any) => {
-          if (
-            !event.is_task &&
-            !event.is_cancelled &&
-            moment(event.start_time).isSame(tomorrowDate, "day")
-          ) {
-            return true;
-          } else return false;
-        });
+        let eventsTomorrow =
+          data.data.eventsThisWeek?.filter((event: any) => {
+            if (
+              !event.is_task &&
+              !event.is_completed &&
+              !event.is_cancelled &&
+              moment(event.start_time).isSame(
+                tomorrowDate,
+                "day"
+              )
+            ) {
+              return true;
+            } else return false;
+          });
         seteventCountTomorrow(
-          data.data.eventsThisWeek?.length ? eventsTomorrow.length : 0
+          data.data.eventsThisWeek?.length
+            ? eventsTomorrow.length
+            : 0
         );
         seteventCountTwoDaysFromNow(
           data.data.eventsThisWeek?.length
             ? data.data.eventsThisWeek?.filter(
                 (event: any) =>
                   !event.is_task &&
+                  !event.is_completed &&
                   !event.is_cancelled &&
-                  moment(event.start_time).isSame(twodaysFromNowDate, "day")
+                  moment(event.start_time).isSame(
+                    twodaysFromNowDate,
+                    "day"
+                  )
               ).length
             : 0
         );
@@ -129,7 +208,9 @@ const Dashboard = () => {
           data.data.eventsAll?.length
             ? data.data.eventsAll?.filter(
                 (event: any) =>
-                  !event.is_task && !event.calendar_id && !event.is_cancelled
+                  !event.is_task &&
+                  event.calendar_titles[0] == null &&
+                  !event.is_cancelled
               ).length
             : 0
         );
@@ -138,6 +219,7 @@ const Dashboard = () => {
             ? data.data.eventsAll?.filter(
                 (event: any) =>
                   event.is_task &&
+                  !event.is_completed &&
                   moment().isBefore(event.end_time) &&
                   !event.is_cancelled
               ).length
@@ -148,13 +230,16 @@ const Dashboard = () => {
             ? data.data.eventsAll?.filter(
                 (event: any) =>
                   event.is_task &&
+                  !event.is_completed &&
                   moment().isAfter(event.end_time) &&
                   !event.is_cancelled
               ).length
             : 0
         );
         setfriendCount(
-          data.data.friends?.length ? data.data.friends?.length : 0
+          data.data.friends?.length
+            ? data.data.friends?.length
+            : 0
         );
         setfriendInviteCount(
           data.data.friendRequests?.length
@@ -167,13 +252,19 @@ const Dashboard = () => {
             : 0
         );
         setcalendarCount(
-          data.data.calendars?.length ? data.data.calendars?.length : 0
+          data.data.calendars?.length
+            ? data.data.calendars?.length
+            : 0
         );
         settotalUserCount(
-          data.data.userCount ? data.data.userCount.user_count : 0
+          data.data.userCount
+            ? data.data.userCount.user_count
+            : 0
         );
         settotalEventCount(
-          data.data.eventCount ? data.data.eventCount.event_count : 0
+          data.data.eventCount
+            ? data.data.eventCount.event_count
+            : 0
         );
         resetIsRefreshing();
       }
@@ -195,7 +286,9 @@ const Dashboard = () => {
     setisCalendarRequestsOpen(true);
   };
 
-  const handleCalendarSelectedForManagement = (calendar: any) => {
+  const handleCalendarSelectedForManagement = (
+    calendar: any
+  ) => {
     setisCalendarPickerOpen(false);
     router.navigate(`/calendar-manager/${calendar.id}`);
   };
@@ -229,13 +322,17 @@ const Dashboard = () => {
             amount1={eventCountToday}
             title2Text={"Tomorrow"}
             amount2={eventCountTomorrow}
-            title3Text={moment().add(2, "days").format("ddd")}
+            title3Text={moment()
+              .add(2, "days")
+              .format("ddd")}
             amount3={eventCountTwoDaysFromNow}
             handlePress={() => {
               dispatch(
                 setPreferences({
                   ...preferencesState,
-                  selectedDate: moment().format("YYYY/MM/DD, h:mm:ss a"),
+                  selectedDate: moment().format(
+                    "YYYY/MM/DD, h:mm:ss a"
+                  ),
                 })
               );
               router.navigate(`/calendar`);
@@ -331,7 +428,9 @@ const Dashboard = () => {
             iconName="calendar-alt"
           ></MetricTile>
         </View>
-        <Text style={styles.headingText}>Accompany Me Totals</Text>
+        <Text style={styles.headingText}>
+          Accompany Me Totals
+        </Text>
         <View style={styles.widgetContainer}>
           <MetricTile
             isTask={false}
@@ -415,7 +514,9 @@ const Dashboard = () => {
         isVisible={isUnsharedEventViewerOpen}
         events={metricData.eventsAll?.filter(
           (event: any) =>
-            !event.is_task && !event.calendar_id && !event.is_cancelled
+            !event.is_task &&
+            event.calendar_titles[0] == null &&
+            !event.is_cancelled
         )}
         handlePress={(id: number) => {
           setisUnsharedEventViewerOpen(false);

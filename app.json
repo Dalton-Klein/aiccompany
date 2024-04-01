@@ -6,7 +6,7 @@
     },
     "name": "Accompany-Me",
     "slug": "Accompany-Me",
-    "version": "1.2.0",
+    "version": "1.2.3",
     "splash": {
       "image": "./assets/icons/splash.png",
       "resizeMode": "contain",
@@ -23,7 +23,7 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.javascripted.Accompany-Me",
       "useAppleSignIn": true,
-      "buildNumber": "20"
+      "buildNumber": "23"
     },
     "android": {
       "package": "com.javascripted.Accompany-Me"

@@ -1,4 +1,7 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import { AppThunk } from "./store";
 import { User, SignIn } from "./interfaces";
 import {
@@ -22,6 +25,7 @@ const initialState = {
     connection_count_acceptor: 0,
     connections: [],
     show_tasks: true,
+    reminder_type: 1,
     input_device_id: "",
     output_device_id: "",
     created_at: null,
@@ -37,10 +41,16 @@ const userSlice = createSlice({
     setUser(state, { payload }: PayloadAction<any>) {
       state.user = payload;
     },
-    updateUserAvatarUrl(state, { payload }: PayloadAction<string | undefined>) {
+    updateUserAvatarUrl(
+      state,
+      { payload }: PayloadAction<string | undefined>
+    ) {
       state.user.avatar_url = payload;
     },
-    updateUserName(state, { payload }: PayloadAction<string | undefined>) {
+    updateUserName(
+      state,
+      { payload }: PayloadAction<string | undefined>
+    ) {
       state.user.username = payload;
     },
     setUserError(state, action: PayloadAction<string>) {
@@ -49,8 +59,12 @@ const userSlice = createSlice({
   },
 });
 
-export const { setUser, setUserError, updateUserAvatarUrl, updateUserName } =
-  userSlice.actions;
+export const {
+  setUser,
+  setUserError,
+  updateUserAvatarUrl,
+  updateUserName,
+} = userSlice.actions;
 export default userSlice.reducer;
 
 // THUNK / EPIC
@@ -67,7 +81,13 @@ export const createUserInState =
   async (dispatch) => {
     try {
       let response: any;
-      response = await verifyUser(email, vKey, name, password, steam_id);
+      response = await verifyUser(
+        email,
+        vKey,
+        name,
+        password,
+        steam_id
+      );
       if (!response.error) {
         dispatch(setUser(response.data));
       }
@@ -144,6 +164,7 @@ export const logoutUser =
             connection_count_acceptor: 0,
             connections: [],
             show_tasks: true,
+            reminder_type: 1,
             input_device_id: "",
             output_device_id: "",
             created_at: undefined,
@@ -160,7 +181,11 @@ export const logoutUser =
 
 // THUNK5: Resetting Password For User
 export const resetPasswordInState =
-  (email: string, vKey: string, password: string): AppThunk =>
+  (
+    email: string,
+    vKey: string,
+    password: string
+  ): AppThunk =>
   async (dispatch) => {
     try {
       let response: any;

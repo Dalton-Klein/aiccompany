@@ -14,6 +14,7 @@ export interface User {
   output_device_id: string;
   created_at?: Date;
   updated_at?: Date;
+  reminder_type: number;
   error: React.SetStateAction<boolean>;
 }
 
