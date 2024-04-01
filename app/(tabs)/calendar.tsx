@@ -62,7 +62,6 @@ const Calendar = () => {
     if (routeName === "calendar") {
       generateMasterSchedule(true);
     }
-    dispatch(updateUserThunk(userState.id));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName]);
 

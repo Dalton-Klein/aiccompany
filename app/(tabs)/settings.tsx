@@ -48,6 +48,11 @@ const Settings = () => {
   }, []);
 
   useEffect(() => {
+    //Might need this hook to get pictures to refresh without switching tabs
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userState.avatar_url]);
+
+  useEffect(() => {
     if (userState.reminder_type === 1) {
       setreminderSetting("15 minutes before");
     } else if (userState.reminder_type === 2) {

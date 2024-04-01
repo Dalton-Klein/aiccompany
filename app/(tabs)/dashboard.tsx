@@ -27,6 +27,7 @@ import UnsharedEventsBrowser from "../../components/nav/unsharedEventsBrowser";
 import MetricTileTriple from "../../components/widgets/metric-widget-triple";
 import React from "react";
 import { usePushNotifications } from "../auth/usePushNotifications";
+import { updateUserThunk } from "../../store/userSlice";
 
 const Dashboard = () => {
   const { expoPushToken, notification } =
@@ -119,6 +120,7 @@ const Dashboard = () => {
           lastTabPage: routeName,
         })
       );
+      dispatch(updateUserThunk(userState.id));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName]);
