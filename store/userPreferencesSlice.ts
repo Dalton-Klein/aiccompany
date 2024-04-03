@@ -1,10 +1,14 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  PayloadAction,
+} from "@reduxjs/toolkit";
 import { Preferences } from "./interfaces";
 
 const initialState: Preferences = {
   lastTabPage: "dashboard",
   selectedCalendar: { id: 0 },
   selectedDate: "",
+  refreshDashboard: false,
   refreshCalendar: false,
   taskView: "Active",
   refreshTaskView: false,
@@ -14,7 +18,10 @@ const preferencesSlice = createSlice({
   name: "preferences",
   initialState,
   reducers: {
-    setPreferences(state, { payload }: PayloadAction<Preferences>) {
+    setPreferences(
+      state,
+      { payload }: PayloadAction<Preferences>
+    ) {
       state = payload;
       return state;
     },
@@ -22,12 +29,18 @@ const preferencesSlice = createSlice({
       state = { ...initialState };
       return state;
     },
-    setPreferencesError(state, action: PayloadAction<string>) {
+    setPreferencesError(
+      state,
+      action: PayloadAction<string>
+    ) {
       return state;
     },
   },
 });
 
-export const { setPreferences, resetPreferences, setPreferencesError } =
-  preferencesSlice.actions;
+export const {
+  setPreferences,
+  resetPreferences,
+  setPreferencesError,
+} = preferencesSlice.actions;
 export default preferencesSlice.reducer;

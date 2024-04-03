@@ -326,9 +326,7 @@ export const getEventsData = async (
     const jsonify = httpResult.json();
     return jsonify;
   } catch (error) {
-    console.log(
-      `${error} while fetching calendars for user`
-    );
+    console.log(`${error} while fetching events for user`);
   }
 };
 
@@ -471,6 +469,34 @@ export const createCalendar = async (
           description,
           calendar_url,
           inviteUserIds,
+          token,
+        }),
+      }
+    );
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while creating calendar`);
+  }
+};
+
+export const deleteCalendar = async (
+  userId,
+  calendarId,
+  token
+) => {
+  try {
+    const httpResult = await fetch(
+      `${endpointURL}/delete-calendar`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          calendarId,
           token,
         }),
       }
@@ -754,7 +780,35 @@ export const acceptFriendRequest = async (
     const jsonify = httpResult.json();
     return jsonify;
   } catch (error) {
-    console.log(`${error} while creating event`);
+    console.log(`${error} while accepting friend request`);
+  }
+};
+
+export const removeFriend = async (
+  userId,
+  otherUserId,
+  token
+) => {
+  try {
+    const httpResult = await fetch(
+      `${endpointURL}/remove-friend`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          otherUserId,
+          token,
+        }),
+      }
+    );
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while removing friend`);
   }
 };
 
@@ -784,7 +838,7 @@ export const sendCalendarInvite = async (
     const jsonify = httpResult.json();
     return jsonify;
   } catch (error) {
-    console.log(`${error} while creating event`);
+    console.log(`${error} while sending calendar invite`);
   }
 };
 
@@ -814,7 +868,65 @@ export const acceptCalendarInvite = async (
     const jsonify = httpResult.json();
     return jsonify;
   } catch (error) {
-    console.log(`${error} while creating event`);
+    console.log(
+      `${error} while accepting calendar request`
+    );
+  }
+};
+
+export const removeCalendarMember = async (
+  userId,
+  calendarId,
+  token
+) => {
+  try {
+    const httpResult = await fetch(
+      `${endpointURL}/remove-member-from-calendar`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          calendarId,
+          token,
+        }),
+      }
+    );
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while removing friend`);
+  }
+};
+
+export const revokeCalendarInvite = async (
+  userId,
+  calendarId,
+  token
+) => {
+  try {
+    const httpResult = await fetch(
+      `${endpointURL}/revoke-calendar-invite`,
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId,
+          calendarId,
+          token,
+        }),
+      }
+    );
+
+    const jsonify = httpResult.json();
+    return jsonify;
+  } catch (error) {
+    console.log(`${error} while removing friend`);
   }
 };
 

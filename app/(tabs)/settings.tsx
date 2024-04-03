@@ -131,7 +131,6 @@ const Settings = () => {
   };
 
   const setReminderSetting = async (selected: any) => {
-    console.log("selected: ", selected);
     let determinedId = 1;
     if (selected === "15 minutes before") {
       determinedId = 1;

@@ -107,7 +107,6 @@ const Dashboard = () => {
   }, [expoPushToken?.data]);
 
   useEffect(() => {
-    refreshMetricTiles();
     if (
       routeName === "dashboard" ||
       routeName === "calendar" ||
@@ -124,6 +123,13 @@ const Dashboard = () => {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName]);
+
+  useEffect(() => {
+    if (userState && userState.id && userState.id > 0) {
+      refreshMetricTiles();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userState.id, preferencesState.refreshDashboard]);
 
   const handleUpdatePushToken = async (token: string) => {
     await updateUserField(

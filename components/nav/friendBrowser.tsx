@@ -12,6 +12,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import MemberTile from "../tiles/social/memberTile";
 import React from "react";
+import { removeFriend } from "../../app/services/rest";
+import { setPreferences } from "../../store/userPreferencesSlice";
 
 const FriendBrowser = ({
   friends,
@@ -21,8 +23,12 @@ const FriendBrowser = ({
   handleClose,
 }) => {
   const dispatch = useDispatch();
-  const userState = useSelector((state: RootState) => state.user.user);
-  const preferencesState = useSelector((state: RootState) => state.preferences);
+  const userState = useSelector(
+    (state: RootState) => state.user.user
+  );
+  const preferencesState = useSelector(
+    (state: RootState) => state.preferences
+  );
   const [userTiles, setuserTiles] = useState([]);
 
   useEffect(() => {
@@ -38,26 +44,60 @@ const FriendBrowser = ({
     }
   };
 
-  const covertCalendarDataIntoTiles = async (users: any) => {
-    const memberCalendars = users.map((member: any) => (
-      <View key={member.id}>
-        <MemberTile member={member}></MemberTile>
-      </View>
-    ));
-    setuserTiles(memberCalendars);
+  const covertCalendarDataIntoTiles = async (
+    users: any
+  ) => {
+    if (users && users.length) {
+      const memberCalendars = users.map((member: any) => (
+        <View key={member.id}>
+          <MemberTile
+            member={member}
+            isRemovable={true}
+            removeMessage={
+              "Are you sure you want to remove this user from your friends list?"
+            }
+            handleRemoveUser={() => {
+              handleRemoveFriend(member);
+            }}
+          ></MemberTile>
+        </View>
+      ));
+      setuserTiles(memberCalendars);
+    } else {
+      setuserTiles([]);
+    }
+  };
+
+  const handleRemoveFriend = async (member: any) => {
+    await removeFriend(userState.id, member.user_id, "");
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        refreshDashboard:
+          !preferencesState.refreshDashboard,
+      })
+    );
   };
 
   return (
-    <Modal animationType="slide" transparent={true} visible={isVisible}>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isVisible}
+    >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
-          <Text style={styles.modalTitleText}>{modalTitle}</Text>
+          <Text style={styles.modalTitleText}>
+            {modalTitle}
+          </Text>
           <View style={styles.modalGrid}>
             <ScrollView style={styles.friendScrollBox}>
               {userTiles.length ? (
                 userTiles
               ) : (
-                <Text style={styles.noFriendsText}>No friends yet!</Text>
+                <Text style={styles.noFriendsText}>
+                  No friends yet!
+                </Text>
               )}
             </ScrollView>
           </View>
@@ -68,7 +108,9 @@ const FriendBrowser = ({
               handleClose();
             }}
           >
-            <Text style={styles.buttonText}>{closeButtonText}</Text>
+            <Text style={styles.buttonText}>
+              {closeButtonText}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>

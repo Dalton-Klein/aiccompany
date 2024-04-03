@@ -86,7 +86,6 @@ const AuthenticationForm = () => {
   //     },
   //   });
   //   const useInfo = await response.json();
-  //   console.log("google result: ", useInfo);
   // };
 
   const openAppleSignUp = (

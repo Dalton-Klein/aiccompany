@@ -22,6 +22,7 @@ export interface Preferences {
   lastTabPage: string;
   selectedCalendar: any;
   selectedDate: string;
+  refreshDashboard: boolean;
   refreshCalendar: boolean;
   taskView: string;
   refreshTaskView: boolean;

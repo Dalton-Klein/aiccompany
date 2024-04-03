@@ -1,5 +1,10 @@
 import { useState, useEffect } from "react";
-import { View, TouchableOpacity, Text, StyleSheet } from "react-native";
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  StyleSheet,
+} from "react-native";
 import * as THEME from "../../constants/theme";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import { useNavigationState } from "@react-navigation/native";
@@ -22,21 +27,35 @@ import React from "react";
 
 const TitleBar = (props: any) => {
   const dispatch = useDispatch();
-  const userState = useSelector((state: RootState) => state.user.user);
-  const preferencesState = useSelector((state: RootState) => state.preferences);
+  const userState = useSelector(
+    (state: RootState) => state.user.user
+  );
+  const preferencesState = useSelector(
+    (state: RootState) => state.preferences
+  );
 
   const [mainTitle, setmainTitle] = useState("Dashboard");
   //For picking calendar to filter by
-  const [isCalendarPickerOpen, setisCalendarPickerOpen] = useState(false);
+  const [isCalendarPickerOpen, setisCalendarPickerOpen] =
+    useState(false);
   //For selecting calendars to assign events
-  const [isCalendarSelectionOpen, setisCalendarSelectionOpen] = useState(false);
-  const [calendarsSelected, setcalendarsSelected] = useState([]);
+  const [
+    isCalendarSelectionOpen,
+    setisCalendarSelectionOpen,
+  ] = useState(false);
+  const [calendarsSelected, setcalendarsSelected] =
+    useState([]);
   const [newEventId, setnewEventId] = useState(0);
-  const [isCreateMenuOpen, setisCreateMenuOpen] = useState(false);
-  const [isNewCalendarFormOpen, setisNewCalendarFormOpen] = useState(false);
-  const [isNewEventFormOpen, setisNewEventFormOpen] = useState(false);
-  const [isNewTaskFormOpen, setisNewTaskFormOpen] = useState(false);
-  const [calendarTitle, setcalendarTitle] = useState("Master");
+  const [isCreateMenuOpen, setisCreateMenuOpen] =
+    useState(false);
+  const [isNewCalendarFormOpen, setisNewCalendarFormOpen] =
+    useState(false);
+  const [isNewEventFormOpen, setisNewEventFormOpen] =
+    useState(false);
+  const [isNewTaskFormOpen, setisNewTaskFormOpen] =
+    useState(false);
+  const [calendarTitle, setcalendarTitle] =
+    useState("Master");
 
   const routeName = useNavigationState(
     (state) => state.routes[state.index].name
@@ -46,20 +65,30 @@ const TitleBar = (props: any) => {
     if (routeName === "calendar") {
       setmainTitle(calendarTitle);
     } else {
-      const newTitle = routeName.charAt(0).toUpperCase() + routeName.slice(1);
+      const newTitle =
+        routeName.charAt(0).toUpperCase() +
+        routeName.slice(1);
       setmainTitle(newTitle);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName, calendarTitle]);
 
-  const handleCalendarSelectedForFilter = (calendar: any) => {
+  const handleCalendarSelectedForFilter = (
+    calendar: any
+  ) => {
     handleOpenCalendarPicker();
     setcalendarTitle(calendar.title);
   };
 
-  const handleCalendarSelectedForAssignment = (cal: any) => {
+  const handleCalendarSelectedForAssignment = (
+    cal: any
+  ) => {
     //This either adds or removes a calendar from the array of selected calendars
-    if (calendarsSelected.some((calendar: any) => calendar.id === cal.id)) {
+    if (
+      calendarsSelected.some(
+        (calendar: any) => calendar.id === cal.id
+      )
+    ) {
       const updatedCalendars = calendarsSelected.filter(
         (calendar) => calendar.id !== cal.id
       );
@@ -103,11 +132,22 @@ const TitleBar = (props: any) => {
   };
 
   const handleSubmitCreateEvent = async (event: any) => {
-    const eventResult = await createEvent(userState.id, event, "");
+    const eventResult = await createEvent(
+      userState.id,
+      event,
+      ""
+    );
     dispatch(
       setPreferences({
         ...preferencesState,
         refreshCalendar: !preferencesState.refreshCalendar,
+      })
+    );
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        refreshDashboard:
+          !preferencesState.refreshDashboard,
       })
     );
     setisNewEventFormOpen(false);
@@ -120,7 +160,9 @@ const TitleBar = (props: any) => {
       await createEventAssignments(
         userState.id,
         newEventId,
-        calendarsSelected.map((calendar: any) => calendar.id),
+        calendarsSelected.map(
+          (calendar: any) => calendar.id
+        ),
         ""
       );
       setcalendarsSelected([]);
@@ -136,6 +178,13 @@ const TitleBar = (props: any) => {
         refreshCalendar: !preferencesState.refreshCalendar,
       })
     );
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        refreshDashboard:
+          !preferencesState.refreshDashboard,
+      })
+    );
     closeAllModals();
   };
 
@@ -147,6 +196,13 @@ const TitleBar = (props: any) => {
       form.calendar_url,
       [],
       ""
+    );
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        refreshDashboard:
+          !preferencesState.refreshDashboard,
+      })
     );
     closeAllModals();
   };
@@ -185,7 +241,11 @@ const TitleBar = (props: any) => {
             style={styles.titleButton}
             onPress={handleRightButtonPress}
           >
-            <FontAwesome size={28} name="plus" color={THEME.COLORS.secondary} />
+            <FontAwesome
+              size={28}
+              name="plus"
+              color={THEME.COLORS.secondary}
+            />
           </TouchableOpacity>
         ) : (
           <></>

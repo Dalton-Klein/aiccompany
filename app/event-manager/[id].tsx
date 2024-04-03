@@ -14,7 +14,10 @@ import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import BasicBtn from "../../components/tiles/buttons/basicButton";
 import { useEffect, useState } from "react";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  useLocalSearchParams,
+  useRouter,
+} from "expo-router";
 import {
   createEventAssignments,
   deleteEvent,
@@ -36,8 +39,12 @@ const EventManager = () => {
   const dispatch = useDispatch();
   const router = useRouter();
   const { id } = useLocalSearchParams();
-  const userState = useSelector((state: RootState) => state.user.user);
-  const preferencesState = useSelector((state: RootState) => state.preferences);
+  const userState = useSelector(
+    (state: RootState) => state.user.user
+  );
+  const preferencesState = useSelector(
+    (state: RootState) => state.preferences
+  );
 
   const [isTask, setisTask] = useState(false);
 
@@ -51,14 +58,20 @@ const EventManager = () => {
   const [isCancelled, setisCancelled] = useState(false);
   const [isCompleted, setisCompleted] = useState(false);
   const [calendarTiles, setcalendarTiles] = useState([]);
-  const [calendarsSelected, setcalendarsSelected] = useState([]);
+  const [calendarsSelected, setcalendarsSelected] =
+    useState([]);
   const [unsavedChanges, setunsavedChanges] = useState([]);
-  const [isResultModalVisible, setisResultModalVisible] = useState(false);
-  const [resultText, setresultText] = useState("");
-  const [isLeaveModalVisible, setisLeaveModalVisible] = useState(false);
-  const [isDeleteModalVisible, setisDeleteModalVisible] = useState(false);
-  const [isDeleteSeriesModalVisible, setisDeleteSeriesModalVisible] =
+  const [isResultModalVisible, setisResultModalVisible] =
     useState(false);
+  const [resultText, setresultText] = useState("");
+  const [isLeaveModalVisible, setisLeaveModalVisible] =
+    useState(false);
+  const [isDeleteModalVisible, setisDeleteModalVisible] =
+    useState(false);
+  const [
+    isDeleteSeriesModalVisible,
+    setisDeleteSeriesModalVisible,
+  ] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -66,7 +79,11 @@ const EventManager = () => {
   }, []);
 
   const fetchData = async () => {
-    const result = await getEventsData(userState.id, id, "");
+    const result = await getEventsData(
+      userState.id,
+      id,
+      ""
+    );
     setisTask(result.data.event.is_task);
     settitle(result.data.event.title);
     setnotes(result.data.event.notes);
@@ -81,25 +98,34 @@ const EventManager = () => {
       result.data.calendarAssignments &&
       result.data.calendarAssignments.length
     ) {
-      convertAssignmentsToTiles(result.data.calendarAssignments);
+      convertAssignmentsToTiles(
+        result.data.calendarAssignments
+      );
     }
   };
 
   const convertAssignmentsToTiles = (calendars: any[]) => {
     calendars.forEach((calendar) => {
       if (calendar.is_assigned) {
-        setcalendarsSelected([...calendarsSelected, calendar.calendar_id]);
+        setcalendarsSelected([
+          ...calendarsSelected,
+          calendar.calendar_id,
+        ]);
       }
     });
-    const memberCalendars = calendars.map((calendar: any) => (
-      <View key={calendar.calendar_id}>
-        <CalendarTile
-          calendar={calendar}
-          handlePress={handleCalendarSelectedForAssignment}
-          isPreSelected={calendar.is_assigned === 1}
-        ></CalendarTile>
-      </View>
-    ));
+    const memberCalendars = calendars.map(
+      (calendar: any) => (
+        <View key={calendar.calendar_id}>
+          <CalendarTile
+            calendar={calendar}
+            handlePress={
+              handleCalendarSelectedForAssignment
+            }
+            isPreSelected={calendar.is_assigned === 1}
+          ></CalendarTile>
+        </View>
+      )
+    );
     setcalendarTiles(memberCalendars);
   };
 
@@ -113,7 +139,10 @@ const EventManager = () => {
 
     if (existingIndex === -1) {
       // Field doesn't exist, add a new object
-      setunsavedChanges([...unsavedChanges, { field: field, value: value }]);
+      setunsavedChanges([
+        ...unsavedChanges,
+        { field: field, value: value },
+      ]);
     } else {
       // Field exists, update the existing object
       const updatedChanges = [...unsavedChanges];
@@ -127,9 +156,19 @@ const EventManager = () => {
     isSelected: boolean
   ) => {
     if (isSelected) {
-      await createEventAssignments(userState.id, id, [cal.calendar_id], "");
+      await createEventAssignments(
+        userState.id,
+        id,
+        [cal.calendar_id],
+        ""
+      );
     } else {
-      await removeEventAssignments(userState.id, id, [cal.calendar_id], "");
+      await removeEventAssignments(
+        userState.id,
+        id,
+        [cal.calendar_id],
+        ""
+      );
     }
   };
 
@@ -138,14 +177,19 @@ const EventManager = () => {
       setresultText("Changes saved!");
       setisResultModalVisible(true);
     } else {
-      const saveResult = await updateEventsData(id, unsavedChanges, "");
+      const saveResult = await updateEventsData(
+        id,
+        unsavedChanges,
+        ""
+      );
       if (saveResult) {
         setresultText("Changes saved!");
         setisResultModalVisible(true);
         dispatch(
           setPreferences({
             ...preferencesState,
-            refreshCalendar: !preferencesState.refreshCalendar,
+            refreshCalendar:
+              !preferencesState.refreshCalendar,
           })
         );
         setunsavedChanges([]);
@@ -167,11 +211,18 @@ const EventManager = () => {
   };
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <TouchableWithoutFeedback
+      onPress={Keyboard.dismiss}
+      accessible={false}
+      style={styles.master}
+    >
       <SafeAreaView>
         <View style={styles.calendarContentBox}>
           <View style={styles.titleRow}>
-            <TouchableOpacity style={styles.backBtn} onPress={navigateBack}>
+            <TouchableOpacity
+              style={styles.backBtn}
+              onPress={navigateBack}
+            >
               <Text>Back</Text>
             </TouchableOpacity>
             <Text style={styles.titleText}>
@@ -219,14 +270,23 @@ const EventManager = () => {
                 <TextInput
                   style={styles.textInput}
                   keyboardType="numeric"
-                  placeholder={"Task Duration in minutes..."}
+                  placeholder={
+                    "Task Duration in minutes..."
+                  }
                   placeholderTextColor="grey"
                   value={
-                    taskDuration && taskDuration > 0 ? `${taskDuration}` : ""
+                    taskDuration && taskDuration > 0
+                      ? `${taskDuration}`
+                      : ""
                   }
                   onChangeText={(value) => {
-                    const safeValue = parseInt(value.replace(/[^0-9]/g, ""));
-                    addUnsavedChange("task_duration", safeValue);
+                    const safeValue = parseInt(
+                      value.replace(/[^0-9]/g, "")
+                    );
+                    addUnsavedChange(
+                      "task_duration",
+                      safeValue
+                    );
                     settaskDuration(safeValue);
                   }}
                   onBlur={() => Keyboard.dismiss()}
@@ -235,7 +295,10 @@ const EventManager = () => {
                 <DateTimePicker
                   value={
                     startTime
-                      ? moment(startTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").toDate()
+                      ? moment(
+                          startTime,
+                          "YYYY-MM-DDTHH:mm:ss.SSSZ"
+                        ).toDate()
                       : moment().toDate()
                   }
                   mode={"datetime"}
@@ -243,9 +306,10 @@ const EventManager = () => {
                     if (date) {
                       addUnsavedChange("start_time", date);
                       setstartTime(
-                        moment(date, "YYYY-MM-DDTHH:mm:ss.SSSZ").format(
+                        moment(
+                          date,
                           "YYYY-MM-DDTHH:mm:ss.SSSZ"
-                        )
+                        ).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
                       );
                     }
                   }}
@@ -265,7 +329,10 @@ const EventManager = () => {
               <DateTimePicker
                 value={
                   endTime
-                    ? moment(endTime, "YYYY-MM-DDTHH:mm:ss.SSSZ").toDate()
+                    ? moment(
+                        endTime,
+                        "YYYY-MM-DDTHH:mm:ss.SSSZ"
+                      ).toDate()
                     : moment().toDate()
                 }
                 mode={"datetime"}
@@ -273,9 +340,10 @@ const EventManager = () => {
                   if (date) {
                     addUnsavedChange("end_time", date);
                     setendTime(
-                      moment(date, "YYYY-MM-DDTHH:mm:ss.SSSZ").format(
+                      moment(
+                        date,
                         "YYYY-MM-DDTHH:mm:ss.SSSZ"
-                      )
+                      ).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
                     );
                   }
                 }}
@@ -285,7 +353,9 @@ const EventManager = () => {
               />
             </View>
             {isTask ? (
-              <Text style={styles.subTitle}>Is Task Completed</Text>
+              <Text style={styles.subTitle}>
+                Is Task Completed
+              </Text>
             ) : (
               <></>
             )}
@@ -297,12 +367,17 @@ const EventManager = () => {
                     true: THEME.COLORS.neutral,
                   }}
                   thumbColor={
-                    isCompleted ? THEME.COLORS.primary : THEME.COLORS.lighter
+                    isCompleted
+                      ? THEME.COLORS.primary
+                      : THEME.COLORS.lighter
                   }
                   ios_backgroundColor="#3e3e3e"
                   onValueChange={() => {
                     setisCompleted(!isCompleted);
-                    addUnsavedChange("is_completed", !isCompleted);
+                    addUnsavedChange(
+                      "is_completed",
+                      !isCompleted
+                    );
                   }}
                   value={isCompleted}
                   style={styles.seriesSwitch}
@@ -312,7 +387,9 @@ const EventManager = () => {
               <></>
             )}
             <Text style={styles.subTitle}>
-              {isTask ? "Is Task Cancelled" : "Is Event Cancelled"}
+              {isTask
+                ? "Is Task Cancelled"
+                : "Is Event Cancelled"}
             </Text>
             <View style={styles.fieldBox}>
               <Switch
@@ -321,12 +398,17 @@ const EventManager = () => {
                   true: THEME.COLORS.neutral,
                 }}
                 thumbColor={
-                  isCancelled ? THEME.COLORS.primary : THEME.COLORS.lighter
+                  isCancelled
+                    ? THEME.COLORS.primary
+                    : THEME.COLORS.lighter
                 }
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={() => {
                   setisCancelled(!isCancelled);
-                  addUnsavedChange("is_cancelled", !isCancelled);
+                  addUnsavedChange(
+                    "is_cancelled",
+                    !isCancelled
+                  );
                 }}
                 value={isCancelled}
                 style={styles.seriesSwitch}
@@ -334,12 +416,16 @@ const EventManager = () => {
             </View>
             {isSeries && (
               <Text style={styles.seriesNotifText}>
-                *Calendar assignments will be applied to all events in this
-                series*
+                *Calendar assignments will be applied to all
+                events in this series*
               </Text>
             )}
-            <Text style={styles.subTitle}>Calendar Assignments</Text>
-            <View style={styles.calendarTileBox}>{calendarTiles}</View>
+            <Text style={styles.subTitle}>
+              Calendar Assignments
+            </Text>
+            <View style={styles.calendarTileBox}>
+              {calendarTiles}
+            </View>
             <TouchableOpacity
               style={styles.deleteBtnContainer}
               onPress={() => {
@@ -357,7 +443,9 @@ const EventManager = () => {
                   setisDeleteSeriesModalVisible(true);
                 }}
               >
-                <Text style={styles.stayBtnText}>Delete Series</Text>
+                <Text style={styles.stayBtnText}>
+                  Delete Series
+                </Text>
               </TouchableOpacity>
             ) : (
               <></>
@@ -380,7 +468,9 @@ const EventManager = () => {
         >
           <View style={styles.centeredView}>
             <View style={styles.modalView}>
-              <Text style={styles.modalText}>{resultText}</Text>
+              <Text style={styles.modalText}>
+                {resultText}
+              </Text>
               <TouchableOpacity
                 style={styles.btnContainer}
                 onPress={() => {
@@ -414,7 +504,9 @@ const EventManager = () => {
               <TouchableOpacity
                 style={styles.btnContainer}
                 onPress={() => {
-                  router.navigate(`/${preferencesState.lastTabPage}`);
+                  router.navigate(
+                    `/${preferencesState.lastTabPage}`
+                  );
                 }}
               >
                 <Text style={styles.btnText}>Leave</Text>
@@ -439,7 +531,9 @@ const EventManager = () => {
                   setisDeleteModalVisible(false);
                 }}
               >
-                <Text style={styles.stayBtnText}>Cancel</Text>
+                <Text style={styles.stayBtnText}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.btnContainer}
@@ -448,10 +542,13 @@ const EventManager = () => {
                   dispatch(
                     setPreferences({
                       ...preferencesState,
-                      refreshCalendar: !preferencesState.refreshCalendar,
+                      refreshCalendar:
+                        !preferencesState.refreshCalendar,
                     })
                   );
-                  router.navigate(`/${preferencesState.lastTabPage}`);
+                  router.navigate(
+                    `/${preferencesState.lastTabPage}`
+                  );
                 }}
               >
                 <Text style={styles.btnText}>Delete</Text>
@@ -476,19 +573,29 @@ const EventManager = () => {
                   setisDeleteSeriesModalVisible(false);
                 }}
               >
-                <Text style={styles.stayBtnText}>Cancel</Text>
+                <Text style={styles.stayBtnText}>
+                  Cancel
+                </Text>
               </TouchableOpacity>
               <TouchableOpacity
                 style={styles.btnContainer}
                 onPress={async () => {
-                  await deleteSeries(userState.id, id, seriesId, "");
+                  await deleteSeries(
+                    userState.id,
+                    id,
+                    seriesId,
+                    ""
+                  );
                   dispatch(
                     setPreferences({
                       ...preferencesState,
-                      refreshCalendar: !preferencesState.refreshCalendar,
+                      refreshCalendar:
+                        !preferencesState.refreshCalendar,
                     })
                   );
-                  router.navigate(`/${preferencesState.lastTabPage}`);
+                  router.navigate(
+                    `/${preferencesState.lastTabPage}`
+                  );
                 }}
               >
                 <Text style={styles.btnText}>Delete</Text>
@@ -502,6 +609,9 @@ const EventManager = () => {
 };
 
 const styles = StyleSheet.create({
+  master: {
+    backgroundColor: THEME.COLORS.lighter,
+  },
   calendarContentBox: {
     maxHeight: "83%",
   },

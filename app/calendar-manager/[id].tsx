@@ -18,7 +18,10 @@ import {
 } from "expo-router";
 import CalendarInviteForm from "../../components/forms/calendarInviteForm";
 import {
+  deleteCalendar,
   getCalendarsData,
+  removeCalendarMember,
+  revokeCalendarInvite,
   updateCalendarsData,
   uploadAvatarCloud,
 } from "../services/rest";
@@ -26,10 +29,21 @@ import MemberTile from "../../components/tiles/social/memberTile";
 import React from "react";
 import { FontAwesome5 } from "@expo/vector-icons";
 import * as ImagePicker from "expo-image-picker";
+import { RootState } from "../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { setPreferences } from "../../store/userPreferencesSlice";
 
 const CalendarManager = () => {
+  const dispatch = useDispatch();
   const router = useRouter();
   const { id } = useLocalSearchParams();
+  const userState = useSelector(
+    (state: RootState) => state.user.user
+  );
+  const preferencesState = useSelector(
+    (state: RootState) => state.preferences
+  );
+
   const [calendarBanner, setcalendarBanner] = useState("");
   const [title, settitle] = useState("");
   const [description, setdescription] = useState("");
@@ -41,7 +55,10 @@ const CalendarManager = () => {
   const [resultText, setresultText] = useState("");
   const [isLeaveModalVisible, setisLeaveModalVisible] =
     useState(false);
-
+  const [
+    isDeleteCalendarModalVisible,
+    setisDeleteCalendarModalVisible,
+  ] = useState(false);
   useEffect(() => {
     fetchData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -58,9 +75,13 @@ const CalendarManager = () => {
     setdescription(result.data.description);
     if (result.memberResult && result.memberResult.length) {
       convertMembersToTiles(result.memberResult);
+    } else {
+      setmemberTiles([]);
     }
     if (result.inviteResult && result.inviteResult.length) {
       convertInviteesToTiles(result.inviteResult);
+    } else {
+      setinvitedTiles([]);
     }
   };
 
@@ -71,6 +92,13 @@ const CalendarManager = () => {
         <MemberTile
           member={member}
           key={member.id}
+          isRemovable={true}
+          removeMessage={
+            "Are you sure you want to remove this user from the calendar?"
+          }
+          handleRemoveUser={() => {
+            handleRemoveUserFromCalendar(member);
+          }}
         ></MemberTile>
       );
     });
@@ -84,10 +112,29 @@ const CalendarManager = () => {
         <MemberTile
           member={member}
           key={member.id}
+          isRemovable={true}
+          removeMessage={
+            "Are you sure you want to revoke the invite for this user?"
+          }
+          handleRemoveUser={() => {
+            handleRemoveInviteForUser(member);
+          }}
         ></MemberTile>
       );
     });
     setinvitedTiles(tiles);
+  };
+
+  const handleRemoveUserFromCalendar = async (
+    member: any
+  ) => {
+    await removeCalendarMember(member.user_id, id, "");
+    await fetchData();
+  };
+
+  const handleRemoveInviteForUser = async (member: any) => {
+    await revokeCalendarInvite(member.receiver, id, "");
+    await fetchData();
   };
 
   const addUnsavedChange = (
@@ -166,8 +213,20 @@ const CalendarManager = () => {
     }
   };
 
+  const handleDeleteCalendar = async () => {
+    await deleteCalendar(userState.id, id, "");
+    dispatch(
+      setPreferences({
+        ...preferencesState,
+        refreshDashboard:
+          !preferencesState.refreshDashboard,
+      })
+    );
+    router.navigate("dashboard");
+  };
+
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.master}>
       <View style={styles.titleRow}>
         <TouchableOpacity
           style={styles.backBtn}
@@ -256,6 +315,19 @@ const CalendarManager = () => {
             Nothing to show here!
           </Text>
         )}
+        <Text style={styles.subTitle}>Danger Zone</Text>
+        <View style={styles.buttonBox}>
+          <TouchableOpacity
+            onPress={() => {
+              setisDeleteCalendarModalVisible(true);
+            }}
+            style={styles.deleteAcctBtn}
+          >
+            <Text style={styles.deleteAcctBtnText}>
+              Delete Calendar
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
       <View style={styles.confirmContainer}>
         <BasicBtn
@@ -317,11 +389,54 @@ const CalendarManager = () => {
           </View>
         </View>
       </Modal>
+      {/* Confirm Delete Calendar Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDeleteCalendarModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>
+              Are you sure you want to delete this calendar?
+            </Text>
+            <Text style={styles.modalText}>
+              Don't worry, no events will be deleted.
+            </Text>
+            <Text style={styles.modalText}>
+              However, all events currently assigned to this
+              calendar will become unassigned, and the
+              calendar will be removed for all members
+              within it.
+            </Text>
+            <BasicBtn
+              iconUrl={<></>}
+              handlePress={() => {
+                handleDeleteCalendar();
+                setisDeleteCalendarModalVisible(false);
+              }}
+              buttonText={"Confirm"}
+              isCancel={false}
+            />
+            <BasicBtn
+              iconUrl={<></>}
+              handlePress={() => {
+                setisDeleteCalendarModalVisible(false);
+              }}
+              buttonText={"Cancel"}
+              isCancel={true}
+            />
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
+  master: {
+    backgroundColor: THEME.COLORS.lighter,
+  },
   scrollBox: {
     maxHeight: "80%",
   },
@@ -442,7 +557,35 @@ const styles = StyleSheet.create({
     color: "grey",
     marginLeft: 25,
     marginBottom: 20,
-    fontSize: THEME.SIZES.large,
+    fontSize: THEME.SIZES.medium,
+  },
+  buttonBox: {
+    flex: 1,
+    maxWidth: "100%",
+    marginTop: 15,
+    justifyContent: "center",
+  },
+  deleteAcctBtn: {
+    flex: 1,
+    borderRadius: THEME.BORDERSIZES.medium,
+    borderWidth: 2,
+    borderColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 10,
+    marginLeft: 20,
+    marginRight: 20,
+    minWidth: "80%",
+    maxHeight: 50,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingRight: 20,
+    paddingLeft: 20,
+  },
+  deleteAcctBtnText: {
+    color: "red",
+    fontSize: THEME.SIZES.medium,
+    textAlign: "center",
   },
   confirmContainer: {
     minWidth: "80%",
@@ -463,7 +606,7 @@ const styles = StyleSheet.create({
     backgroundColor: THEME.COLORS.lighter,
     borderRadius: 20,
     width: "90%",
-    minHeight: 200,
+    minHeight: "50%",
     padding: 35,
     alignItems: "center",
     justifyContent: "center",
