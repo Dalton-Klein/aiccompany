@@ -9,6 +9,7 @@ import {
   Image,
   TouchableOpacity,
   Switch,
+  Modal,
 } from "react-native";
 import { useRouter } from "expo-router";
 import * as THEME from "../../constants/theme";
@@ -21,6 +22,7 @@ import {
   updateUserThunk,
 } from "../../store/userSlice";
 import {
+  deleteUserAccount,
   updateUserField,
   uploadAvatarCloud,
 } from "../services/rest";
@@ -39,6 +41,10 @@ const Settings = () => {
     useState("");
   const [hasUnsavedChanges, setHasUnsavedChanges] =
     useState(false);
+  const [
+    isDeleteAccountModalVisible,
+    setisDeleteAccountModalVisible,
+  ] = useState(false);
 
   useEffect(() => {
     if (!userState.id || userState.id < 1) {
@@ -74,6 +80,13 @@ const Settings = () => {
     router.navigate("auth/authentication");
   };
 
+  const handleDeleteAccount = async () => {
+    await deleteUserAccount(userState.id, "");
+    setisDeleteAccountModalVisible(false);
+    dispatch(logoutUser(userState.id));
+    router.navigate("auth/authentication");
+  };
+
   const toggleShowTasksSwitch = async (value: boolean) => {
     await updateUserField(
       userState.id,
@@ -89,7 +102,7 @@ const Settings = () => {
       await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
       alert(
-        "Sorry, we need camera roll permissions to make this work!"
+        "Sorry, we need camera roll permissions to make this work! Go to your settings, then to the Accompany Me app, and enable access to photos."
       );
       return;
     }
@@ -139,6 +152,7 @@ const Settings = () => {
       determinedId
     );
   };
+
   return (
     <SafeAreaView style={styles.masterContainer}>
       <TitleBar title="Settings"></TitleBar>
@@ -248,7 +262,62 @@ const Settings = () => {
             isCancel={true}
           />
         </View>
+        <View style={styles.userFieldBox}>
+          <Text style={styles.userFieldText}>
+            Danger Zone
+          </Text>
+        </View>
+        <View style={styles.buttonBox}>
+          <TouchableOpacity
+            onPress={() => {
+              setisDeleteAccountModalVisible(true);
+            }}
+            style={styles.deleteAcctBtn}
+          >
+            <Text style={styles.deleteAcctBtnText}>
+              Delete Account
+            </Text>
+          </TouchableOpacity>
+        </View>
       </ScrollView>
+      {/* Result Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDeleteAccountModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>
+              Are you sure you want to delete your account?
+            </Text>
+            <Text style={styles.modalText}>
+              All of the data associated to your account
+              will be deleted.
+            </Text>
+            <TouchableOpacity
+              style={styles.deleteAcctBtn}
+              onPress={() => {
+                handleDeleteAccount();
+              }}
+            >
+              <Text style={styles.deleteAcctBtnText}>
+                Continue
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.modalBtnContainer}
+              onPress={() => {
+                setisDeleteAccountModalVisible(false);
+              }}
+            >
+              <Text style={styles.modalBtnText}>
+                Cancel
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 };
@@ -337,8 +406,81 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonBox: {
-    maxWidth: 150,
+    maxWidth: 250,
     marginTop: 15,
+  },
+  deleteAcctBtn: {
+    backgroundColor: THEME.COLORS.lighter,
+    flex: 1,
+    borderRadius: THEME.BORDERSIZES.medium,
+    borderWidth: 2,
+    borderColor: "red",
+    justifyContent: "center",
+    alignItems: "center",
+    marginBottom: 15,
+    marginLeft: 5,
+    marginRight: 5,
+    minWidth: "100%",
+    maxHeight: 50,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingRight: 20,
+    paddingLeft: 20,
+  },
+  deleteAcctBtnText: {
+    color: "red",
+    fontSize: THEME.SIZES.medium,
+    textAlign: "center",
+  },
+  centeredView: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    marginTop: 22,
+  },
+  modalView: {
+    margin: 20,
+    backgroundColor: THEME.COLORS.lighter,
+    borderRadius: 20,
+    width: "90%",
+    minHeight: "50%",
+    padding: 35,
+    alignItems: "center",
+    justifyContent: "center",
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  modalText: {
+    marginBottom: 20,
+    fontSize: THEME.SIZES.medium,
+    textAlign: "center",
+  },
+  modalBtnContainer: {
+    flex: 1,
+    backgroundColor: THEME.COLORS.primary,
+    borderRadius: THEME.BORDERSIZES.medium,
+    justifyContent: "center",
+    alignItems: "center",
+    minWidth: "100%",
+    marginLeft: 5,
+    marginRight: 5,
+    marginTop: 20,
+    maxHeight: 50,
+    paddingTop: 10,
+    paddingBottom: 10,
+    paddingRight: 20,
+    paddingLeft: 20,
+  },
+  modalBtnText: {
+    color: THEME.COLORS.lighter,
+    fontSize: THEME.SIZES.medium,
+    textAlign: "center",
   },
 });
 

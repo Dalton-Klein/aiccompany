@@ -6,7 +6,7 @@
     },
     "name": "Accompany-Me",
     "slug": "Accompany-Me",
-    "version": "1.2.3",
+    "version": "1.2.5",
     "splash": {
       "image": "./assets/icons/splash.png",
       "resizeMode": "contain",
@@ -23,7 +23,10 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.javascripted.Accompany-Me",
       "useAppleSignIn": true,
-      "buildNumber": "23"
+      "buildNumber": "25",
+      "infoPlist": {
+        "NSPhotoLibraryUsageDescription": "This app uses your photo library to let you choose images for profile photos and calendar customization. This enhances your app experience by allowing for a personalized planning environment."
+      }
     },
     "android": {
       "package": "com.javascripted.Accompany-Me"

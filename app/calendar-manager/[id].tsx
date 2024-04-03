@@ -12,7 +12,10 @@ import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import BasicBtn from "../../components/tiles/buttons/basicButton";
 import { useEffect, useState } from "react";
-import { useLocalSearchParams, useRouter } from "expo-router";
+import {
+  useLocalSearchParams,
+  useRouter,
+} from "expo-router";
 import CalendarInviteForm from "../../components/forms/calendarInviteForm";
 import {
   getCalendarsData,
@@ -33,9 +36,11 @@ const CalendarManager = () => {
   const [memberTiles, setmemberTiles] = useState([]);
   const [invitedTiles, setinvitedTiles] = useState([]);
   const [unsavedChanges, setunsavedChanges] = useState([]);
-  const [isResultModalVisible, setisResultModalVisible] = useState(false);
+  const [isResultModalVisible, setisResultModalVisible] =
+    useState(false);
   const [resultText, setresultText] = useState("");
-  const [isLeaveModalVisible, setisLeaveModalVisible] = useState(false);
+  const [isLeaveModalVisible, setisLeaveModalVisible] =
+    useState(false);
 
   useEffect(() => {
     fetchData();
@@ -62,7 +67,12 @@ const CalendarManager = () => {
   const convertMembersToTiles = (memberData: any[]) => {
     let tiles = [];
     memberData.forEach((member) => {
-      tiles.push(<MemberTile member={member} key={member.id}></MemberTile>);
+      tiles.push(
+        <MemberTile
+          member={member}
+          key={member.id}
+        ></MemberTile>
+      );
     });
     setmemberTiles(tiles);
   };
@@ -70,19 +80,30 @@ const CalendarManager = () => {
   const convertInviteesToTiles = (memberData: any[]) => {
     let tiles = [];
     memberData.forEach((member) => {
-      tiles.push(<MemberTile member={member} key={member.id}></MemberTile>);
+      tiles.push(
+        <MemberTile
+          member={member}
+          key={member.id}
+        ></MemberTile>
+      );
     });
     setinvitedTiles(tiles);
   };
 
-  const addUnsavedChange = (field: string, value: string) => {
+  const addUnsavedChange = (
+    field: string,
+    value: string
+  ) => {
     const existingIndex = unsavedChanges.findIndex(
       (item) => item.field === field
     );
 
     if (existingIndex === -1) {
       // Field doesn't exist, add a new object
-      setunsavedChanges([...unsavedChanges, { field: field, value: value }]);
+      setunsavedChanges([
+        ...unsavedChanges,
+        { field: field, value: value },
+      ]);
     } else {
       // Field exists, update the existing object
       const updatedChanges = [...unsavedChanges];
@@ -96,7 +117,11 @@ const CalendarManager = () => {
       setresultText("Changes saved!");
       setisResultModalVisible(true);
     } else {
-      const saveResult = await updateCalendarsData(id, unsavedChanges, "");
+      const saveResult = await updateCalendarsData(
+        id,
+        unsavedChanges,
+        ""
+      );
       setresultText("Changes saved!");
       setisResultModalVisible(true);
       setunsavedChanges([]);
@@ -113,22 +138,28 @@ const CalendarManager = () => {
 
   const handlePickAvatar = async () => {
     // Requesting permission to access the camera roll
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
+      alert(
+        "Sorry, we need camera roll permissions to make this work! Go to your settings, then to the Accompany Me app, and enable access to photos."
+      );
       return;
     }
 
     // Launching the image picker
-    let result: any = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1], // Optional: You can force the crop aspect ratio to be square
-      quality: 1,
-    });
+    let result: any =
+      await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1], // Optional: You can force the crop aspect ratio to be square
+        quality: 1,
+      });
 
     if (result && !result.cancelled) {
-      const uploadResult = await uploadAvatarCloud(result.assets[0].uri);
+      const uploadResult = await uploadAvatarCloud(
+        result.assets[0].uri
+      );
       // // Assuming you have a function to handle the upload of the image URL to your server or backend
       addUnsavedChange("calendar_url", uploadResult);
       setcalendarBanner(uploadResult);
@@ -138,13 +169,21 @@ const CalendarManager = () => {
   return (
     <SafeAreaView>
       <View style={styles.titleRow}>
-        <TouchableOpacity style={styles.backBtn} onPress={navigateBack}>
+        <TouchableOpacity
+          style={styles.backBtn}
+          onPress={navigateBack}
+        >
           <Text>Back</Text>
         </TouchableOpacity>
-        <Text style={styles.titleText}>Manage Calendar</Text>
+        <Text style={styles.titleText}>
+          Manage Calendar
+        </Text>
         <Text style={styles.backBtn}></Text>
       </View>
-      <ScrollView keyboardShouldPersistTaps="always" style={styles.scrollBox}>
+      <ScrollView
+        keyboardShouldPersistTaps="always"
+        style={styles.scrollBox}
+      >
         <View style={styles.photoBox}>
           <Text style={styles.subTitle}>Photo</Text>
           {calendarBanner ? (
@@ -152,7 +191,10 @@ const CalendarManager = () => {
               style={styles.avatarBg}
               onPress={handlePickAvatar}
             >
-              <Image src={calendarBanner} style={styles.profileImg} />
+              <Image
+                src={calendarBanner}
+                style={styles.profileImg}
+              />
             </TouchableOpacity>
           ) : (
             <TouchableOpacity
@@ -202,13 +244,17 @@ const CalendarManager = () => {
         {memberTiles.length ? (
           memberTiles
         ) : (
-          <Text style={styles.nothingText}>Nothing to show here!</Text>
+          <Text style={styles.nothingText}>
+            Nothing to show here!
+          </Text>
         )}
         <Text style={styles.subTitle}>Pending Invites</Text>
         {invitedTiles.length ? (
           invitedTiles
         ) : (
-          <Text style={styles.nothingText}>Nothing to show here!</Text>
+          <Text style={styles.nothingText}>
+            Nothing to show here!
+          </Text>
         )}
       </ScrollView>
       <View style={styles.confirmContainer}>
@@ -227,7 +273,9 @@ const CalendarManager = () => {
       >
         <View style={styles.centeredView}>
           <View style={styles.modalView}>
-            <Text style={styles.modalText}>{resultText}</Text>
+            <Text style={styles.modalText}>
+              {resultText}
+            </Text>
             <TouchableOpacity
               style={styles.btnContainer}
               onPress={() => {

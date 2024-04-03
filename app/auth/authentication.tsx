@@ -14,8 +14,15 @@ import { useEffect, useState } from "react";
 import * as Google from "expo-auth-session/providers/google";
 import * as WebBrowser from "expo-web-browser";
 import { Auth } from "./auth.native";
-import { validateEmail, validateUsername } from "../services/auth-services";
-import { createUser, uploadAvatarCloud, verifyUser } from "../services/rest";
+import {
+  validateEmail,
+  validateUsername,
+} from "../services/auth-services";
+import {
+  createUser,
+  uploadAvatarCloud,
+  verifyUser,
+} from "../services/rest";
 import {
   GestureHandlerRootView,
   TouchableWithoutFeedback,
@@ -35,24 +42,28 @@ const AuthenticationForm = () => {
   const routeName = useNavigationState(
     (state) => state.routes[state.index].name
   );
-  const [hasSignInError, sethasSignInError] = useState(false);
+  const [hasSignInError, sethasSignInError] =
+    useState(false);
   const [signupError, setsignupError] = useState("");
   const [accessToken, setaccessToken] = useState(null);
-  const [request, response, promptAsync] = Google.useIdTokenAuthRequest({
-    webClientId:
-      "1053731323112-gptakuvho0ugstuanjskff0eebl95t4v.apps.googleusercontent.com",
-    iosClientId:
-      "1053731323112-v4iot9bd003v1bsotriki0qar4n2hpl5.apps.googleusercontent.com",
-    androidClientId:
-      "1053731323112-0hf213cjgsusebp007pn4f6iu7bak0jc.apps.googleusercontent.com",
-  });
+  const [request, response, promptAsync] =
+    Google.useIdTokenAuthRequest({
+      webClientId:
+        "1053731323112-gptakuvho0ugstuanjskff0eebl95t4v.apps.googleusercontent.com",
+      iosClientId:
+        "1053731323112-v4iot9bd003v1bsotriki0qar4n2hpl5.apps.googleusercontent.com",
+      androidClientId:
+        "1053731323112-0hf213cjgsusebp007pn4f6iu7bak0jc.apps.googleusercontent.com",
+    });
   const [profileImage, setprofileImage] = useState(null);
   const [username, setusername] = useState("");
   const [email, setemail] = useState("");
   const [password, setpassword] = useState("");
   const [appleId, setappleId] = useState("");
-  const [isUsernameFocused, setisUsernameFocused] = useState(false);
-  const [isEmailFocused, setisEmailFocused] = useState(false);
+  const [isUsernameFocused, setisUsernameFocused] =
+    useState(false);
+  const [isEmailFocused, setisEmailFocused] =
+    useState(false);
   const [currentMenu, setcurrentMenu] = useState("signin");
 
   useEffect(() => {
@@ -86,7 +97,12 @@ const AuthenticationForm = () => {
   ) => {
     setappleId(appleUserId);
     setemail(appleEmail);
-    if (givenName && givenName.length && familyName && familyName.length) {
+    if (
+      givenName &&
+      givenName.length &&
+      familyName &&
+      familyName.length
+    ) {
       setusername(`${givenName} ${familyName}`);
     }
     setcurrentMenu("apple-signup");
@@ -96,10 +112,14 @@ const AuthenticationForm = () => {
     setcurrentMenu("signin");
   };
 
-  const validateAppleSignUpCredentials = async (userTEmailF: boolean) => {
+  const validateAppleSignUpCredentials = async (
+    userTEmailF: boolean
+  ) => {
     let hasError = false;
     if (userTEmailF) {
-      const userNameValidation = await validateUsername(username);
+      const userNameValidation = await validateUsername(
+        username
+      );
       if (userNameValidation !== "success") {
         setsignupError(userNameValidation);
         hasError = true;
@@ -118,7 +138,11 @@ const AuthenticationForm = () => {
 
   const handleAppleSignUp = async () => {
     if (signupError === "") {
-      const result = await createUser({ username, email, appleId });
+      const result = await createUser({
+        username,
+        email,
+        appleId,
+      });
       if (!result.error) {
         const verifyResult = await verifyUser(
           email,
@@ -132,7 +156,9 @@ const AuthenticationForm = () => {
           setsignupError(verifyResult.error);
         } else {
           dispatch(setUser(verifyResult.data));
-          await new Promise((resolve) => setTimeout(resolve, 1000));
+          await new Promise((resolve) =>
+            setTimeout(resolve, 1000)
+          );
           router.navigate("dashboard");
         }
       }
@@ -146,22 +172,28 @@ const AuthenticationForm = () => {
 
   const handlePickAvatar = async () => {
     // Requesting permission to access the camera roll
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
+      alert(
+        "Sorry, we need camera roll permissions to make this work! Go to your settings, then to the Accompany Me app, and enable access to photos."
+      );
       return;
     }
 
     // Launching the image picker
-    let result: any = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1], // Optional: You can force the crop aspect ratio to be square
-      quality: 1,
-    });
+    let result: any =
+      await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1], // Optional: You can force the crop aspect ratio to be square
+        quality: 1,
+      });
 
     if (!result.cancelled) {
-      const uploadResult = await uploadAvatarCloud(result.assets[0].uri);
+      const uploadResult = await uploadAvatarCloud(
+        result.assets[0].uri
+      );
       // // Assuming you have a function to handle the upload of the image URL to your server or backend
       setprofileImage(uploadResult);
     }
@@ -169,7 +201,10 @@ const AuthenticationForm = () => {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <TouchableWithoutFeedback
+        onPress={Keyboard.dismiss}
+        accessible={false}
+      >
         <View style={styles.masterContainer}>
           <Image
             src={
@@ -254,13 +289,18 @@ const AuthenticationForm = () => {
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
                 <View style={styles.imagePickerBox}>
-                  <Text style={styles.imagePickerText}>Profile Photo</Text>
+                  <Text style={styles.imagePickerText}>
+                    Profile Photo
+                  </Text>
                   {profileImage ? (
                     <TouchableOpacity
                       style={styles.avatarBg}
                       onPress={handlePickAvatar}
                     >
-                      <Image src={profileImage} style={styles.profileImg} />
+                      <Image
+                        src={profileImage}
+                        style={styles.profileImg}
+                      />
                     </TouchableOpacity>
                   ) : (
                     <TouchableOpacity
@@ -278,7 +318,8 @@ const AuthenticationForm = () => {
                 <TextInput
                   style={[
                     styles.textInput,
-                    isUsernameFocused && styles.focusedInput,
+                    isUsernameFocused &&
+                      styles.focusedInput,
                   ]}
                   placeholder={"Username"}
                   placeholderTextColor="grey"
@@ -305,7 +346,9 @@ const AuthenticationForm = () => {
                   onFocus={() => setisEmailFocused(true)}
                   onBlur={() => setisEmailFocused(false)}
                 ></TextInput>
-                <Text>{signupError !== "" ? signupError : ""}</Text>
+                <Text>
+                  {signupError !== "" ? signupError : ""}
+                </Text>
                 <View style={styles.modalConfirmContainer}>
                   <BasicBtn
                     iconUrl={<></>}
@@ -334,7 +377,8 @@ const AuthenticationForm = () => {
                 <TextInput
                   style={[
                     styles.textInput,
-                    isUsernameFocused && styles.focusedInput,
+                    isUsernameFocused &&
+                      styles.focusedInput,
                   ]}
                   placeholder={"Username"}
                   onChangeText={(value) => {
@@ -378,7 +422,9 @@ const AuthenticationForm = () => {
                     buttonText={"Sign In"}
                     isCancel={false}
                   />
-                  <Text style={styles.seperatorText}>or</Text>
+                  <Text style={styles.seperatorText}>
+                    or
+                  </Text>
                   <BasicBtn
                     iconUrl={<></>}
                     handlePress={handleEmailSignIn}
@@ -386,7 +432,9 @@ const AuthenticationForm = () => {
                     isCancel={false}
                   />
                   <TouchableOpacity>
-                    <Text>Don't have an account? Create one</Text>
+                    <Text>
+                      Don't have an account? Create one
+                    </Text>
                   </TouchableOpacity>
                 </View>
               </View>

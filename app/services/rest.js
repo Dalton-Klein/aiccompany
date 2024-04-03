@@ -53,6 +53,26 @@ export const createUser = async (user) => {
   return result;
 };
 
+export const deleteUserAccount = async (userId, token) => {
+  let result = await fetch(
+    `${endpointURL}/delete-account`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        userId,
+        token,
+      }),
+    }
+  )
+    .then((res) => res.json())
+    .then((data) => data)
+    .catch((err) => console.log("DELETE USER ERROR", err));
+  return result;
+};
+
 export const signInUser = async (user, isAppleSignIn) => {
   const { email, password, appleUserId } = user;
   if (isAppleSignIn) {

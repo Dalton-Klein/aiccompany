@@ -15,8 +15,13 @@ import * as ImagePicker from "expo-image-picker";
 import { uploadAvatarCloud } from "../../app/services/rest";
 import { FontAwesome5 } from "@expo/vector-icons";
 
-const CreateCalendarForm = ({ isModalVisible, handleCreate, handleCancel }) => {
-  const [calendarBanner, setcalendarBanner] = useState(null);
+const CreateCalendarForm = ({
+  isModalVisible,
+  handleCreate,
+  handleCancel,
+}) => {
+  const [calendarBanner, setcalendarBanner] =
+    useState(null);
   const [title, settitle] = useState("");
   const [description, setdescription] = useState("");
 
@@ -30,39 +35,54 @@ const CreateCalendarForm = ({ isModalVisible, handleCreate, handleCancel }) => {
 
   const handlePickAvatar = async () => {
     // Requesting permission to access the camera roll
-    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    const { status } =
+      await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
-      alert("Sorry, we need camera roll permissions to make this work!");
+      alert(
+        "Sorry, we need camera roll permissions to make this work! Go to your settings, then to the Accompany Me app, and enable access to photos."
+      );
       return;
     }
 
     // Launching the image picker
-    let result: any = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      aspect: [1, 1], // Optional: You can force the crop aspect ratio to be square
-      quality: 1,
-    });
+    let result: any =
+      await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1], // Optional: You can force the crop aspect ratio to be square
+        quality: 1,
+      });
 
     if (!result.cancelled) {
-      const uploadResult = await uploadAvatarCloud(result.assets[0].uri);
+      const uploadResult = await uploadAvatarCloud(
+        result.assets[0].uri
+      );
       // // Assuming you have a function to handle the upload of the image URL to your server or backend
       setcalendarBanner(uploadResult);
     }
   };
 
   return (
-    <Modal animationType="slide" transparent={true} visible={isModalVisible}>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isModalVisible}
+    >
       <View style={styles.centeredView}>
         <View style={styles.modalView}>
           <View style={styles.imagePickerBox}>
-            <Text style={styles.imagePickerText}>Calendar Photo</Text>
+            <Text style={styles.imagePickerText}>
+              Calendar Photo
+            </Text>
             {calendarBanner ? (
               <TouchableOpacity
                 style={styles.avatarBg}
                 onPress={handlePickAvatar}
               >
-                <Image src={calendarBanner} style={styles.profileImg} />
+                <Image
+                  src={calendarBanner}
+                  style={styles.profileImg}
+                />
               </TouchableOpacity>
             ) : (
               <TouchableOpacity
