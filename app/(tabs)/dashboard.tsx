@@ -119,7 +119,9 @@ const Dashboard = () => {
           lastTabPage: routeName,
         })
       );
-      dispatch(updateUserThunk(userState.id));
+      if (userState && userState.id && userState.id > 0) {
+        dispatch(updateUserThunk(userState.id));
+      }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [routeName]);

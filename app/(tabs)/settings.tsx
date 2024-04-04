@@ -29,6 +29,7 @@ import {
 import React from "react";
 import * as ImagePicker from "expo-image-picker";
 import SelectDropdown from "react-native-select-dropdown";
+import { FontAwesome } from "@expo/vector-icons";
 
 const Settings = () => {
   const router = useRouter();
@@ -39,11 +40,19 @@ const Settings = () => {
 
   const [reminderSetting, setreminderSetting] =
     useState("");
-  const [hasUnsavedChanges, setHasUnsavedChanges] =
-    useState(false);
+  const [newUsername, setnewUsername] = useState("");
+  const [errorText, seterrorText] = useState("");
+  const [
+    isUsernameInputFocused,
+    setisUsernameInputFocused,
+  ] = useState(false);
   const [
     isDeleteAccountModalVisible,
     setisDeleteAccountModalVisible,
+  ] = useState(false);
+  const [
+    isChangeUsernameModalVisible,
+    setisChangeUsernameModalVisible,
   ] = useState(false);
 
   useEffect(() => {
@@ -93,7 +102,9 @@ const Settings = () => {
       "show_tasks",
       value
     );
-    dispatch(updateUserThunk(userState.id));
+    if (userState && userState.id && userState.id > 0) {
+      dispatch(updateUserThunk(userState.id));
+    }
   };
 
   const handlePickAvatar = async () => {
@@ -126,7 +137,9 @@ const Settings = () => {
         "avatar_url",
         uploadResult
       );
-      dispatch(updateUserThunk(userState.id));
+      if (userState && userState.id && userState.id > 0) {
+        dispatch(updateUserThunk(userState.id));
+      }
     }
   };
 
@@ -152,6 +165,38 @@ const Settings = () => {
     );
   };
 
+  const handleRequestUsernameChange = async () => {
+    const result: any = await updateUserField(
+      userState.id,
+      "username",
+      newUsername
+    );
+    if (!result) {
+      seterrorText("API error, sorry try again");
+    } else if (result && result.error) {
+      seterrorText(result.error);
+    } else {
+      setisChangeUsernameModalVisible(false);
+      if (userState && userState.id && userState.id > 0) {
+        dispatch(updateUserThunk(userState.id));
+      }
+    }
+  };
+  const handleUsernameErrorChecking = (value: string) => {
+    const regex = /[A-Za-z0-9]/;
+    if (value.length < 4) {
+      seterrorText("Username is too short");
+    } else if (value.length > 18) {
+      seterrorText("Username is too long");
+    } else if (!regex.test(value)) {
+      seterrorText(
+        "Username must contain a letter or number"
+      );
+    } else {
+      seterrorText("");
+    }
+    setnewUsername(value);
+  };
   return (
     <SafeAreaView style={styles.masterContainer}>
       <TitleBar title="Settings"></TitleBar>
@@ -175,25 +220,25 @@ const Settings = () => {
               style={styles.dynamicAvatarBg}
               onPress={handlePickAvatar}
             >
-              <Text style={styles.dynamicAvatarText}>
-                {userState.username
-                  ? userState.username
-                      .split(" ")
-                      .map((word: string[]) => word[0])
-                      .join("")
-                      .slice(0, 2)
-                      .toLowerCase()
-                  : "gg"}
-              </Text>
+              <FontAwesome
+                name="user-o"
+                size={36}
+                color={THEME.COLORS.lighter}
+              />
             </TouchableOpacity>
           )}
         </View>
-
         <View style={styles.userFieldBox}>
           <Text style={styles.userFieldText}>Username</Text>
-          <Text style={styles.userFieldText}>
-            {userState.username}
-          </Text>
+          <TouchableOpacity
+            onPress={() => {
+              setisChangeUsernameModalVisible(true);
+            }}
+          >
+            <Text style={styles.userFieldText}>
+              {userState.username}
+            </Text>
+          </TouchableOpacity>
         </View>
         <View style={styles.userSelectBox}>
           <Text style={styles.userFieldText}>
@@ -279,7 +324,7 @@ const Settings = () => {
           </TouchableOpacity>
         </View>
       </ScrollView>
-      {/* Result Modal */}
+      {/* Delete Account Modal */}
       <Modal
         animationType="slide"
         transparent={true}
@@ -314,6 +359,59 @@ const Settings = () => {
                 Cancel
               </Text>
             </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
+      {/* Change Username Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isChangeUsernameModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>
+              Change Username
+            </Text>
+            <TextInput
+              style={[
+                styles.textInput,
+                isUsernameInputFocused &&
+                  styles.focusedInput,
+              ]}
+              placeholder={"New username..."}
+              placeholderTextColor="grey"
+              onChangeText={(value) => {
+                handleUsernameErrorChecking(value);
+              }}
+              onFocus={() =>
+                setisUsernameInputFocused(true)
+              }
+              onBlur={() =>
+                setisUsernameInputFocused(false)
+              }
+            />
+            <Text style={styles.errorText}>
+              {errorText && errorText.length
+                ? errorText
+                : ""}
+            </Text>
+            <BasicBtn
+              iconUrl={<></>}
+              handlePress={() => {
+                handleRequestUsernameChange();
+              }}
+              buttonText={"Request Change"}
+              isCancel={false}
+            />
+            <BasicBtn
+              iconUrl={<></>}
+              handlePress={() => {
+                setisChangeUsernameModalVisible(false);
+              }}
+              buttonText={"Cancel"}
+              isCancel={true}
+            />
           </View>
         </View>
       </Modal>
@@ -480,6 +578,27 @@ const styles = StyleSheet.create({
     color: THEME.COLORS.lighter,
     fontSize: THEME.SIZES.medium,
     textAlign: "center",
+  },
+  textInput: {
+    marginTop: 15,
+    marginBottom: 45,
+    padding: 5,
+    borderRadius: THEME.BORDERSIZES.medium,
+    borderColor: THEME.COLORS.primary,
+    minWidth: "100%",
+    color: THEME.COLORS.fontColor,
+    textAlign: "center",
+    fontWeight: "800",
+  },
+  focusedInput: {
+    borderColor: THEME.COLORS.primary,
+    borderWidth: 2,
+  },
+  errorText: {
+    textAlign: "center",
+    color: "red",
+    fontSize: THEME.SIZES.medium,
+    marginBottom: 15,
   },
 });
 

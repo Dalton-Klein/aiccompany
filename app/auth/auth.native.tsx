@@ -6,9 +6,15 @@ import { useEffect } from "react";
 import { RootState } from "../../store/store";
 import React from "react";
 
-export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
+export function Auth({
+  handleSuccess,
+  handleError,
+  handleCreateAccount,
+}) {
   const dispatch = useDispatch();
-  const userState = useSelector((state: RootState) => state.user.user);
+  const userState = useSelector(
+    (state: RootState) => state.user.user
+  );
 
   useEffect(() => {
     if (userState.id && userState.id > 0) {
@@ -18,25 +24,36 @@ export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
 
   const tryAppleLogin = async () => {
     try {
-      const credential = await AppleAuthentication.signInAsync({
-        requestedScopes: [
-          AppleAuthentication.AppleAuthenticationScope.FULL_NAME,
-          AppleAuthentication.AppleAuthenticationScope.EMAIL,
-        ],
-      });
+      const credential =
+        await AppleAuthentication.signInAsync({
+          requestedScopes: [
+            AppleAuthentication.AppleAuthenticationScope
+              .FULL_NAME,
+            AppleAuthentication.AppleAuthenticationScope
+              .EMAIL,
+          ],
+        });
       // Sign in via Supabase Auth.
       if (credential.identityToken && credential.user) {
         const result: any = await dispatch(
-          signInUserThunk({ appleUserId: credential.user }, true)
+          signInUserThunk(
+            { appleUserId: credential.user },
+            true
+          )
         );
-        if (result && result.status && result.status === "success") {
+        if (
+          result &&
+          result.status &&
+          result.status === "success"
+        ) {
           handleSuccess(result);
         } else {
           handleCreateAccount(
             credential.user,
             credential.email,
             credential.fullName.givenName,
-            credential.fullName.familyName
+            credential.fullName.familyName,
+            credential.identityToken
           );
         }
       } else {
@@ -53,8 +70,14 @@ export function Auth({ handleSuccess, handleError, handleCreateAccount }) {
   if (Platform.OS === "ios")
     return (
       <AppleAuthentication.AppleAuthenticationButton
-        buttonType={AppleAuthentication.AppleAuthenticationButtonType.SIGN_IN}
-        buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+        buttonType={
+          AppleAuthentication.AppleAuthenticationButtonType
+            .SIGN_IN
+        }
+        buttonStyle={
+          AppleAuthentication.AppleAuthenticationButtonStyle
+            .BLACK
+        }
         cornerRadius={5}
         style={{ width: 200, height: 64, marginBottom: 15 }}
         onPress={tryAppleLogin}

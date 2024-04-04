@@ -56,8 +56,11 @@ const AuthenticationForm = () => {
         "1053731323112-0hf213cjgsusebp007pn4f6iu7bak0jc.apps.googleusercontent.com",
     });
   const [profileImage, setprofileImage] = useState(null);
+  const [givenName, setgivenName] = useState("");
+  const [familyName, setfamilyName] = useState("");
   const [username, setusername] = useState("");
   const [email, setemail] = useState("");
+  const [identityToken, setidentityToken] = useState("");
   const [password, setpassword] = useState("");
   const [appleId, setappleId] = useState("");
   const [isUsernameFocused, setisUsernameFocused] =
@@ -92,18 +95,14 @@ const AuthenticationForm = () => {
     appleUserId: string,
     appleEmail: string,
     givenName: string,
-    familyName: string
+    familyName: string,
+    identityToken: string
   ) => {
     setappleId(appleUserId);
     setemail(appleEmail);
-    if (
-      givenName &&
-      givenName.length &&
-      familyName &&
-      familyName.length
-    ) {
-      setusername(`${givenName} ${familyName}`);
-    }
+    setgivenName(givenName);
+    setfamilyName(familyName);
+    setidentityToken(identityToken);
     setcurrentMenu("apple-signup");
   };
 
@@ -138,15 +137,16 @@ const AuthenticationForm = () => {
   const handleAppleSignUp = async () => {
     if (signupError === "") {
       const result = await createUser({
-        username,
-        email,
+        givenName,
+        familyName,
+        identityToken,
         appleId,
       });
       if (!result.error) {
         const verifyResult = await verifyUser(
-          email,
+          result.data,
           "apple",
-          username,
+          `${givenName} ${familyName}`,
           "apple",
           appleId,
           profileImage ? profileImage : ""
@@ -160,6 +160,8 @@ const AuthenticationForm = () => {
           );
           router.navigate("dashboard");
         }
+      } else {
+        setsignupError(result.error);
       }
     }
   };
@@ -287,10 +289,13 @@ const AuthenticationForm = () => {
           >
             <View style={styles.centeredView}>
               <View style={styles.modalView}>
+                <Text style={styles.signupTitleText}>
+                  Welcome Aboard!
+                </Text>
+                <Text style={styles.imagePickerText}>
+                  Tap image to pick profile photo
+                </Text>
                 <View style={styles.imagePickerBox}>
-                  <Text style={styles.imagePickerText}>
-                    Profile Photo
-                  </Text>
                   {profileImage ? (
                     <TouchableOpacity
                       style={styles.avatarBg}
@@ -314,7 +319,7 @@ const AuthenticationForm = () => {
                     </TouchableOpacity>
                   )}
                 </View>
-                <TextInput
+                {/* <TextInput
                   style={[
                     styles.textInput,
                     isUsernameFocused &&
@@ -344,7 +349,7 @@ const AuthenticationForm = () => {
                   }}
                   onFocus={() => setisEmailFocused(true)}
                   onBlur={() => setisEmailFocused(false)}
-                ></TextInput>
+                ></TextInput> */}
                 <Text>
                   {signupError !== "" ? signupError : ""}
                 </Text>
@@ -488,6 +493,12 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-around",
     flexWrap: "wrap",
+  },
+  signupTitleText: {
+    fontWeight: "400",
+    fontSize: THEME.SIZES.medium,
+    paddingBottom: 15,
+    textAlign: "center",
   },
   btnContainer: {
     backgroundColor: THEME.COLORS.primary,

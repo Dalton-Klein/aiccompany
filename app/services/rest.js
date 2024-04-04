@@ -35,15 +35,17 @@ export const verifyUser = async (
 };
 
 export const createUser = async (user) => {
-  const { username, email, appleId } = user;
+  const { givenName, familyName, identityToken, appleId } =
+    user;
   let result = await fetch(`${endpointURL}/signup`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      username,
-      email,
+      givenName,
+      familyName,
+      identityToken,
       appleId,
     }),
   })
@@ -209,20 +211,23 @@ export const fetchUserData = async (userId) => {
 };
 
 export const updateUserField = async (id, field, value) => {
-  await fetch(`${endpointURL}/updateUserInfoField`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      userId: id,
-      field,
-      value,
-    }),
-  })
+  const result = await fetch(
+    `${endpointURL}/updateUserInfoField`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        userId: id,
+        field,
+        value,
+      }),
+    }
+  )
     .then((res) => res.json())
     .catch((err) =>
-      console.log("Fetch Error (avatar)", err)
+      console.log("Update user field error: ", err)
     );
-  return;
+  return result;
 };
 
 export const uploadAvatarCloud = async (uri) => {

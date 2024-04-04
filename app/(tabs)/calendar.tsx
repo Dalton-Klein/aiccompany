@@ -20,7 +20,6 @@ import { RootState, persistor } from "../../store/store";
 import { useNavigationState } from "@react-navigation/native";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
 import React, { useRef } from "react";
-import { updateUserThunk } from "../../store/userSlice";
 
 const Calendar = () => {
   const dispatch = useDispatch();
