@@ -112,10 +112,6 @@ const Calendar = () => {
     }
   };
 
-  const refreshSchedule = (date: any) => {
-    setselectedDate(date);
-  };
-
   // Creates master data array of days with events nested
   const generateMasterSchedule = async (
     isForceRefresh = false

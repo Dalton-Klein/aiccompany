@@ -242,6 +242,7 @@ const CalendarManager = () => {
       <ScrollView
         keyboardShouldPersistTaps="always"
         style={styles.scrollBox}
+        keyboardDismissMode={"on-drag"}
       >
         <View style={styles.photoBox}>
           <Text style={styles.subTitle}>Photo</Text>

@@ -1,5 +1,11 @@
 import { useState, useEffect } from "react";
-import { View, StyleSheet, Text, TouchableOpacity, Modal } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  Modal,
+} from "react-native";
 import * as THEME from "../../constants/theme";
 import moment from "moment";
 import FontAwesome from "@expo/vector-icons/FontAwesome";
@@ -11,10 +17,13 @@ import { RootState } from "../../store/store";
 
 const WeeklyPicker = (props: any) => {
   const dispatch = useDispatch();
-  const preferencesState = useSelector((state: RootState) => state.preferences);
+  const preferencesState = useSelector(
+    (state: RootState) => state.preferences
+  );
 
   const [sliderTiles, setsliderTiles] = useState([]);
-  const [isDatePickerOpen, setisDatePickerOpen] = useState(false);
+  const [isDatePickerOpen, setisDatePickerOpen] =
+    useState(false);
   const [selectedDate, setselectedDate] = useState(
     moment().format("YYYY/MM/DD")
   );
@@ -29,25 +38,37 @@ const WeeklyPicker = (props: any) => {
   }, [selectedDate]);
 
   useEffect(() => {
-    createSliderTiles();
     setselectedDate(props.parentSelectedDate);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [preferencesState.selectedDate]);
+  }, [
+    preferencesState.selectedDate,
+    props.parentSelectedDate,
+  ]);
 
   const createSliderTiles = () => {
     let tempTiles = [];
-    const mostRecentSunday = moment(selectedDate, "YYYY/MM/DD").day(0);
+    const mostRecentSunday = moment(
+      selectedDate,
+      "YYYY/MM/DD"
+    ).day(0);
     for (let i = 0; i <= 6; i++) {
-      const dateData = mostRecentSunday.clone().add(i, "days");
+      const dateData = mostRecentSunday
+        .clone()
+        .add(i, "days");
       tempTiles.push(
-        <View style={styles.daySliderSlot} key={dateData.format("YYYY-DD-MM")}>
+        <View
+          style={styles.daySliderSlot}
+          key={dateData.format("YYYY-DD-MM")}
+        >
           <Text style={styles.daySliderDayTitleText}>
             {dateData.format("dd")}
           </Text>
           <TouchableOpacity
             style={styles.dayButton}
             onPress={() => {
-              sliderTilePressed(dateData.format("YYYY-DD-MM"));
+              sliderTilePressed(
+                dateData.format("YYYY-DD-MM")
+              );
             }}
           >
             <Text style={styles.dayOfMonthText}>

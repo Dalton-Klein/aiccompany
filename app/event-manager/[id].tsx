@@ -1,6 +1,5 @@
 import {
   Text,
-  Image,
   TouchableOpacity,
   View,
   Modal,
@@ -211,126 +210,93 @@ const EventManager = () => {
   };
 
   return (
-    <TouchableWithoutFeedback
-      onPress={Keyboard.dismiss}
-      accessible={false}
-      style={styles.master}
-    >
-      <SafeAreaView>
-        <View style={styles.calendarContentBox}>
-          <View style={styles.titleRow}>
-            <TouchableOpacity
-              style={styles.backBtn}
-              onPress={navigateBack}
-            >
-              <Text>Back</Text>
-            </TouchableOpacity>
-            <Text style={styles.titleText}>
-              {isTask ? "Manage Task" : "Manage Event"}
-            </Text>
-            <Text style={styles.backBtn}></Text>
+    // Was having problems with scroll when I used the touchablewithoutfeedback. I instead added keyboardDismissMode on scrollview and it seems to work
+    // <TouchableWithoutFeedback
+    //   onPress={Keyboard.dismiss}
+    //   accessible={false}
+    // >
+    <SafeAreaView style={styles.master}>
+      <View style={styles.calendarContentBox}>
+        <View style={styles.titleRow}>
+          <TouchableOpacity
+            style={styles.backBtn}
+            onPress={navigateBack}
+          >
+            <Text>Back</Text>
+          </TouchableOpacity>
+          <Text style={styles.titleText}>
+            {isTask ? "Manage Task" : "Manage Event"}
+          </Text>
+          <Text style={styles.backBtn}></Text>
+        </View>
+        <ScrollView
+          keyboardShouldPersistTaps="always"
+          keyboardDismissMode={"on-drag"}
+        >
+          <Text style={styles.subTitle}>Title</Text>
+          <View style={styles.fieldBox}>
+            <TextInput
+              style={styles.textInput}
+              placeholder={"Event Name"}
+              value={title}
+              placeholderTextColor="grey"
+              onChangeText={(value) => {
+                addUnsavedChange("title", value);
+                settitle(value);
+              }}
+            ></TextInput>
           </View>
-          <ScrollView keyboardShouldPersistTaps="always">
-            <Text style={styles.subTitle}>Title</Text>
-            <View style={styles.fieldBox}>
-              <TextInput
-                style={styles.textInput}
-                placeholder={"Event Name"}
-                value={title}
-                placeholderTextColor="grey"
-                onChangeText={(value) => {
-                  addUnsavedChange("title", value);
-                  settitle(value);
-                }}
-              ></TextInput>
-            </View>
-            <Text style={styles.subTitle}>Notes</Text>
-            <View style={styles.fieldBox}>
-              <TextInput
-                style={styles.textInput}
-                placeholder={"Event Notes"}
-                value={notes}
-                placeholderTextColor="grey"
-                onChangeText={(value) => {
-                  addUnsavedChange("notes", value);
-                  setnotes(value);
-                }}
-              ></TextInput>
-            </View>
-            <Text style={styles.subTitle}>
-              {isTask ? "Duration (minutes)" : "Start Time"}
-            </Text>
-            <View style={styles.datePickerBox}>
-              {/* <Text style={styles.datePickedText}>
+          <Text style={styles.subTitle}>Notes</Text>
+          <View style={styles.fieldBox}>
+            <TextInput
+              style={styles.textInput}
+              placeholder={"Event Notes"}
+              value={notes}
+              placeholderTextColor="grey"
+              onChangeText={(value) => {
+                addUnsavedChange("notes", value);
+                setnotes(value);
+              }}
+            ></TextInput>
+          </View>
+          <Text style={styles.subTitle}>
+            {isTask ? "Duration (minutes)" : "Start Time"}
+          </Text>
+          <View style={styles.datePickerBox}>
+            {/* <Text style={styles.datePickedText}>
               {isTask
                 ? `${taskDuration} minutes`
                 : moment(startTime).format("MMMM Do YYYY, h:mm a")}
             </Text> */}
-              {isTask ? (
-                <TextInput
-                  style={styles.textInput}
-                  keyboardType="numeric"
-                  placeholder={
-                    "Task Duration in minutes..."
-                  }
-                  placeholderTextColor="grey"
-                  value={
-                    taskDuration && taskDuration > 0
-                      ? `${taskDuration}`
-                      : ""
-                  }
-                  onChangeText={(value) => {
-                    const safeValue = parseInt(
-                      value.replace(/[^0-9]/g, "")
-                    );
-                    addUnsavedChange(
-                      "task_duration",
-                      safeValue
-                    );
-                    settaskDuration(safeValue);
-                  }}
-                  onBlur={() => Keyboard.dismiss()}
-                ></TextInput>
-              ) : (
-                <DateTimePicker
-                  value={
-                    startTime
-                      ? moment(
-                          startTime,
-                          "YYYY-MM-DDTHH:mm:ss.SSSZ"
-                        ).toDate()
-                      : moment().toDate()
-                  }
-                  mode={"datetime"}
-                  onChange={(e: any, date: any) => {
-                    if (date) {
-                      addUnsavedChange("start_time", date);
-                      setstartTime(
-                        moment(
-                          date,
-                          "YYYY-MM-DDTHH:mm:ss.SSSZ"
-                        ).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
-                      );
-                    }
-                  }}
-                  accentColor={THEME.COLORS.primary}
-                  minuteInterval={15}
-                  style={styles.datePicker}
-                />
-              )}
-            </View>
-            <Text style={styles.subTitle}>
-              {isTask ? "Deadline" : "End Time"}
-            </Text>
-            <View style={styles.datePickerBox}>
-              {/* <Text style={styles.datePickedText}>
-                {moment(endTime).format("MMMM Do YYYY, h:mm a")}
-              </Text> */}
+            {isTask ? (
+              <TextInput
+                style={styles.textInput}
+                keyboardType="numeric"
+                placeholder={"Task Duration in minutes..."}
+                placeholderTextColor="grey"
+                value={
+                  taskDuration && taskDuration > 0
+                    ? `${taskDuration}`
+                    : ""
+                }
+                onChangeText={(value) => {
+                  const safeValue = parseInt(
+                    value.replace(/[^0-9]/g, "")
+                  );
+                  addUnsavedChange(
+                    "task_duration",
+                    safeValue
+                  );
+                  settaskDuration(safeValue);
+                }}
+                onBlur={() => Keyboard.dismiss()}
+              ></TextInput>
+            ) : (
               <DateTimePicker
                 value={
-                  endTime
+                  startTime
                     ? moment(
-                        endTime,
+                        startTime,
                         "YYYY-MM-DDTHH:mm:ss.SSSZ"
                       ).toDate()
                     : moment().toDate()
@@ -338,8 +304,8 @@ const EventManager = () => {
                 mode={"datetime"}
                 onChange={(e: any, date: any) => {
                   if (date) {
-                    addUnsavedChange("end_time", date);
-                    setendTime(
+                    addUnsavedChange("start_time", date);
+                    setstartTime(
                       moment(
                         date,
                         "YYYY-MM-DDTHH:mm:ss.SSSZ"
@@ -351,46 +317,49 @@ const EventManager = () => {
                 minuteInterval={15}
                 style={styles.datePicker}
               />
-            </View>
-            {isTask ? (
-              <Text style={styles.subTitle}>
-                Is Task Completed
-              </Text>
-            ) : (
-              <></>
             )}
-            {isTask ? (
-              <View style={styles.fieldBox}>
-                <Switch
-                  trackColor={{
-                    false: THEME.COLORS.dark,
-                    true: THEME.COLORS.neutral,
-                  }}
-                  thumbColor={
-                    isCompleted
-                      ? THEME.COLORS.primary
-                      : THEME.COLORS.lighter
-                  }
-                  ios_backgroundColor="#3e3e3e"
-                  onValueChange={() => {
-                    setisCompleted(!isCompleted);
-                    addUnsavedChange(
-                      "is_completed",
-                      !isCompleted
-                    );
-                  }}
-                  value={isCompleted}
-                  style={styles.seriesSwitch}
-                />
-              </View>
-            ) : (
-              <></>
-            )}
+          </View>
+          <Text style={styles.subTitle}>
+            {isTask ? "Deadline" : "End Time"}
+          </Text>
+          <View style={styles.datePickerBox}>
+            {/* <Text style={styles.datePickedText}>
+                {moment(endTime).format("MMMM Do YYYY, h:mm a")}
+              </Text> */}
+            <DateTimePicker
+              value={
+                endTime
+                  ? moment(
+                      endTime,
+                      "YYYY-MM-DDTHH:mm:ss.SSSZ"
+                    ).toDate()
+                  : moment().toDate()
+              }
+              mode={"datetime"}
+              onChange={(e: any, date: any) => {
+                if (date) {
+                  addUnsavedChange("end_time", date);
+                  setendTime(
+                    moment(
+                      date,
+                      "YYYY-MM-DDTHH:mm:ss.SSSZ"
+                    ).format("YYYY-MM-DDTHH:mm:ss.SSSZ")
+                  );
+                }
+              }}
+              accentColor={THEME.COLORS.primary}
+              minuteInterval={15}
+              style={styles.datePicker}
+            />
+          </View>
+          {isTask ? (
             <Text style={styles.subTitle}>
-              {isTask
-                ? "Is Task Cancelled"
-                : "Is Event Cancelled"}
+              Is Task Completed
             </Text>
+          ) : (
+            <></>
+          )}
+          {isTask ? (
             <View style={styles.fieldBox}>
               <Switch
                 trackColor={{
@@ -398,213 +367,240 @@ const EventManager = () => {
                   true: THEME.COLORS.neutral,
                 }}
                 thumbColor={
-                  isCancelled
+                  isCompleted
                     ? THEME.COLORS.primary
                     : THEME.COLORS.lighter
                 }
                 ios_backgroundColor="#3e3e3e"
                 onValueChange={() => {
-                  setisCancelled(!isCancelled);
+                  setisCompleted(!isCompleted);
                   addUnsavedChange(
-                    "is_cancelled",
-                    !isCancelled
+                    "is_completed",
+                    !isCompleted
                   );
                 }}
-                value={isCancelled}
+                value={isCompleted}
                 style={styles.seriesSwitch}
               />
             </View>
-            {isSeries && (
-              <Text style={styles.seriesNotifText}>
-                *Calendar assignments will be applied to all
-                events in this series*
-              </Text>
-            )}
-            <Text style={styles.subTitle}>
-              Calendar Assignments
+          ) : (
+            <></>
+          )}
+          <Text style={styles.subTitle}>
+            {isTask
+              ? "Is Task Cancelled"
+              : "Is Event Cancelled"}
+          </Text>
+          <View style={styles.fieldBox}>
+            <Switch
+              trackColor={{
+                false: THEME.COLORS.dark,
+                true: THEME.COLORS.neutral,
+              }}
+              thumbColor={
+                isCancelled
+                  ? THEME.COLORS.primary
+                  : THEME.COLORS.lighter
+              }
+              ios_backgroundColor="#3e3e3e"
+              onValueChange={() => {
+                setisCancelled(!isCancelled);
+                addUnsavedChange(
+                  "is_cancelled",
+                  !isCancelled
+                );
+              }}
+              value={isCancelled}
+              style={styles.seriesSwitch}
+            />
+          </View>
+          {isSeries && (
+            <Text style={styles.seriesNotifText}>
+              *Calendar assignments will be applied to all
+              events in this series*
             </Text>
-            <View style={styles.calendarTileBox}>
-              {calendarTiles}
-            </View>
+          )}
+          <Text style={styles.subTitle}>
+            Calendar Assignments
+          </Text>
+          <View style={styles.calendarTileBox}>
+            {calendarTiles}
+          </View>
+          <TouchableOpacity
+            style={styles.deleteBtnContainer}
+            onPress={() => {
+              setisDeleteModalVisible(true);
+            }}
+          >
+            <Text style={styles.stayBtnText}>
+              {isTask ? "Delete Task" : "Detete Event"}
+            </Text>
+          </TouchableOpacity>
+          {isSeries ? (
             <TouchableOpacity
               style={styles.deleteBtnContainer}
               onPress={() => {
-                setisDeleteModalVisible(true);
+                setisDeleteSeriesModalVisible(true);
               }}
             >
               <Text style={styles.stayBtnText}>
-                {isTask ? "Delete Task" : "Detete Event"}
+                Delete Series
               </Text>
             </TouchableOpacity>
-            {isSeries ? (
-              <TouchableOpacity
-                style={styles.deleteBtnContainer}
-                onPress={() => {
-                  setisDeleteSeriesModalVisible(true);
-                }}
-              >
-                <Text style={styles.stayBtnText}>
-                  Delete Series
-                </Text>
-              </TouchableOpacity>
-            ) : (
-              <></>
-            )}
-          </ScrollView>
+          ) : (
+            <></>
+          )}
+        </ScrollView>
+      </View>
+      <View style={styles.confirmContainer}>
+        <BasicBtn
+          iconUrl={<></>}
+          handlePress={handleSaveChanges}
+          buttonText={"Save"}
+          isCancel={false}
+        />
+      </View>
+      {/* Result Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isResultModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text style={styles.modalText}>
+              {resultText}
+            </Text>
+            <TouchableOpacity
+              style={styles.btnContainer}
+              onPress={() => {
+                setisResultModalVisible(false);
+              }}
+            >
+              <Text style={styles.btnText}>Close</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        <View style={styles.confirmContainer}>
-          <BasicBtn
-            iconUrl={<></>}
-            handlePress={handleSaveChanges}
-            buttonText={"Save"}
-            isCancel={false}
-          />
+      </Modal>
+      {/* Confirm Leave Page Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isLeaveModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text
+              style={styles.modalText}
+            >{`You have unsaved changes, are you sure you want to leave?`}</Text>
+            <TouchableOpacity
+              style={styles.stayBtnContainer}
+              onPress={() => {
+                setisLeaveModalVisible(false);
+              }}
+            >
+              <Text style={styles.stayBtnText}>Stay</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnContainer}
+              onPress={() => {
+                router.navigate(
+                  `/${preferencesState.lastTabPage}`
+                );
+              }}
+            >
+              <Text style={styles.btnText}>Leave</Text>
+            </TouchableOpacity>
+          </View>
         </View>
-        {/* Result Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isResultModalVisible}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text style={styles.modalText}>
-                {resultText}
-              </Text>
-              <TouchableOpacity
-                style={styles.btnContainer}
-                onPress={() => {
-                  setisResultModalVisible(false);
-                }}
-              >
-                <Text style={styles.btnText}>Close</Text>
-              </TouchableOpacity>
-            </View>
+      </Modal>
+      {/* Confirm Delete Event Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDeleteModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text
+              style={styles.modalText}
+            >{`This event will be removed from all calendars. Are you sure you want to delete this event?`}</Text>
+            <TouchableOpacity
+              style={styles.stayBtnContainer}
+              onPress={() => {
+                setisDeleteModalVisible(false);
+              }}
+            >
+              <Text style={styles.stayBtnText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnContainer}
+              onPress={async () => {
+                await deleteEvent(userState.id, id, "");
+                dispatch(
+                  setPreferences({
+                    ...preferencesState,
+                    refreshCalendar:
+                      !preferencesState.refreshCalendar,
+                  })
+                );
+                router.navigate(
+                  `/${preferencesState.lastTabPage}`
+                );
+              }}
+            >
+              <Text style={styles.btnText}>Delete</Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
-        {/* Confirm Leave Page Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isLeaveModalVisible}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text
-                style={styles.modalText}
-              >{`You have unsaved changes, are you sure you want to leave?`}</Text>
-              <TouchableOpacity
-                style={styles.stayBtnContainer}
-                onPress={() => {
-                  setisLeaveModalVisible(false);
-                }}
-              >
-                <Text style={styles.stayBtnText}>Stay</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.btnContainer}
-                onPress={() => {
-                  router.navigate(
-                    `/${preferencesState.lastTabPage}`
-                  );
-                }}
-              >
-                <Text style={styles.btnText}>Leave</Text>
-              </TouchableOpacity>
-            </View>
+        </View>
+      </Modal>
+      {/* Confirm Delete SERIES Modal */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isDeleteSeriesModalVisible}
+      >
+        <View style={styles.centeredView}>
+          <View style={styles.modalView}>
+            <Text
+              style={styles.modalText}
+            >{`All events in this series will be removed from all calendars. \n\nAre you sure you want to delete every event in this series?`}</Text>
+            <TouchableOpacity
+              style={styles.stayBtnContainer}
+              onPress={() => {
+                setisDeleteSeriesModalVisible(false);
+              }}
+            >
+              <Text style={styles.stayBtnText}>Cancel</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.btnContainer}
+              onPress={async () => {
+                await deleteSeries(
+                  userState.id,
+                  id,
+                  seriesId,
+                  ""
+                );
+                dispatch(
+                  setPreferences({
+                    ...preferencesState,
+                    refreshCalendar:
+                      !preferencesState.refreshCalendar,
+                  })
+                );
+                router.navigate(
+                  `/${preferencesState.lastTabPage}`
+                );
+              }}
+            >
+              <Text style={styles.btnText}>Delete</Text>
+            </TouchableOpacity>
           </View>
-        </Modal>
-        {/* Confirm Delete Event Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isDeleteModalVisible}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text
-                style={styles.modalText}
-              >{`This event will be removed from all calendars. Are you sure you want to delete this event?`}</Text>
-              <TouchableOpacity
-                style={styles.stayBtnContainer}
-                onPress={() => {
-                  setisDeleteModalVisible(false);
-                }}
-              >
-                <Text style={styles.stayBtnText}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.btnContainer}
-                onPress={async () => {
-                  await deleteEvent(userState.id, id, "");
-                  dispatch(
-                    setPreferences({
-                      ...preferencesState,
-                      refreshCalendar:
-                        !preferencesState.refreshCalendar,
-                    })
-                  );
-                  router.navigate(
-                    `/${preferencesState.lastTabPage}`
-                  );
-                }}
-              >
-                <Text style={styles.btnText}>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-        {/* Confirm Delete SERIES Modal */}
-        <Modal
-          animationType="slide"
-          transparent={true}
-          visible={isDeleteSeriesModalVisible}
-        >
-          <View style={styles.centeredView}>
-            <View style={styles.modalView}>
-              <Text
-                style={styles.modalText}
-              >{`All events in this series will be removed from all calendars. \n\nAre you sure you want to delete every event in this series?`}</Text>
-              <TouchableOpacity
-                style={styles.stayBtnContainer}
-                onPress={() => {
-                  setisDeleteSeriesModalVisible(false);
-                }}
-              >
-                <Text style={styles.stayBtnText}>
-                  Cancel
-                </Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.btnContainer}
-                onPress={async () => {
-                  await deleteSeries(
-                    userState.id,
-                    id,
-                    seriesId,
-                    ""
-                  );
-                  dispatch(
-                    setPreferences({
-                      ...preferencesState,
-                      refreshCalendar:
-                        !preferencesState.refreshCalendar,
-                    })
-                  );
-                  router.navigate(
-                    `/${preferencesState.lastTabPage}`
-                  );
-                }}
-              >
-                <Text style={styles.btnText}>Delete</Text>
-              </TouchableOpacity>
-            </View>
-          </View>
-        </Modal>
-      </SafeAreaView>
-    </TouchableWithoutFeedback>
+        </View>
+      </Modal>
+    </SafeAreaView>
+    // </TouchableWithoutFeedback>
   );
 };
 
