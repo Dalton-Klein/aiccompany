@@ -1,9 +1,15 @@
 import { useState, useEffect } from "react";
-import { View, StyleSheet, Text } from "react-native";
+import {
+  View,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+} from "react-native";
 import { useRouter } from "expo-router";
 import EventTile from "./event-tile";
 import * as THEME from "../../../constants/theme";
 import React from "react";
+import FontAwesome from "@expo/vector-icons/FontAwesome";
 
 const DayTile = (props) => {
   const router = useRouter();
@@ -15,7 +21,11 @@ const DayTile = (props) => {
   }, []);
 
   const generateEventSchedule = () => {
-    seteventFeed(props.events.map((event: any) => turnEventIntoTile(event)));
+    seteventFeed(
+      props.events.map((event: any) =>
+        turnEventIntoTile(event)
+      )
+    );
   };
 
   const turnEventIntoTile = (event) => {
@@ -33,7 +43,9 @@ const DayTile = (props) => {
         props.onLayout(e);
       }}
     >
-      <Text style={styles.dayTitle}>{props.title}</Text>
+      <View style={styles.dayTitleBox}>
+        <Text style={styles.dayTitle}>{props.title}</Text>
+      </View>
       {eventFeed}
     </View>
   );
@@ -46,9 +58,16 @@ const styles = StyleSheet.create({
     marginBottom: 10,
     minHeight: 60,
   },
+  dayTitleBox: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
   dayTitle: {
     fontSize: THEME.SIZES.medium,
     color: THEME.COLORS.fontColor,
+    fontWeight: "700",
+    fontStyle: "italic",
   },
 });
 

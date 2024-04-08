@@ -1,4 +1,11 @@
-import { Text, View, Modal, TextInput, Switch, ScrollView } from "react-native";
+import {
+  Text,
+  View,
+  Modal,
+  TextInput,
+  Switch,
+  ScrollView,
+} from "react-native";
 import { StyleSheet } from "react-native";
 import * as THEME from "../../constants/theme";
 import BasicBtn from "../tiles/buttons/basicButton";
@@ -8,19 +15,33 @@ import moment from "moment";
 import SelectDropdown from "react-native-select-dropdown";
 import React from "react";
 
-const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
-  const recurrenceOptions = ["Day(s)", "Week(s)", "Month(s)"];
+const CreateEventForm = ({
+  isModalVisible,
+  handleCreate,
+  handleCancel,
+}) => {
+  const recurrenceOptions = [
+    "Day(s)",
+    "Week(s)",
+    "Month(s)",
+  ];
   const [errorText, seterrorText] = useState("");
   const [title, settitle] = useState("");
+  const [durationUnit, setdurationUnit] = useState("");
   const [notes, setnotes] = useState("");
   const [isSeries, setisSeries] = useState(false);
-  const [seriesReccurenceNumber, setseriesReccurenceNumber] = useState(1);
-  const [seriesReccurenceFrequency, setseriesReccurenceFrequency] =
-    useState("");
-  const [selectedSeriesEndDate, setselectedSeriesEndDate] = useState(
-    new Date()
-  );
-  const [selectedStartDate, setselectedStartDate] = useState(new Date());
+  const [
+    seriesReccurenceNumber,
+    setseriesReccurenceNumber,
+  ] = useState(1);
+  const [
+    seriesReccurenceFrequency,
+    setseriesReccurenceFrequency,
+  ] = useState("");
+  const [selectedSeriesEndDate, setselectedSeriesEndDate] =
+    useState(new Date());
+  const [selectedStartDate, setselectedStartDate] =
+    useState(new Date());
   const [duration, setduration] = useState("60");
 
   useEffect(() => {
@@ -33,7 +54,10 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     const dateTime = moment().add(remainder, "minutes");
     setselectedStartDate(dateTime.toDate());
     setduration("60");
-    setselectedSeriesEndDate(dateTime.add(1, "hour").toDate());
+    setdurationUnit("Minute(s)");
+    setselectedSeriesEndDate(
+      dateTime.add(1, "hour").toDate()
+    );
     setseriesReccurenceNumber(1);
     setseriesReccurenceFrequency("");
     setisSeries(false);
@@ -49,8 +73,8 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
       seterrorText("Must choose Event Start Time!");
       hasError = true;
     }
-    if (!duration) {
-      seterrorText("Must choose Event Duration!");
+    if (!duration || parseInt(duration) < 1) {
+      seterrorText("Event must have a duration!");
       hasError = true;
     }
     if (isSeries) {
@@ -68,16 +92,31 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
       }
     }
     if (!hasError) {
+      let durationSelected: string;
+      let calculatedEndTime: any;
+      if (durationUnit === "Minute(s)") {
+        durationSelected = "minutes";
+        calculatedEndTime = moment(selectedStartDate)
+          .add(parseInt(duration), "minutes")
+          .toDate();
+      } else if (durationUnit === "Hour(s)") {
+        calculatedEndTime = moment(selectedStartDate)
+          .add(parseInt(duration), "hours")
+          .toDate();
+      } else if (durationUnit === "Day(s)") {
+        calculatedEndTime = moment(selectedStartDate)
+          .add(parseInt(duration), "days")
+          .toDate();
+      }
       handleCreate({
         title,
         notes,
         start_time: selectedStartDate,
-        end_time: moment(selectedStartDate)
-          .add(parseInt(duration), "minutes")
-          .toDate(),
+        end_time: calculatedEndTime,
         is_series: isSeries,
         series_reccurence_number: seriesReccurenceNumber,
-        series_reccurence_frequency: seriesReccurenceFrequency,
+        series_reccurence_frequency:
+          seriesReccurenceFrequency,
         series_end_time: selectedSeriesEndDate,
       });
       setInitialFormValues();
@@ -93,24 +132,46 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
     setisSeries(!isSeries);
   };
 
-  const handleConfirmSeriesEndTime = (e: any, date: any) => {
+  const handleConfirmSeriesEndTime = (
+    e: any,
+    date: any
+  ) => {
     setselectedSeriesEndDate(date);
   };
 
   return (
-    <Modal animationType="slide" transparent={true} visible={isModalVisible}>
-      <ScrollView contentContainerStyle={styles.centeredView}>
-        <View style={styles.modalView}>
-          <Text style={styles.datePickerText}>*Event Name</Text>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isModalVisible}
+      style={styles.centeredView}
+    >
+      <View style={styles.modalView}>
+        <ScrollView
+          style={{
+            flex: 1,
+            paddingLeft: 35,
+            paddingRight: 35,
+            paddingTop: 20,
+            paddingBottom: 15,
+            flexGrow: 1,
+          }}
+          contentContainerStyle={styles.scrollView}
+        >
+          <Text style={styles.datePickerText}>
+            *Event Name
+          </Text>
           <TextInput
             style={styles.textInput}
-            placeholder={"Event Name"}
+            placeholder={"Event Name..."}
             placeholderTextColor="grey"
             onChangeText={(value) => {
               settitle(value);
             }}
           ></TextInput>
-          <Text style={styles.datePickerText}>*Select Event Start Time</Text>
+          <Text style={styles.datePickerText}>
+            *Select Event Start Time
+          </Text>
           <DateTimePicker
             value={selectedStartDate}
             mode={"datetime"}
@@ -121,7 +182,7 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
           />
           <Text
             style={styles.datePickerText}
-          >{`Event Duration (Minutes)`}</Text>
+          >{`Event Duration`}</Text>
           <TextInput
             style={styles.textInput}
             keyboardType="numeric"
@@ -132,24 +193,53 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               setduration(value);
             }}
           ></TextInput>
-          <Text style={styles.datePickerText}>Event Notes</Text>
+          <SelectDropdown
+            data={["Minute(s)", "Hour(s)", "Day(s)"]}
+            defaultButtonText="Select Frequency"
+            onSelect={(selectedItem, index) => {
+              setdurationUnit(selectedItem);
+            }}
+            defaultValue={"Minute(s)"}
+            buttonTextAfterSelection={(
+              selectedItem,
+              index
+            ) => {
+              return selectedItem;
+            }}
+            rowTextForSelection={(item, index) => {
+              return item;
+            }}
+            buttonStyle={{
+              marginBottom: 20,
+            }}
+            buttonTextStyle={{
+              fontSize: THEME.SIZES.medium,
+            }}
+          />
+          <Text style={styles.datePickerText}>
+            Event Notes
+          </Text>
           <TextInput
             style={styles.textInput}
-            placeholder={"Event Notes"}
+            placeholder={"Notes..."}
             placeholderTextColor="grey"
             onChangeText={(value) => {
               setnotes(value);
             }}
           ></TextInput>
           <View style={styles.seriesBox}>
-            <Text style={styles.datePickedText}>Is this a series?</Text>
+            <Text style={styles.datePickerText}>
+              Is this a series?
+            </Text>
             <Switch
               trackColor={{
                 false: THEME.COLORS.dark,
                 true: THEME.COLORS.neutral,
               }}
               thumbColor={
-                isSeries ? THEME.COLORS.primary : THEME.COLORS.lighter
+                isSeries
+                  ? THEME.COLORS.primary
+                  : THEME.COLORS.lighter
               }
               ios_backgroundColor="#3e3e3e"
               onValueChange={toggleSeriesSwitch}
@@ -159,37 +249,63 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
           </View>
           {isSeries ? (
             <View style={styles.recurrenceBox}>
-              <Text>Every</Text>
+              <Text style={styles.datePickerText}>
+                Every
+              </Text>
               <SelectDropdown
-                data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]}
+                data={[
+                  1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12,
+                ]}
                 defaultButtonText="1"
                 onSelect={(selectedItem, index) => {
                   setseriesReccurenceNumber(selectedItem);
                 }}
-                buttonTextAfterSelection={(selectedItem, index) => {
+                buttonTextAfterSelection={(
+                  selectedItem,
+                  index
+                ) => {
                   return selectedItem;
                 }}
                 rowTextForSelection={(item, index) => {
                   return item;
                 }}
-                buttonStyle={{ marginBottom: 5, marginTop: 5 }}
+                buttonStyle={{
+                  marginBottom: 5,
+                  marginTop: 5,
+                }}
+                buttonTextStyle={{
+                  fontSize: THEME.SIZES.medium,
+                }}
               />
               <SelectDropdown
                 data={recurrenceOptions}
                 defaultButtonText="Select Frequency"
                 onSelect={(selectedItem, index) => {
-                  setseriesReccurenceFrequency(selectedItem);
+                  setseriesReccurenceFrequency(
+                    selectedItem
+                  );
                 }}
-                buttonTextAfterSelection={(selectedItem, index) => {
+                buttonTextAfterSelection={(
+                  selectedItem,
+                  index
+                ) => {
                   return selectedItem;
                 }}
                 rowTextForSelection={(item, index) => {
                   return item;
                 }}
-                buttonStyle={{ marginBottom: 5, marginTop: 5 }}
+                buttonStyle={{
+                  marginBottom: 5,
+                  marginTop: 5,
+                }}
+                buttonTextStyle={{
+                  fontSize: THEME.SIZES.medium,
+                }}
               />
 
-              <Text style={styles.datePickerText}>Select Series End Date</Text>
+              <Text style={styles.datePickerText}>
+                Select Series End Date
+              </Text>
 
               <DateTimePicker
                 value={selectedSeriesEndDate}
@@ -203,7 +319,9 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
           )}
           <View style={styles.modalConfirmContainer}>
             {errorText !== "" ? (
-              <Text style={styles.errorText}>{errorText}</Text>
+              <Text style={styles.errorText}>
+                {errorText}
+              </Text>
             ) : (
               <></>
             )}
@@ -223,8 +341,8 @@ const CreateEventForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               isCancel={true}
             />
           </View>
-        </View>
-      </ScrollView>
+        </ScrollView>
+      </View>
     </Modal>
   );
 };
@@ -234,14 +352,16 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: 22,
   },
   modalView: {
     margin: 20,
+    marginTop: 70,
+    justifyContent: "center",
     backgroundColor: THEME.COLORS.lighter,
     borderRadius: 20,
     width: "90%",
-    padding: 35,
+    minHeight: "60%",
+    maxHeight: "82%",
     alignItems: "center",
     shadowColor: "#000",
     shadowOffset: {
@@ -251,21 +371,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.25,
     shadowRadius: 4,
     elevation: 5,
+    flex: 1,
   },
-  modalGrid: {
-    minWidth: "100%",
-    marginBottom: 15,
-    flexDirection: "row",
-    justifyContent: "space-around",
-    flexWrap: "wrap",
-  },
-  btnContainer: {
-    backgroundColor: THEME.COLORS.primary,
-    borderRadius: THEME.SIZES.small / 1.25,
-    justifyContent: "center",
+  scrollView: {
     alignItems: "center",
-    minWidth: "100%",
-    marginBottom: 15,
   },
   textInput: {
     marginBottom: 15,
@@ -273,26 +382,9 @@ const styles = StyleSheet.create({
     borderRadius: THEME.BORDERSIZES.medium,
     borderColor: THEME.COLORS.primary,
     minWidth: "100%",
-  },
-  btnContentBox: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    alignItems: "center",
-    minWidth: "100%",
-    paddingTop: 10,
-    paddingBottom: 10,
-    paddingRight: 20,
-    paddingLeft: 20,
-    borderRadius: THEME.BORDERSIZES.large,
-  },
-  btnImg: {
-    borderRadius: THEME.SIZES.small / 1.25,
-  },
-  btnText: {
-    color: THEME.COLORS.lighter,
-    marginLeft: 10,
-    fontSize: THEME.SIZES.large,
+    fontSize: THEME.SIZES.medium,
+    alignSelf: "center",
+    textAlign: "center",
   },
   modalConfirmContainer: {
     minWidth: "100%",
@@ -300,15 +392,20 @@ const styles = StyleSheet.create({
     justifyContent: "space-evenly",
     minHeight: 175,
     marginTop: 20,
+    marginBottom: 25,
   },
   datePickerText: {
     marginBottom: 10,
     marginTop: 10,
     color: THEME.COLORS.darker,
     fontSize: THEME.SIZES.medium,
+    fontWeight: "600",
   },
   datePicker: {
     marginBottom: 15,
+    paddingLeft: 0,
+    justifyContent: "flex-start",
+    alignSelf: "center",
   },
   datePickedText: {
     marginBottom: 15,

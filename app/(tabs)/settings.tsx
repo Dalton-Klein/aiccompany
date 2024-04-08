@@ -272,6 +272,9 @@ const Settings = () => {
               marginTop: 5,
               minWidth: "95%",
             }}
+            buttonTextStyle={{
+              fontSize: THEME.SIZES.medium,
+            }}
           />
         </View>
         <View style={styles.userFieldBoxSwitch}>

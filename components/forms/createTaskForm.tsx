@@ -14,12 +14,18 @@ import DateTimePicker from "@react-native-community/datetimepicker";
 import moment from "moment";
 import React from "react";
 
-const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
+const CreateTaskForm = ({
+  isModalVisible,
+  handleCreate,
+  handleCancel,
+}) => {
   const [errorText, seterrorText] = useState("");
   const [title, settitle] = useState("");
   const [notes, setnotes] = useState("");
   const [duration, setduration] = useState(0);
-  const [selectedEndDate, setSelectedEndDate] = useState(new Date());
+  const [selectedEndDate, setSelectedEndDate] = useState(
+    new Date()
+  );
 
   useEffect(() => {
     const remainder = 15 - (moment().minute() % 15);
@@ -54,9 +60,18 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
   };
 
   return (
-    <Modal animationType="slide" transparent={true} visible={isModalVisible}>
-      <ScrollView contentContainerStyle={styles.centeredView}>
+    <Modal
+      animationType="slide"
+      transparent={true}
+      visible={isModalVisible}
+    >
+      <ScrollView
+        contentContainerStyle={styles.centeredView}
+      >
         <View style={styles.modalView}>
+          <Text style={styles.datePickerText}>
+            *Task Name
+          </Text>
           <TextInput
             style={styles.textInput}
             placeholder={"Task Name..."}
@@ -65,6 +80,9 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               settitle(value);
             }}
           ></TextInput>
+          <Text style={styles.datePickerText}>
+            Task Notes
+          </Text>
           <TextInput
             style={styles.textInput}
             placeholder={"Task Notes..."}
@@ -73,16 +91,23 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
               setnotes(value);
             }}
           ></TextInput>
+          <Text style={styles.datePickerText}>
+            *Task Duration
+          </Text>
           <TextInput
             style={styles.textInput}
             keyboardType="numeric"
             placeholder={"Task Duration in minutes..."}
             placeholderTextColor="grey"
             onChangeText={(value) => {
-              setduration(parseInt(value.replace(/[^0-9]/g, "")));
+              setduration(
+                parseInt(value.replace(/[^0-9]/g, ""))
+              );
             }}
           ></TextInput>
-          <Text style={styles.datePickerText}>Select Task Deadline</Text>
+          <Text style={styles.datePickerText}>
+            *Task Deadline
+          </Text>
           <DateTimePicker
             value={selectedEndDate}
             mode={"datetime"}
@@ -92,7 +117,9 @@ const CreateTaskForm = ({ isModalVisible, handleCreate, handleCancel }) => {
           />
           <View style={styles.modalConfirmContainer}>
             {errorText !== "" ? (
-              <Text style={styles.errorText}>{errorText}</Text>
+              <Text style={styles.errorText}>
+                {errorText}
+              </Text>
             ) : (
               <></>
             )}
@@ -159,6 +186,7 @@ const styles = StyleSheet.create({
     borderRadius: THEME.BORDERSIZES.medium,
     borderColor: THEME.COLORS.primary,
     minWidth: "100%",
+    textAlign: "center",
   },
   btnContentBox: {
     display: "flex",
@@ -192,6 +220,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
     color: THEME.COLORS.darker,
     fontSize: THEME.SIZES.medium,
+    fontWeight: "600",
   },
   datePickedText: {
     marginBottom: 15,
